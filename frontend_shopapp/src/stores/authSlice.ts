@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { get } from 'lodash';
-import { RootState } from './index';
-import request from '../utils/request';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { get } from "lodash";
+import { RootState } from "./index";
+import request from "../utils/request";
 
 export interface IUser {
   accessToken: string;
@@ -14,21 +14,21 @@ export interface IUser {
 interface AuthState {
   isLogin: boolean;
   user: IUser;
-  loadingLoginAdmin: 'idle' | 'pending' | 'success' | 'error';
+  loadingLoginAdmin: "idle" | "pending" | "success" | "error";
 }
 
 const initUser: IUser = {
-  accessToken: '',
-  deptCode: '',
-  deptName: '',
-  tokenType: '',
-  userName: '',
+  accessToken: "",
+  deptCode: "",
+  deptName: "",
+  tokenType: "",
+  userName: "",
 };
 
 const initialState: AuthState = {
   isLogin: false,
   user: initUser,
-  loadingLoginAdmin: 'idle',
+  loadingLoginAdmin: "idle",
 };
 
 export interface PayloadLoginAdmin {
@@ -38,12 +38,12 @@ export interface PayloadLoginAdmin {
 }
 
 export const actionLoginAdmin = createAsyncThunk(
-  'auth/actionLoginAdmin',
+  "auth/actionLoginAdmin",
   async (data: PayloadLoginAdmin, { rejectWithValue }) => {
     try {
       return await request({
-        url: '/common/auth/signin',
-        method: 'POST',
+        url: "/common/auth/signin",
+        method: "POST",
         data,
         headers: { ...data },
       });
@@ -54,7 +54,7 @@ export const actionLoginAdmin = createAsyncThunk(
 );
 
 const slice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     actionLogout(state) {
@@ -65,15 +65,15 @@ const slice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(actionLoginAdmin.pending, (state) => {
-        state.loadingLoginAdmin = 'pending';
+        state.loadingLoginAdmin = "pending";
       })
       .addCase(actionLoginAdmin.fulfilled, (state, action) => {
         state.isLogin = true;
-        state.user = get(action, 'payload.data');
-        state.loadingLoginAdmin = 'success';
+        state.user = get(action, "payload.data");
+        state.loadingLoginAdmin = "success";
       })
       .addCase(actionLoginAdmin.rejected, (state) => {
-        state.loadingLoginAdmin = 'error';
+        state.loadingLoginAdmin = "error";
       });
   },
 });
@@ -83,6 +83,7 @@ export const { actionLogout } = slice.actions;
 // selectors
 export const selectIsLogin = (state: RootState) => state.auth.isLogin;
 export const selectUser = (state: RootState) => state.auth.user;
-export const selectLoadingLoginAdmin = (state: RootState) => state.auth.loadingLoginAdmin;
+export const selectLoadingLoginAdmin = (state: RootState) =>
+  state.auth.loadingLoginAdmin;
 
 export default slice.reducer;

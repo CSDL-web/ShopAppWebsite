@@ -13,18 +13,36 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Link as RouterLink } from "react-router-dom";
+import { useState } from "react";
 import { useAppDispatch } from "stores";
 import { actionLoginAdmin } from "stores/authSlice";
 
 const LoginPage = () => {
-
   const dispatch = useAppDispatch();
+
+  const [user, setUser] = useState({
+    username: "",
+    password: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUser((prev: any) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("login");
-   // dispatch(actionLoginAdmin(user));
-
+    console.log("login", user);
+    dispatch(
+      actionLoginAdmin({
+        usernameOrEmail: user.username,
+        password: user.password,
+        systemCode: "SHOP_APP",
+      })
+    );
   };
 
   return (
@@ -49,6 +67,8 @@ const LoginPage = () => {
           <TextField
             label="Username"
             name="username"
+            value={user.username}
+            onChange={handleChange}
             fullWidth
             required
             autoFocus
@@ -58,6 +78,8 @@ const LoginPage = () => {
             label="Password"
             name="password"
             type="password"
+            value={user.password}
+            onChange={handleChange}
             fullWidth
             required
             margin="normal"
@@ -68,11 +90,7 @@ const LoginPage = () => {
             label="Remember me"
           />
 
-          <Button 
-          type="submit" 
-          variant="contained" 
-          fullWidth sx={{ mt: 2 }}
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             Sign In
           </Button>
         </Box>
