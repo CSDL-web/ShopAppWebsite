@@ -1,0 +1,26 @@
+.default-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--mui-palette-background-default);
+}
+
+.default-layout__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  color: #1976d2;
+  width: 40px !important;
+  height: 40px !important;
+}
