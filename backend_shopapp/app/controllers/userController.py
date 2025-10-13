@@ -8,11 +8,11 @@ from typing import List
 
 router = APIRouter(prefix="/api/users", tags=["Users"])
 
-@router.post("", response_model=UserResponse)
+@router.post("/create_user", response_model=UserResponse)
 def create_user(user_dto: UserDTO, db: Session = Depends(get_db)):
     user = UserService.create_user(db, user_dto)
     return user
 
-@router.get("", response_model=List[UserResponse])
-def get_all_users(db: Session = Depends(get_db)):
-    return UserService.get_all_users(db)
+# @router.get("/get_db", response_model=List[UserResponse])
+# def get_all_users(db: Session = Depends(get_db)):
+#     return UserService.get_all_users(db)
