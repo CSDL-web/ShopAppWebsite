@@ -12,7 +12,7 @@
 
 #### mỗi khi merge xong anh báo lại bọn em cần pull code mới về để code tránh bị conflict
 
-#### BEß
+#### BE
 
 ##### version: Python 3.11.13 (python:3.11-slim trong docker) y/c đúng phiên bản để tránh xung đột
 
@@ -31,6 +31,8 @@
 ##### vd: common/users/login (riêng thằng này cần một con auth) sau phải chuyển thành auth/login (auth/resgister)
 
 ##### luồng Controller <- Response <- Dto,Model <- Service <- Repositories
+
+
 
 #### FE
 
