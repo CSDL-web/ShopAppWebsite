@@ -1,12 +1,3 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from app.configs.dbConfig import get_db, Base, engine
+from app.configs.appConfig import create_app
 
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-@app.get("/")
-def read_root(db: Session = Depends(get_db)):
-    return {"message": "Database connected successfully!"}
-
+app = create_app()
