@@ -1,23 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from dtos.category_dto import CategoryCreate, CategoryRead, CategoryUpdate
-from services.category_service import CategoryService
-from configs.dbConfig import get_db
+from app.dtos.category_dto import CategoryCreate, CategoryRead, CategoryUpdate
+from app.services.category_service import CategoryService
+from app.configs.dbConfig import get_db
+from app.services.auth_service import get_current_user
+from app.models.user_model import User
 
-router = APIRouter(
-    prefix="/categories",
-    tags=["Categories"]
+
+categoryRouter = APIRouter(
+    prefix="/categories",  
+    tags=["Categories"]   
 )
+
 
 def get_category_service(db: Session = Depends(get_db)) -> CategoryService:
     return CategoryService(db)
 
 
-@router.post(
-    "/",
+@categoryRouter.post(
+    "/create_new_category",
     response_model=CategoryRead, 
-    status_code=status.HTTP_201_CREATED #trả về 201 success
+    status_code=status.HTTP_201_CREATED
 )
 def create_new_category(
     category_data: CategoryCreate,  
@@ -37,9 +41,8 @@ def create_new_category(
             detail=f"Lỗi máy chủ nội bộ: {str(e)}"
         )
 
-
-@router.get(
-    "/",
+@categoryRouter.get(
+    "/get_all_categories",
     response_model=List[CategoryRead] 
 )
 def get_all_categories(
@@ -50,9 +53,8 @@ def get_all_categories(
     categories = service.get_all_categories(skip=skip, limit=limit)
     return categories
 
-
-@router.get(
-    "/{category_id}", 
+@categoryRouter.get(
+    "/get_category_by_id/{category_id}", 
     response_model=CategoryRead
 )
 def get_category_by_id(
@@ -68,9 +70,8 @@ def get_category_by_id(
             detail=str(e)
         )
 
-
-@router.patch(
-    "/{category_id}",
+@categoryRouter.patch(
+    "/update_a_category/{category_id}",
     response_model=CategoryRead
 )
 def update_a_category(
@@ -90,19 +91,24 @@ def update_a_category(
         raise HTTPException(status_code=status_code, detail=str(e))
 
 
-@router.delete(
-    "/{category_id}",
+@categoryRouter.delete(
+    "/delete_a_category/{category_id}",
     status_code=status.HTTP_204_NO_CONTENT 
 )
 def delete_a_category(
     category_id: int,
-    service: CategoryService = Depends(get_category_service)
+    service: CategoryService = Depends(get_category_service),
+    current_user: User = Depends(get_current_user) 
 ):
     try:
-        service.delete_category(category_id)
+        #check xem có quyền xóa hay không 
+        service.delete_category(category_id, current_user)
         return None 
+    
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+    except HTTPException as e:
+        raise e

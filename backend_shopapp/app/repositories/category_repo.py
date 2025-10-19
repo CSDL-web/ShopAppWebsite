@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import Optional
-from models.schema import Category
+from app.models.category_model import Category
 
 class CategoryRepository:
     def __init__(self, db: Session):

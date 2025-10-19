@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import Optional
-from models.schema import User
+from app.models.user_model import User
 
 def exists_by_phone_number(db: Session, phone_number: str) -> bool:
     return db.query(User).filter(User.phone_number == phone_number).first() is not None

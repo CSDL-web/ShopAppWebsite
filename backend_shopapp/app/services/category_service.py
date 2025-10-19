@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
-from repositories.category_repo import CategoryRepository 
-from dtos.category_dto import CategoryCreate, CategoryUpdate 
-from models.schema import Category 
+from app.repositories.category_repo import CategoryRepository 
+from app.dtos.category_dto import CategoryCreate, CategoryUpdate 
+from app.models.category_model import Category 
+from app.models.user_model import User
+from fastapi import HTTPException, status
 
 class CategoryService:
     def __init__(self, db: Session):
@@ -32,6 +34,17 @@ class CategoryService:
         update_dict = update_data.model_dump(exclude_unset=True)
         return self.repo.update(category_id, update_dict)
 
-    def delete_category(self, category_id: int) -> Category:
-        db_category = self.get_category_by_id(category_id) 
+
+    def delete_category(self, category_id: int, current_user: User): 
+        if not current_user.role or (
+            current_user.role.name != 'admin' 
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, # 403: Cấm
+                detail="Bro không có quyền xóa cái này."
+            )
+        db_category = self.repo.get_by_id(category_id) 
+        if db_category is None:
+            raise ValueError("Không tìm thấy category để xóa.") 
+        
         return self.repo.delete(category_id)
