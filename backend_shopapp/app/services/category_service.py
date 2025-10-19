@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from repositories.category_repo import CategoryRepository 
 from dtos.category_dto import CategoryCreate, CategoryUpdate 
-from models import Category 
+from models.schema import Category 
 
 class CategoryService:
     def __init__(self, db: Session):

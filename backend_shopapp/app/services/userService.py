@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from models.userModel import User
+from models.schema import User
 # from models.roleModel import Role
 from dtos.userLoginDto import UserLoginDTO
 # from dtos.userDto import UserDTO 
