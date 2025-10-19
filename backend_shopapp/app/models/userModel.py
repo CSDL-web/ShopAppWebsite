@@ -3,9 +3,8 @@ from sqlalchemy.orm import relationship
 from configs.dbConfig import Base
 
 class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
+    __tablename__ = "users"    
+    id = Column(Integer, primary_key=True, index=True) #db tự động tạo index cho PK rồi
     full_name = Column(String(100))
     phone_number = Column(String(10), nullable=False, unique=True)
     address = Column(String(200))
@@ -14,6 +13,11 @@ class User(Base):
     date_of_birth = Column(Date)
     facebook_account_id = Column(Integer, default=0)
     google_account_id = Column(Integer, default=0)
-
     role_id = Column(Integer, ForeignKey("roles.id"))
     role = relationship("Role", back_populates="users")
+    
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True)
+    
