@@ -1,12 +1,19 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from typing import Optional
-from models import User
+from app.models.user_model import User
 
-def exists_by_phone_number(db: Session, phone_number: str) -> bool:
-    return db.query(User).filter(User.phone_number == phone_number).first() is not None
+class UserRepository:
+    def __init__(self, db: Session):
+        self.db = db
 
-def find_by_phone_number(db: Session, phone_number: str) -> Optional[User]:
-    return db.query(User).filter(User.phone_number == phone_number).first()
+    def get_users(self, skip: int = 0, limit: int = 10):
+        return (
+            self.db.query(User)
+            .options(joinedload(User.role)) 
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
-def get_users(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(User).offset(skip).limit(limit).all()
+    def get_user_by_id(self, id: int)-> Optional[User]:
+        return self.db.query(User).filter(User.id == id).options(joinedload(User.role)).one()
