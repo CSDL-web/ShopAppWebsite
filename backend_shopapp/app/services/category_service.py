@@ -1,0 +1,45 @@
+from sqlalchemy.orm import Session
+from app.repositories.category_repo import CategoryRepository 
+from app.dtos.category_dto import CategoryCreate, CategoryUpdate 
+from app.models.category_model import Category 
+from app.models.user_model import User
+from fastapi import HTTPException, status
+
+class CategoryService:
+    def __init__(self, db: Session):
+        self.repo = CategoryRepository(db)
+
+    def create_category(self, category_data: CategoryCreate) -> Category:
+        existing_category = self.repo.get_by_name(category_data.name)
+        print(existing_category)
+        if existing_category:
+            raise ValueError(f"Tên danh mục '{category_data.name}' đã tồn tại.")
+        category_dict = category_data.model_dump() 
+        return self.repo.create(category_dict)
+
+    def get_category_by_id(self, category_id: int) -> Category:
+        category = self.repo.get_by_id(category_id)
+        if not category:
+            raise ValueError(f"Không tìm thấy danh mục với ID {category_id}.")
+        return category
+
+    def get_all_categories(self, skip: int, limit: int):
+        return self.repo.get_all(skip, limit)
+
+    def update_category(self, update_data: CategoryUpdate) -> Category:
+        update_dict = update_data.model_dump(exclude_unset=True)
+        return self.repo.update(update_dict)
+
+    def delete_category(self, category_id: int, current_user: User): 
+        if not current_user.role or (
+            current_user.role.name != 'admin' 
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, # 403: Cấm
+                detail="Bro không có quyền xóa cái này."
+            )
+        db_category = self.repo.get_by_id(category_id) 
+        if db_category is None:
+            raise ValueError("Không tìm thấy category để xóa.") 
+        
+        return self.repo.delete(category_id)
