@@ -8,7 +8,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -21,7 +21,11 @@ services:
     networks:
       - shopapp_network
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} --silent"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} --silent",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -35,20 +39,24 @@ services:
       - ./.env
     ports:
       - "5000:5000"
+      - "5678:5678"
     depends_on:
       mysql_container:
         condition: service_healthy
     networks:
       - shopapp_network
     environment:
+      RUNNING_IN_DOCKER: "true"
       DB_HOST: mysql_container
       DB_PORT: 3306
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
-      RUNNING_IN_DOCKER: "true"
+    volumes:
+      - ./backend_shopapp:/app
     command: >
-      bash -c "sleep 15 && uvicorn app.app:app --host 0.0.0.0 --port 5000 --reload"
+        bash -c "sleep 10 && python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
+
 
 networks:
   shopapp_network:

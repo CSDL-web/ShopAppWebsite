@@ -11,6 +11,7 @@ class CategoryService:
 
     def create_category(self, category_data: CategoryCreate) -> Category:
         existing_category = self.repo.get_by_name(category_data.name)
+        print(existing_category)
         if existing_category:
             raise ValueError(f"Tên danh mục '{category_data.name}' đã tồn tại.")
         category_dict = category_data.model_dump() 
@@ -25,15 +26,9 @@ class CategoryService:
     def get_all_categories(self, skip: int, limit: int):
         return self.repo.get_all(skip, limit)
 
-    def update_category(self, category_id: int, update_data: CategoryUpdate) -> Category:
-        db_category = self.get_category_by_id(category_id)
-        if update_data.name and update_data.name != db_category.name:
-            existing = self.repo.get_by_name(update_data.name)
-            if existing:
-                raise ValueError(f"Tên '{update_data.name}' đã được sử dụng.")
+    def update_category(self, update_data: CategoryUpdate) -> Category:
         update_dict = update_data.model_dump(exclude_unset=True)
-        return self.repo.update(category_id, update_dict)
-
+        return self.repo.update(update_dict)
 
     def delete_category(self, category_id: int, current_user: User): 
         if not current_user.role or (
