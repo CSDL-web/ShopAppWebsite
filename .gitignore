@@ -3,7 +3,6 @@ node_modules/
 .cache/
 dist/
 build/
-.vscode/
 *.log
 .venv/
 .env
