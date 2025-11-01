@@ -16,5 +16,5 @@ def create_app() -> FastAPI:
     @app.get("/db")
     def check_db():
         return {"message": "Database connected successfully!"}
-
+    
     return app
