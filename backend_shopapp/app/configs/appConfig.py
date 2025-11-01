@@ -1,10 +1,12 @@
-from app.controllers import userRouter
+from app.controllers import userRouter,categoryRouter
 from fastapi import FastAPI
 from app.configs.dbConfig import Base, engine
 
 
 def init_routers(app: FastAPI):
     app.include_router(userRouter)
+    app.include_router(categoryRouter)
+
     
 def create_app() -> FastAPI:
     app = FastAPI(title="ShopApp Backend")

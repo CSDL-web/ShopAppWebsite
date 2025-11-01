@@ -45,6 +45,7 @@ def create_new_category(
     "/get_all_categories",
     response_model=List[CategoryRead] 
 )
+
 def get_all_categories(
     skip: int = 0,
     limit: int = 100,
@@ -71,16 +72,15 @@ def get_category_by_id(
         )
 
 @categoryRouter.patch(
-    "/update_a_category/{category_id}",
+    "/update_a_category",
     response_model=CategoryRead
 )
 def update_a_category(
-    category_id: int,
     update_data: CategoryUpdate, 
     service: CategoryService = Depends(get_category_service)
 ):
     try:
-        updated_category = service.update_category(category_id, update_data)
+        updated_category = service.update_category(update_data)
         return updated_category
     except ValueError as e:
         if "Không tìm thấy" in str(e):
@@ -101,7 +101,6 @@ def delete_a_category(
     current_user: User = Depends(get_current_user) 
 ):
     try:
-        #check xem có quyền xóa hay không 
         service.delete_category(category_id, current_user)
         return None 
     
