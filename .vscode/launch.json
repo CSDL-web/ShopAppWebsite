@@ -11,7 +11,7 @@
       },
       "pathMappings": [
         {
-          "localRoot": "/Users/mac/Desktop/ShopAppWebsite/backend_shopapp",
+          "localRoot": "/home/duong/Desktop/ShopAppWebsite/backend_shopapp",
           "remoteRoot": "/app"
         }
       ]
