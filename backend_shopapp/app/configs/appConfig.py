@@ -1,4 +1,4 @@
-from app.controllers import userRouter,categoryRouter,productRouter
+from app.controllers import userRouter,categoryRouter,productRouter,commentsRouter
 from fastapi import FastAPI
 from app.configs.dbConfig import Base, engine
 
@@ -7,6 +7,7 @@ def init_routers(app: FastAPI):
     app.include_router(userRouter)
     app.include_router(categoryRouter)
     app.include_router(productRouter)
+    app.include_router(commentsRouter)
 
     
 def create_app() -> FastAPI:

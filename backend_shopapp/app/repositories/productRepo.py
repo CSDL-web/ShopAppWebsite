@@ -23,7 +23,7 @@ def get_all_products_repo(db: Session):
 def update_product_repo(db: Session, product: Product, new_data: dict) -> Product:
     # Cập nhật các field thông thường
     for key, value in new_data.items():
-        if key != "images":
+        if key == "images":
             continue  # xử lý images riêng
         setattr(product, key, value)
 

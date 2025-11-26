@@ -33,3 +33,8 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 
 #5. tạo sản phẩm mới 
 #@productRouter.put("/create_product/{product_id}/{}")
+
+@productRouter.get("/_debug_db_url")
+def debug_db_url(db: Session = Depends(get_db)):
+    # db.bind.url là URL thực tế app đang dùng
+    return {"db_url": str(db.bind.url)}

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models.product_model import Product
+from app.models.product_model import Product, ProductImage
 from app.models.user_model import User
 from app.dtos.productDto import ProductDTO, ProductImageDTO
 from app.repositories.productRepo import (
@@ -26,10 +26,27 @@ class ProductService:
 
         if product_dto.stock_quantity < 0:
             raise HTTPException(status_code=400, detail="Số lượng không hợp lệ")
+        
+        # 2. DTO → MODEL TRANSFORMATION
+        new_product = Product(
+            name=product_dto.name,
+            price=product_dto.price,
+            thumbnail=product_dto.thumbnail,
+            description=product_dto.description,
+            category_id=product_dto.category_id,
+            # stock_quantity=product_dto.stock_quantity
+        )
+
+        # 3. HANDLE RELATIONSHIPS (nếu có)
+        if product_dto.images:
+            new_product.images = [
+                ProductImage(image_url=img.image_url)
+                for img in product_dto.images
+            ]
+
 
         # ✅ 3. Gọi repository để tạo
-        new_product = create_product_repo(db, product_dto)
-        return new_product
+        return  create_product_repo(db, new_product)
 
 
     @staticmethod

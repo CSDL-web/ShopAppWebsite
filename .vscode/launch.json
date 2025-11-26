@@ -11,7 +11,7 @@
       },
       "pathMappings": [
         {
-          "localRoot": "/home/duong/Desktop/ShopAppWebsite/backend_shopapp",
+          "localRoot":"C:/Ổ G/Coder/csdlweb/ShopAppWebsite/backend_shopapp",
           "remoteRoot": "/app"
         }
       ]
