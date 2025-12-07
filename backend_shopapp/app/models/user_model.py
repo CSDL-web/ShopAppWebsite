@@ -17,5 +17,6 @@ class User(Base):
     
     role = relationship("Role", back_populates="users")
 
+    orders = relationship("Order", back_populates="user")
 
-    
+    favorites = relationship("Favorite", back_populates="user")
