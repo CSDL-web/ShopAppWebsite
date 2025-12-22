@@ -16,7 +16,7 @@ class CategoryRepository:
 
     #Read
     def get_by_id(self, category_id: int) -> Optional[Category]:
-        return self.db.query(Category).filter(Category.id == category_id).one()
+        return self.db.query(Category).filter(Category.id == category_id).first()
     
     def get_by_name(self, name: int) -> Optional[Category]:
         return self.db.query(Category).filter(Category.name == name).first()
