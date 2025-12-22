@@ -1,4 +1,4 @@
-from app.controllers import userRouter,categoryRouter
+from app.controllers import userRouter,categoryRouter,productRouter,commentsRouter
 from fastapi import FastAPI
 from app.configs.dbConfig import Base, engine
 
@@ -14,6 +14,8 @@ from app.controllers.flyway_schema_history_router import flyway_router
 def init_routers(app: FastAPI):
     app.include_router(userRouter)
     app.include_router(categoryRouter)
+    app.include_router(productRouter)
+    app.include_router(commentsRouter)
 
     app.include_router(coupon_router)
     app.include_router(coupon_condition_router)
