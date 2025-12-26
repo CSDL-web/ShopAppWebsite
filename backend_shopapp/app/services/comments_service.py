@@ -3,14 +3,7 @@ from fastapi import HTTPException
 from typing import List
 from app.models.comments_model import Comment
 from app.dtos.comments_dto import CommentDTO
-from app.repositories.commentsRepo import (
-    create_comment_repo,
-    find_comment_by_id,
-    find_comments_by_product_id,
-    find_comments_by_user_id,
-    find_all_comments_repo,
-    update_comment_repo,
-    delete_comment_repo)
+from app.repositories.comment_repo import CommentRepository
 
 class CommentsService:
     @staticmethod

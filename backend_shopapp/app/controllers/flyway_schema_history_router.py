@@ -6,7 +6,7 @@ from app.configs.dbConfig import get_db
 from app.services.flyway_schema_history_service import FlywaySchemaHistoryService
 from app.dtos.fly_schema_history_dto import FlywaySchemaHistoryRead
 from app.models.user_model import User
-from app.controllers.user_router import get_current_user
+from app.services.auth_service import get_current_user
 
 flyway_router = APIRouter(prefix="/admin/flyway", tags=["Admin Flyway"])
 

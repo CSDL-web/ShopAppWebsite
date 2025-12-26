@@ -7,7 +7,7 @@ from app.services.order_service import OrderService
 from app.dtos.order_dto import OrderCreate, OrderUpdate, OrderRead
 from app.models.user_model import User
 
-from app.controllers.user_router import get_current_user
+from app.services.auth_service import get_current_user
 
 order_router = APIRouter(prefix="/orders", tags=["Orders"])
 

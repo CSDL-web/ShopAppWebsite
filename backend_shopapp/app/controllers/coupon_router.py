@@ -6,7 +6,7 @@ from app.configs.dbConfig import get_db
 from app.services.coupon_service import CouponService
 from app.dtos.coupon_dto import CouponCreate, CouponUpdate, CouponRead
 from app.models.user_model import User
-from app.controllers.user_router import get_current_user 
+from app.services.auth_service import get_current_user 
 
 coupon_router = APIRouter(prefix="/coupons", tags=["Coupons"])
 

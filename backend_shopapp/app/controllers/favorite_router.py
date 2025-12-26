@@ -6,7 +6,7 @@ from app.configs.dbConfig import get_db
 from app.services.favorite_service import FavoriteService
 from app.dtos.favorite_dto import FavoriteCreate, FavoriteRead
 from app.models.user_model import User
-from app.controllers.user_router import get_current_user
+from app.services.auth_service import get_current_user
 
 favorite_router = APIRouter(prefix="/favorites", tags=["Favorites"])
 

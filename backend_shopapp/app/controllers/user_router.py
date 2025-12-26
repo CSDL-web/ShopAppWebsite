@@ -1,45 +1,35 @@
+# File: app/controllers/user_router.py
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.configs.dbConfig import get_db
-from app.services.userService import UserService
-from app.dtos.userDto import UserRead as UserResponse
+from app.services.user_service import UserService
+from app.dtos.user_dto import UserDTO, UserRead 
+from app.dtos.user_login_dto import UserLoginDTO 
+# from app.dtos.token_dto import TokenDTO # (Optional) Dùng để type hint response login
 
-userRouter = APIRouter(prefix="/api/users", tags=["Users"])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
+userRouter = APIRouter(prefix="/users", tags=["Users"])
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:
     return UserService(db)
 
-def get_current_user(db: Session = Depends(get_db)):
-    service = UserService(db)
-    
-    # 1. Thử lấy user ID 1 trong DB 
+@userRouter.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def register(user_data: UserDTO, service: UserService = Depends(get_user_service)):
     try:
-        user = service.get_user_by_id(1)
-        if user:
-            return user
-    except Exception:
-        pass 
+        return service.register_user(user_data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    # 2. Nếu DB lỗi hoặc chưa có user, tạo User giả quyền Admin để trả về
-    class FakeRole:
-        name = "admin"
+@userRouter.post("/login")
+def login(login_data: UserLoginDTO, service: UserService = Depends(get_user_service)):
+    # Trả về Access Token
+    return service.login_user(login_data)
 
-    class FakeUser:
-        id = 1
-        full_name = "System Admin (Fake)"
-        role = FakeRole()
-        role_id = 1
-    
-    return FakeUser()
-
-@userRouter.get("/get_user", response_model=List[UserResponse])
+@userRouter.get("", response_model=List[UserRead])
 def get_all_users(skip: int = 0, limit: int = 10, service: UserService = Depends(get_user_service)):
-    return service.get_all_users(skip, limit)
+    return service.repo.get_users(skip, limit) # Lưu ý: Repo cần có hàm get_users hoặc dùng service
 
-@userRouter.get("/get_user_by_id/{id}", response_model=UserResponse)
-def getUserById(id: int, service: UserService = Depends(get_user_service)):
-    return service.get_user_by_id(id)
+@userRouter.get("/{user_id}", response_model=UserRead)
+def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service)):
+    return service.get_user_by_id(user_id)
