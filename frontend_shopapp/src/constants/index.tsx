@@ -2,6 +2,7 @@ export const URL = {
   Home: "/",
   Login: "/login",
   Products: "/product/:id",
+  Cart: "/cart",
 };
 
 export const DATE_TIME_FORMAT = "YYYY/MM/DD HH:mm:ss";

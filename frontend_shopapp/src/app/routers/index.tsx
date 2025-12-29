@@ -9,6 +9,7 @@ const DEFAULT_LAYOUT = "default";
 const Login = lazy(() => import("app/pages/login/loginPage"));
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
+const Cart = lazy(() => import("@/app/pages/carts/index"));
 
 interface ItemType {
   key: string;
@@ -36,6 +37,12 @@ const userItems: ItemType[] = [
     layout: DEFAULT_LAYOUT,
     private: false,
   },
+  {
+    key: URL.Cart,
+    components: <Cart />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
 ];
 
 const adminItems: ItemType[] = [
@@ -54,6 +61,12 @@ const adminItems: ItemType[] = [
   {
     key: URL.Products,
     components: <Products />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Cart,
+    components: <Cart />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },
