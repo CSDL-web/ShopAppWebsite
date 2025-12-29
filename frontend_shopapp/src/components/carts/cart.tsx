@@ -1,63 +1,99 @@
 import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useNavigate } from "react-router-dom";
 
-import { Product } from "";
-import { removeItem } from "../../store/cartSlice";
-import { useAppDispatch } from "@/stores";
-
-import InStockText from "../inStockText";
+import { useAppSelector } from 'stores';
+import CartItem from "./cart_item";
+import { COLORS } from "@/styles/colors";
 import CustomHR from "../CustomHR";
+import { Product } from "../products/fakeData";
+import ProductLinkText from "../productLinkText";
+import Subtotal from "./subTotal";
+import CustomButton from "../customButton";
+import { getCart } from "@/stores/cart";
 
-export default function CartItem({ item }: { item: Product }) {
-  const dispatch = useAppDispatch();
+export default function Cart() {
+  const cart = useAppSelector(getCart);
+  const navigate = useNavigate();
+
+  const total = cart.reduce((sum: number, item: Product) => sum + (item.price ?? 0),0);
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        margin: "3rem 0",
+        gap: "2rem",
+      }}
+    >
+      {/* LEFT: CART ITEMS */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          margin: "2rem 0",
+          backgroundColor: COLORS.white,
+          padding: "2rem",
+          width: "55vw",
         }}
       >
-        {/* LEFT */}
-        <Box sx={{ display: "flex" }}>
-          <img
-            src={item.image}
-            alt={item.title}
-            width={225}
-            height={257}
-            style={{ objectFit: "contain" }}
-          />
-
-          <Box sx={{ marginLeft: "2rem" }}>
-            <Typography variant="h6" fontWeight={500}>
-              {item.title}
-            </Typography>
-
-            <InStockText sx={{ fontWeight: 500 }} />
-
-            <Typography sx={{ fontSize: "0.875rem" }}>
-              Eligible for FREE Shipping & FREE Returns
-            </Typography>
-
-            <Button
-              size="small"
-              sx={{ textTransform: "none", padding: 0, marginTop: "0.5rem" }}
-              onClick={() => dispatch(removeItem(item))}
-            >
-              Delete
-            </Button>
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h4" fontWeight={700}>
+            Shopping Cart
+          </Typography>
+          <Typography>Price</Typography>
         </Box>
 
-        {/* RIGHT */}
-        <Typography sx={{ fontSize: "1.25rem", fontWeight: 700 }}>
-          ${item.price}
-        </Typography>
+        <CustomHR />
+
+        {cart.map((item: Product) => (
+          <CartItem key={item.id} item={item} />
+        ))}
+
+        <Subtotal
+          items={cart.length}
+          price={total}
+          sx={{ textAlign: "right" }}
+        />
       </Box>
 
-      <CustomHR />
+      {/* RIGHT: SUMMARY */}
+      <Box
+        sx={{
+          backgroundColor: COLORS.white,
+          padding: "1rem",
+          width: "15vw",
+          height: "fit-content",
+        }}
+      >
+        <Typography
+          sx={{
+            color: COLORS.green,
+            display: "flex",
+            alignItems: "center",
+            fontSize: "0.875rem",
+          }}
+        >
+          <CheckCircleIcon sx={{ marginRight: "0.25rem" }} />
+          Your order qualifies for FREE Shipping.
+        </Typography>
+
+        <Typography sx={{ marginLeft: "1.8rem", fontSize: "0.875rem" }}>
+          Choose this option at checkout.{" "}
+          <ProductLinkText>See details</ProductLinkText>
+        </Typography>
+
+        <Subtotal items={cart.length} price={total} />
+
+        <CustomButton onClick={() => navigate("/checkout")}>
+          Proceed to Checkout
+        </CustomButton>
+      </Box>
     </Box>
   );
 }

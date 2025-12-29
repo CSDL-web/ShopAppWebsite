@@ -1,103 +1,61 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useNavigate } from "react-router-dom";
+import { Box, Button, Typography } from "@mui/material";
+import { useAppDispatch } from "@/stores";
+import CustomHR from "../CustomHR";
+import InStockText from "../inStockText";
+import { Product } from "../products/fakeData";
+import { removeItem } from "@/stores/cart";
 
-import { useAppSelector } from 'stores';
-import { getCart } from "../../store/cartSlice";
-import { Product } from "../../types/product";
-import { COLORS } from "../common/colors";
-
-import CartItem from "./CartItem";
-import CustomHR from "../shared/CustomHR";
-import ProductLinkText from "../common/ProductLinkText";
-import CustomButton from "../common/CustomButton";
-import Subtotal from "../Subtotal";
-
-export default function Cart() {
-  const cart = useAppSelector(getCart);
-  const navigate = useNavigate();
-
-  const total = cart.reduce(
-    (sum: number, item: Product) => sum + (item.price ?? 0),
-    0
-  );
+export default function CartItem({ item }: { item: Product }) {
+  const dispatch = useAppDispatch();
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        margin: "3rem 0",
-        gap: "2rem",
-      }}
-    >
-      {/* LEFT: CART ITEMS */}
+    <Box>
       <Box
         sx={{
-          backgroundColor: COLORS.white,
-          padding: "2rem",
-          width: "55vw",
+          display: "flex",
+          justifyContent: "space-between",
+          margin: "2rem 0",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="h4" fontWeight={700}>
-            Shopping Cart
-          </Typography>
-          <Typography>Price</Typography>
+        {/* LEFT */}
+        <Box sx={{ display: "flex" }}>
+          <img
+            src={item.image}
+            alt={item.title}
+            width={225}
+            height={257}
+            style={{ objectFit: "contain" }}
+          />
+
+          <Box sx={{ marginLeft: "2rem" }}>
+            <Typography variant="h6" fontWeight={500}>
+              {item.title}
+            </Typography>
+
+            <InStockText sx={{ fontWeight: 500 }} />
+
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              Eligible for FREE Shipping & FREE Returns
+            </Typography>
+
+            <Button
+              size="small"
+              sx={{ textTransform: "none", padding: 0, marginTop: "0.5rem" }}
+              onClick={() => dispatch(removeItem(item))}
+            >
+              Delete
+            </Button>
+          </Box>
         </Box>
 
-        <CustomHR />
-
-        {cart.map((item: Product) => (
-          <CartItem key={item.id} item={item} />
-        ))}
-
-        <Subtotal
-          items={cart.length}
-          price={total}
-          sx={{ textAlign: "right" }}
-        />
+        {/* RIGHT */}
+        <Typography sx={{ fontSize: "1.25rem", fontWeight: 700 }}>
+          ${item.price}
+        </Typography>
       </Box>
 
-      {/* RIGHT: SUMMARY */}
-      <Box
-        sx={{
-          backgroundColor: COLORS.white,
-          padding: "1rem",
-          width: "15vw",
-          height: "fit-content",
-        }}
-      >
-        <Typography
-          sx={{
-            color: COLORS.green,
-            display: "flex",
-            alignItems: "center",
-            fontSize: "0.875rem",
-          }}
-        >
-          <CheckCircleIcon sx={{ marginRight: "0.25rem" }} />
-          Your order qualifies for FREE Shipping.
-        </Typography>
-
-        <Typography sx={{ marginLeft: "1.8rem", fontSize: "0.875rem" }}>
-          Choose this option at checkout.{" "}
-          <ProductLinkText>See details</ProductLinkText>
-        </Typography>
-
-        <Subtotal items={cart.length} price={total} />
-
-        <CustomButton onClick={() => navigate("/checkout")}>
-          Proceed to Checkout
-        </CustomButton>
-      </Box>
+      <CustomHR />
     </Box>
   );
 }
