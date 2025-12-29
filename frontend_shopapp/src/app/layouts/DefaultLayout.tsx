@@ -3,7 +3,6 @@ import { Box, Container } from "@mui/material";
 import { ILayoutProps } from "models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import "styles/index.scss";
 
 export default function DefaultLayout({ children }: ILayoutProps) {
   const queryClient = useQueryClient();
