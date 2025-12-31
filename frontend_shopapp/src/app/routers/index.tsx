@@ -7,6 +7,7 @@ import Product from "@/app/pages/dashboards/product"
 const DEFAULT_LAYOUT = "default";
 
 const Login = lazy(() => import("app/pages/login/loginPage"));
+const Register = lazy(() => import("app/pages/login/register"));
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
@@ -21,6 +22,7 @@ interface ItemType {
 
 const userItems: ItemType[] = [
   { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Register, components: <Register />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
@@ -28,6 +30,7 @@ const userItems: ItemType[] = [
 
 const adminItems: ItemType[] = [
   { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Register, components: <Register />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
@@ -35,12 +38,14 @@ const adminItems: ItemType[] = [
   // ✅ ADD route User vào đây
   { key: "/dashboard/users", components: <User />, layout: DEFAULT_LAYOUT, private: false },
   { key: "/dashboard/products", components: <Product />, layout: DEFAULT_LAYOUT, private: false },
+  { key: "/register", components: <Register />, layout: DEFAULT_LAYOUT, private: false },
 
 ];
 
 const sharedItems: ItemType[] = [
   { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Register, components: <Register />, layout: DEFAULT_LAYOUT, private: false },
 ];
 
 function getItems(isTargetAdmin: boolean) {

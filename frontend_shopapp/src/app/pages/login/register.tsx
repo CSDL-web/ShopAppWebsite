@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Link as RouterLink } from "react-router-dom";
-
 import {
   Box,
   Paper,
@@ -11,7 +10,7 @@ import {
   Link,
   IconButton,
   InputAdornment,
-  Switch,
+  Checkbox,
   FormControlLabel,
 } from "@mui/material";
 
@@ -44,7 +43,7 @@ function GoogleIcon() {
   );
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <Box
       sx={{
@@ -65,15 +64,28 @@ export default function SignInPage() {
           backgroundColor: "#f5f6f7",
         }}
       >
-        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-          Sign in
-        </Typography>
-
-        <Typography sx={{ color: "text.secondary", mb: 3, maxWidth: 380 }}>
-          Log in by entering your email address and password.
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+          Create Your Account
         </Typography>
 
         <Box sx={{ display: "grid", gap: 2 }}>
+          <Button
+            variant="outlined"
+            size="large"
+            sx={{
+              py: 1.2,
+              borderRadius: "12px",
+              textTransform: "none",
+              fontWeight: 700,
+              backgroundColor: "#fff",
+            }}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </Button>
+
+          <Divider sx={{ my: 0.5 }}>Or</Divider>
+
           <Box>
             <Typography sx={{ mb: 1, color: "text.secondary" }}>
               Email address
@@ -116,15 +128,17 @@ export default function SignInPage() {
             />
           </Box>
 
-          <Link href="#" underline="hover" sx={{ color: "primary.main", mt: -1 }}>
-            Forgot password?
-          </Link>
+          <FormControlLabel
+            control={<Checkbox />}
+            label="Receive news, updates and deals"
+            sx={{ color: "text.secondary" }}
+          />
 
           <Button
             variant="contained"
             size="large"
             sx={{
-              mt: 1,
+              mt: 0.5,
               py: 1.4,
               borderRadius: "12px",
               textTransform: "none",
@@ -133,45 +147,34 @@ export default function SignInPage() {
               "&:hover": { backgroundColor: "#5d3df0" },
             }}
           >
-            Log in
+            Create Account
           </Button>
 
-          <FormControlLabel
-            control={<Switch />}
-            label="Remember me"
-            sx={{ mt: 0.5, color: "text.secondary" }}
-          />
-
-          <Divider sx={{ my: 1.5 }}>Or</Divider>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 1.2,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              backgroundColor: "#fff",
-            }}
-          >
-            <GoogleIcon />
-            Sign in with Google
-          </Button>
-<Typography sx={{ color: "text.secondary" }}>
-  Don&apos;t have an account?{" "}
-  <Link
-    component={RouterLink}
-    to="/register"
-    underline="hover"
-    sx={{ color: "primary.main" }}
-  >
-    Sign up here
-  </Link>
-</Typography>
+          <Typography sx={{ mt: 2, color: "text.secondary", fontSize: 14 }}>
+            By creating an account, you are agree to the{" "}
+            <Link href="#" underline="hover">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="#" underline="hover">
+              Privacy Policy
+            </Link>
+            .
+          </Typography>
 
 
-          
+        <Typography sx={{ color: "text.secondary" }}>
+        Already have an account?{" "}
+        <Link
+            component={RouterLink}
+            to="/login"
+            underline="hover"
+            sx={{ color: "primary.main" }}
+        >
+            Log in here
+        </Link>
+        </Typography>
+
         </Box>
       </Paper>
     </Box>

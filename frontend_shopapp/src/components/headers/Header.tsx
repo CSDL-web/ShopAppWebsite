@@ -10,13 +10,13 @@ import SearchBar from "./SearchBar";
 
 export default function Header() {
   const links = [
-    "Medical Care",
+    "Home",
     "Groceries",
     "Best Sellers",
     "Prime",
     "New Releases",
     "Books",
-    "Gift Cards",
+    "Log in",
   ];
 
   return (
@@ -61,11 +61,20 @@ export default function Header() {
           <Typography fontWeight={700}>All</Typography>
         </HeaderLink>
 
+       
+
+
         {links.map((l) => (
-          <HeaderLink key={l} to={`/${l}`}>
+          <HeaderLink
+            key={l}
+            to={l === "Log in" ? "/login" : l === "Home" ? "/" : `/${l}`}
+          >
             <Typography variant="body2">{l}</Typography>
           </HeaderLink>
         ))}
+
+
+        
       </Box>
     </Box>
   );
