@@ -2,14 +2,15 @@ import { ReactElement, Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { URL } from "../../constants";
 import DefaultLayout from "../layouts/DefaultLayout";
-
-const NONE_LAYOUT = "none";
+import User from "@/app/pages/dashboards/user";
+import Product from "@/app/pages/dashboards/product"
 const DEFAULT_LAYOUT = "default";
 
 const Login = lazy(() => import("app/pages/login/loginPage"));
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
+
 
 interface ItemType {
   key: string;
@@ -19,85 +20,37 @@ interface ItemType {
 }
 
 const userItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Products,
-    components: <Products />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Cart,
-    components: <Cart />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+  { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
 ];
 
 const adminItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Products,
-    components: <Products />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Cart,
-    components: <Cart />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+  { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
+
+  // ✅ ADD route User vào đây
+  { key: "/dashboard/users", components: <User />, layout: DEFAULT_LAYOUT, private: false },
+  { key: "/dashboard/products", components: <Product />, layout: DEFAULT_LAYOUT, private: false },
+
 ];
 
 const sharedItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+  { key: URL.Login, components: <Login />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
 ];
 
 function getItems(isTargetAdmin: boolean) {
-  const items = isTargetAdmin
-    ? adminItems.concat(sharedItems)
-    : userItems.concat(sharedItems);
-  return items;
+  return isTargetAdmin ? adminItems.concat(sharedItems) : userItems.concat(sharedItems);
 }
 
 export default function Routers() {
   const items = getItems(true);
+  console.log("ROUTES:", items.map(i => i.key));
   const token = localStorage.getItem("token");
-  console.log(items);
 
   return (
     <Routes>
