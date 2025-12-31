@@ -18,6 +18,12 @@ class CommentRepository:
 
     def get_by_product_id(self, product_id: int) -> List[Comment]:
         return self.db.query(Comment).filter(Comment.product_id == product_id).all()
+    
+    def get_by_user_id(self, user_id: int) -> List[Comment]:
+        return self.db.query(Comment).filter(Comment.user_id == user_id).all()
+
+    def get_all(self) -> List[Comment]:
+        return self.db.query(Comment).all()
 
     def update(self, comment_id: int, content: str) -> Optional[Comment]:
         db_comment = self.get_by_id(comment_id)

@@ -9,7 +9,7 @@ class User(Base):
     __tablename__ = "users"    
     id = Column(Integer, primary_key=True, index=True) 
     fullname = Column(String(100))
-    phone_number = Column(String(15), nullable=False) # [FIX] DB là 15
+    phone_number = Column(String(15), nullable=True) 
     address = Column(String(200))
     password = Column(String(200), nullable=False)
     is_active = Column(Boolean, default=True)

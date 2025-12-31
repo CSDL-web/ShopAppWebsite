@@ -29,8 +29,13 @@ class UserService:
             return False
 
     def register_user(self, user_dto: UserDTO) -> User:
-        if self.repo.exists_by_phone(user_dto.phone_number):
-            raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
+        if user_dto.phone_number:
+            if self.repo.exists_by_phone(user_dto.phone_number):
+                raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
+
+        if user_dto.email:
+            if self.repo.exists_by_email(user_dto.email):
+                raise HTTPException(status_code=400, detail="Email đã tồn tại")
 
         hashed_password = self._hash_password(user_dto.password)
 
@@ -43,19 +48,28 @@ class UserService:
         return self.repo.create(user_data)
 
     def login_user(self, login_dto: UserLoginDTO):
-        user = self.repo.get_by_phone_number(login_dto.phone_number)
+        account_input = login_dto.account
+        user = None
+
+        if "@" in account_input:
+            user = self.repo.get_by_email(account_input)
+        else:
+            user = self.repo.get_by_phone_number(account_input)
+
         if not user:
-            raise HTTPException(status_code=400, detail="Số điện thoại hoặc mật khẩu không đúng")
+            raise HTTPException(status_code=400, detail="Tài khoản hoặc mật khẩu không đúng")
 
         if not self._verify_password(login_dto.password, user.password):
-            raise HTTPException(status_code=400, detail="Số điện thoại hoặc mật khẩu không đúng")
+            raise HTTPException(status_code=400, detail="Tài khoản hoặc mật khẩu không đúng")
 
         if not user.is_active:
             raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
 
+        sub_identifier = user.phone_number if user.phone_number else user.email
+
         access_token = TokenService.create_access_token(
             data={
-                "sub": user.phone_number,
+                "sub": sub_identifier,
                 "id": user.id,
                 "role_id": user.role_id
             }
@@ -69,3 +83,8 @@ class UserService:
 
     def get_all_users(self, skip: int, limit: int):
         return self.repo.db.query(User).offset(skip).limit(limit).all()
+    def get_user_by_id(self, user_id: int):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+        return user
