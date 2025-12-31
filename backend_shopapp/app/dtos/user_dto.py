@@ -14,8 +14,7 @@ class UserDTO(BaseModel):
     facebook_account_id: Optional[str] = Field(default=None)
     google_account_id: Optional[str] = Field(default=None)
     
-    # role_id mặc định backend tự set là 1 (User), không cho client gửi lên để tránh hack
-
+    role_id: int = Field(default=1, description="Mã quyền (1: User, 2: Admin)")
 
 
 # DTO Dùng để trả dữ liệu về (Response)
