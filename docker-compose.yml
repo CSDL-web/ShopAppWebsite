@@ -55,8 +55,7 @@ services:
     volumes:
       - ./backend_shopapp:/app
     command: >
-        bash -c "sleep 10 && python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
-
+      bash -c "sleep 10 && python -m uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"
 
 networks:
   shopapp_network:

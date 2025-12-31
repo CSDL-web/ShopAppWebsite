@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import CustomBox from "./shared/CustomBox";
-import { Product } from "@/types/supabase";
-import DeliveryOptions from "./DeliveryOptions";
+
 import { COLORS } from "@/styles/colors";
+import { Product } from "../products/fakeData";
+import CustomBox from "../customBox";
+import DeliveryOptions from "../DeliveryOptions";
 
 const CheckoutItem = ({ item }: { item: Product }) => {
   return (

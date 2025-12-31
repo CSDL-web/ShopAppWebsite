@@ -11,6 +11,7 @@ import CheckoutItem from "./checkout_item";
 import CustomBox from "../customBox";
 import CustomButton from "../customButton";
 import ProductLinkText from "../productLinkText";
+import OrderSummary from "../OrderSummary";
 
 const Checkout = () => {
   const cart = useAppSelector(getCart);
