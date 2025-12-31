@@ -14,8 +14,6 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
     
-    # Thêm quantity nếu DTO yêu cầu (tùy bạn, nếu không cần thì xóa dòng này)
-    quantity = Column(Integer, default=0) 
 
     category_id = Column(Integer, ForeignKey("categories.id"))
 

@@ -16,8 +16,6 @@ class ProductDTO(BaseModel):
 
     category_id: int = Field(..., description="ID của danh mục")
     
-    # Bổ sung bắt buộc
-    quantity: int = Field(default=0, ge=0, description="Số lượng tồn kho")
     
     images: Optional[List[ProductImageDTO]] = Field(default_factory=list)
 
