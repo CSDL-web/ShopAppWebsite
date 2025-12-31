@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Boolean, Date, ForeignKey, DateT
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.configs.dbConfig import Base
+from app.models.token_model import Token 
+from app.models.social_account_model import SocialAccount
 
 class User(Base):
     __tablename__ = "users"    

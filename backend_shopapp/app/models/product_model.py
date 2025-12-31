@@ -14,17 +14,22 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
     
+    # Thêm quantity nếu DTO yêu cầu (tùy bạn, nếu không cần thì xóa dòng này)
+    quantity = Column(Integer, default=0) 
 
     category_id = Column(Integer, ForeignKey("categories.id"))
+
     category = relationship("Category", back_populates="products")
-    # quan hệ 1 - Nhiều : (1 sản phầm có nhiều ảnh)
-    images = relationship("ProductImage",back_populates = "product_images", cascade="all, delete") # thuộc tính ảo
-    comments = relationship("Comment", back_populates="product_comments", cascade="all, delete")  # thuộc tính ảo
+
+    images = relationship("ProductImage", back_populates="product", cascade="all, delete") 
+    comments = relationship("Comment", back_populates="product", cascade="all, delete")  
+    order_details = relationship("OrderDetail", back_populates="product")
+    favorites = relationship("Favorite", back_populates="product", cascade="all, delete")
 
 class ProductImage(Base):
     __tablename__ = "product_images"
     id = Column(Integer, primary_key = True, index = True)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     image_url = Column(String(255))
-    product = relationship("Product", back_populates="images")
     
+    product = relationship("Product", back_populates="images")
