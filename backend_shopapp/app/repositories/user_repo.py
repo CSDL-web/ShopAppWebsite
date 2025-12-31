@@ -37,3 +37,5 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(db_user)
         return db_user
+    def get_users(self, skip: int = 0, limit: int = 10):
+        return self.db.query(User).offset(skip).limit(limit).all()
