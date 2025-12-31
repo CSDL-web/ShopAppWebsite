@@ -1,13 +1,13 @@
-# File: app/controllers/user_router.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.configs.dbConfig import get_db
 from app.services.user_service import UserService
-from app.dtos.user_dto import UserDTO, UserRead 
-from app.dtos.user_login_dto import UserLoginDTO 
-# from app.dtos.token_dto import TokenDTO # (Optional) Dùng để type hint response login
+from app.services.auth_service import get_current_user
+from app.models.user_model import User
+from app.dtos.user_dto import UserDTO, UserRead
+from app.dtos.user_login_dto import UserLoginDTO
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
@@ -26,8 +26,13 @@ def login(login_data: UserLoginDTO, service: UserService = Depends(get_user_serv
     return service.login_user(login_data)
 
 @userRouter.get("", response_model=List[UserRead])
-def get_all_users(skip: int = 0, limit: int = 10, service: UserService = Depends(get_user_service)):
-    return service.repo.get_users(skip, limit) 
+def get_all_users(
+    skip: int = 0,
+    limit: int = 10,
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user)
+):
+    return service.repo.get_users(skip, limit)
 
 @userRouter.get("/{user_id}", response_model=UserRead)
 def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service)):
