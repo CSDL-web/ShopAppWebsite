@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.configs.dbConfig import get_db
-from app.services.role_service import RoleService # Bạn cần tạo service này nếu chưa có, hoặc gọi Repo trực tiếp nếu lười
+from app.services.role_service import RoleService 
 from app.dtos.role_dto import RoleCreate, RoleUpdate, RoleRead
-# from app.dependencies import get_current_admin_user # Nếu muốn bảo mật
+
 
 role_router = APIRouter(prefix="/roles", tags=["Roles"])
 

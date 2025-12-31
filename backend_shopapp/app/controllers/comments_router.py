@@ -1,4 +1,4 @@
-# File: app/controllers/comments_router.py
+
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from typing import List

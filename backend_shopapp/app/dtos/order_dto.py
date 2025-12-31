@@ -14,7 +14,7 @@ class OrderStatus(str, Enum):
 class OrderBase(BaseModel):
     user_id: Optional[int] = None
     fullname: str = Field(..., max_length=100)
-    email: str = Field(..., max_length=100) # SỬA: Dùng str thường thay vì EmailStr
+    email: str = Field(..., max_length=100) 
     phone_number: str = Field(..., max_length=20)
     address: str = Field(..., max_length=200)
     note: Optional[str] = Field(None, max_length=100)

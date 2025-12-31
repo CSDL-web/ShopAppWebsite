@@ -23,12 +23,11 @@ def register(user_data: UserDTO, service: UserService = Depends(get_user_service
 
 @userRouter.post("/login")
 def login(login_data: UserLoginDTO, service: UserService = Depends(get_user_service)):
-    # Trả về Access Token
     return service.login_user(login_data)
 
 @userRouter.get("", response_model=List[UserRead])
 def get_all_users(skip: int = 0, limit: int = 10, service: UserService = Depends(get_user_service)):
-    return service.repo.get_users(skip, limit) # Lưu ý: Repo cần có hàm get_users hoặc dùng service
+    return service.repo.get_users(skip, limit) 
 
 @userRouter.get("/{user_id}", response_model=UserRead)
 def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service)):

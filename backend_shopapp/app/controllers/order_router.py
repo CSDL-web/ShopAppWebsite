@@ -58,3 +58,13 @@ def delete_order(
         service.delete_order(order_id, current_user)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@order_router.get("/get-all-orders-admin", response_model=List[OrderRead])
+def get_all_orders_admin(
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    service = OrderService(db)
+    return service.get_all_orders(skip, limit, current_user)
