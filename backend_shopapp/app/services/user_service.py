@@ -2,9 +2,15 @@ import hashlib
 import bcrypt
 import requests
 import uuid
+import os
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from app.models.user_model import User
 from app.repositories.user_repo import UserRepository
@@ -12,6 +18,7 @@ from app.repositories.token_repo import TokenRepository
 from app.dtos.user_dto import UserDTO
 from app.dtos.user_login_dto import UserLoginDTO
 from app.dtos.facebook_login_dto import FacebookLoginDTO
+from app.dtos.google_login_dto import GoogleLoginDTO
 from app.services.token_service import TokenService
 
 class UserService:
@@ -71,6 +78,8 @@ class UserService:
         sub_identifier = user.phone_number if user.phone_number else user.email
         if not sub_identifier and user.facebook_account_id:
             sub_identifier = user.facebook_account_id
+        if not sub_identifier and user.google_account_id:
+            sub_identifier = user.google_account_id
 
         return self._generate_tokens(user, sub_identifier)
 
@@ -108,6 +117,60 @@ class UserService:
 
         sub_identifier = user.phone_number if user.phone_number else (
             user.email if user.email else user.facebook_account_id
+        )
+
+        return self._generate_tokens(user, sub_identifier)
+
+    def login_google(self, google_dto: GoogleLoginDTO):
+        try:
+            CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
+            if not CLIENT_ID:
+                print("Lỗi: Chưa tìm thấy GOOGLE_CLIENT_ID trong biến môi trường (.env)")
+                raise ValueError("Server chưa cấu hình Google Client ID")
+
+            id_info = id_token.verify_oauth2_token(
+                google_dto.google_token,
+                google_requests.Request(),
+                CLIENT_ID
+            )
+
+            google_id = id_info['sub']
+            email = id_info.get('email')
+            name = id_info.get('name', 'Google User')
+
+        except ValueError as e:
+            print(f"Google Login Error: {str(e)}")
+            raise HTTPException(status_code=400, detail="Token Google không hợp lệ hoặc đã hết hạn")
+
+        user = self.repo.db.query(User).filter(User.google_account_id == google_id).first()
+
+        if not user and email:
+            user = self.repo.get_by_email(email)
+            if user:
+                user.google_account_id = google_id
+                self.repo.db.commit()
+                self.repo.db.refresh(user)
+
+        if not user:
+            random_password = str(uuid.uuid4())
+            hashed_password = self._hash_password(random_password)
+
+            new_user_data = {
+                "fullname": name,
+                "email": email,
+                "google_account_id": google_id,
+                "password": hashed_password,
+                "role_id": 1,
+                "is_active": True,
+            }
+            user = self.repo.create(new_user_data)
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.google_account_id
         )
 
         return self._generate_tokens(user, sub_identifier)
@@ -167,6 +230,8 @@ class UserService:
         sub_identifier = user.phone_number if user.phone_number else (
             user.email if user.email else user.facebook_account_id
         )
+        if not sub_identifier and user.google_account_id:
+            sub_identifier = user.google_account_id
 
         access_token_expires = timedelta(minutes=30)
         new_access_token = TokenService.create_access_token(

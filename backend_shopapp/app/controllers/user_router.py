@@ -9,7 +9,8 @@ from app.models.user_model import User
 from app.dtos.user_dto import UserDTO, UserRead
 from app.dtos.user_login_dto import UserLoginDTO
 from app.dtos.token_dto import RefreshTokenRequest
-from app.dtos.facebook_login_dto import FacebookLoginDTO # [MỚI THÊM]
+from app.dtos.facebook_login_dto import FacebookLoginDTO
+from app.dtos.google_login_dto import GoogleLoginDTO
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
@@ -27,13 +28,19 @@ def register(user_data: UserDTO, service: UserService = Depends(get_user_service
 def login(login_data: UserLoginDTO, service: UserService = Depends(get_user_service)):
     return service.login_user(login_data)
 
-# [MỚI THÊM] API Login Facebook
 @userRouter.post("/login-facebook")
 def login_facebook(
-    fb_data: FacebookLoginDTO, 
+    fb_data: FacebookLoginDTO,
     service: UserService = Depends(get_user_service)
 ):
     return service.login_facebook(fb_data)
+
+@userRouter.post("/login-google-(add client gg id in .env)")
+def login_google(
+    google_data: GoogleLoginDTO,
+    service: UserService = Depends(get_user_service)
+):
+    return service.login_google(google_data)
 
 @userRouter.post("/refresh-token")
 def refresh_token(
