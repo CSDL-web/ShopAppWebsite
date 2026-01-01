@@ -8,6 +8,7 @@ from app.services.auth_service import get_current_user
 from app.models.user_model import User
 from app.dtos.user_dto import UserDTO, UserRead
 from app.dtos.user_login_dto import UserLoginDTO
+from app.dtos.token_dto import RefreshTokenRequest
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
@@ -24,6 +25,13 @@ def register(user_data: UserDTO, service: UserService = Depends(get_user_service
 @userRouter.post("/login")
 def login(login_data: UserLoginDTO, service: UserService = Depends(get_user_service)):
     return service.login_user(login_data)
+
+@userRouter.post("/refresh-token")
+def refresh_token(
+    request: RefreshTokenRequest,
+    service: UserService = Depends(get_user_service)
+):
+    return service.refresh_access_token(request.refresh_token)
 
 @userRouter.get("", response_model=List[UserRead])
 def get_all_users(
