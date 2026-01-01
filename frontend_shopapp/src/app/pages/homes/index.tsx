@@ -1,8 +1,5 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-
 import Header from "@/components/headers/Header";
-import ProductCard from "@/components/products/ProductCard";
 import { COLORS } from "@/styles/colors";
 import { products } from "@/components/products/fakeData";
 import Categories from "@/components/categories/Categories";

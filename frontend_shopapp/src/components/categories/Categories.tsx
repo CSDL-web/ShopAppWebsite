@@ -1,17 +1,14 @@
-import { useAppDispatch, useAppSelector } from "@/stores";
-import {
-  actionGetCategories,
-  Category,
-  selectCategoriesData,
-} from "@/stores/categories";
+import { Category } from "@/stores/categories";
 import { Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   categories: Category[];
 }
 
 export default function Categories({ categories }: Props) {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -26,11 +23,15 @@ export default function Categories({ categories }: Props) {
       {categories.map((c: any) => (
         <Box
           key={c.id}
+          onClick={() => navigate(`/categories/${encodeURIComponent(c.name)}`)}
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             cursor: "pointer",
+            "&:hover img": {
+              transform: "scale(1.05)",
+            },
           }}
         >
           <Box

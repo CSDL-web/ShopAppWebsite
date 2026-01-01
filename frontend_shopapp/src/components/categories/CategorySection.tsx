@@ -31,7 +31,7 @@ export default function CategorySection({ title, products }: Props) {
             fontSize: 14,
             "&:hover": { color: "#000" },
           }}
-          onClick={() => navigate(`/category/${title}`)}
+          onClick={() => navigate(`/categories/${encodeURIComponent(title)}`)}
         >
           <Typography fontSize={14}>Xem thêm</Typography>
           <ArrowForwardIosIcon sx={{ fontSize: 14 }} />
