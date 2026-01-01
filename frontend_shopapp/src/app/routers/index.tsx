@@ -5,9 +5,13 @@ import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/users/user";
 import Product from "@/app/pages/dashboards/product";
 import Layout from "@/app/pages/login/layout";
+import AdminLayout from "@/components/admin/AdminLayout";
+
 
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
+const ADMIN_LAYOUT = "admin";
+
 
 const Login = lazy(() => import("@/app/pages/login/loginPage"));
 const Register = lazy(() => import("@/app/pages/login/register"));
@@ -18,6 +22,8 @@ const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
 const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
 const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
+const Categories = lazy(() => import("@/app/pages/dashboards/categories"));
+
 
 interface ItemType {
   key: string;
@@ -101,15 +107,21 @@ const adminItems: ItemType[] = [
   {
     key: "/dashboard/users",
     components: <User />,
-    layout: DEFAULT_LAYOUT,
+    layout: ADMIN_LAYOUT,
     private: false,
   },
   {
     key: "/dashboard/products",
     components: <Product />,
-    layout: DEFAULT_LAYOUT,
+    layout: ADMIN_LAYOUT,
     private: false,
   },
+   {
+    key: "/dashboard/categories",
+    components: <Categories />,
+    layout: ADMIN_LAYOUT,
+    private: false,
+  }, 
   {
     key: "/register",
     components: <Register />,
@@ -137,7 +149,7 @@ const adminItems: ItemType[] = [
   {
     key: "/dashboard/setting",
     components: <Setting />,
-    layout: DEFAULT_LAYOUT,
+    layout: ADMIN_LAYOUT,
     private: false,
   },
 ];
@@ -182,9 +194,12 @@ export default function Routers() {
       {items.map((item) => {
         let element = <Suspense fallback={null}>{item.components}</Suspense>;
 
-        if (item.layout === DEFAULT_LAYOUT) {
-          element = <DefaultLayout>{element}</DefaultLayout>;
-        }
+      if (item.layout === ADMIN_LAYOUT) {
+        element = <AdminLayout>{element}</AdminLayout>;
+      } else if (item.layout === DEFAULT_LAYOUT) {
+        element = <DefaultLayout>{element}</DefaultLayout>;
+      }
+
 
         if (item.private && !token) {
           element = <Navigate to={URL.Login} replace />;

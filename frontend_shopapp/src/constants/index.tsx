@@ -7,8 +7,10 @@ export const URL = {
   CheckPassword: "/check-password",
   Products: "/product/:id",
   Cart: "/cart",
-  user: "/dashboard/users",
-  product: "/dashboard/products"
+  User: "/dashboard/users",
+  Product: "/dashboard/products",
+  Setting: "/dashboard/setting",
+  Categories: "/dashboard/categories"
 
 };
 
