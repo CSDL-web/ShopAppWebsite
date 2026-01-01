@@ -3,14 +3,24 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { URL } from "../../constants";
 import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/user";
-import Product from "@/app/pages/dashboards/product"
-const DEFAULT_LAYOUT = "default";
+import Product from "@/app/pages/dashboards/product";
+import Layout from "@/app/pages/login/layout";
 
-const Login = lazy(() => import("app/pages/login/loginPage"));
-const Register = lazy(() => import("app/pages/login/register"));
+
+const DEFAULT_LAYOUT = "default";
+const AUTH_LAYOUT = "auth";
+
+const Login = lazy(() => import("@/app/pages/login/loginPage"));
+const Register = lazy(() => import("@/app/pages/login/register"));
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
+const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
+const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
+const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
+
+
+
 
 
 interface ItemType {
@@ -26,6 +36,7 @@ const userItems: ItemType[] = [
   { key: URL.Home, components: <Home />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
+  { key: URL.CheckEmail, components: <CheckEmail />, layout: DEFAULT_LAYOUT, private: false },
 ];
 
 const adminItems: ItemType[] = [
@@ -35,10 +46,17 @@ const adminItems: ItemType[] = [
   { key: URL.Products, components: <Products />, layout: DEFAULT_LAYOUT, private: false },
   { key: URL.Cart, components: <Cart />, layout: DEFAULT_LAYOUT, private: false },
 
+
   // ✅ ADD route User vào đây
   { key: "/dashboard/users", components: <User />, layout: DEFAULT_LAYOUT, private: false },
   { key: "/dashboard/products", components: <Product />, layout: DEFAULT_LAYOUT, private: false },
   { key: "/register", components: <Register />, layout: DEFAULT_LAYOUT, private: false },
+  { key: "/forgot-password", components: <ForgotPassword />, layout: DEFAULT_LAYOUT, private: false },
+  { key: "/check-email", components: <CheckEmail />, layout: DEFAULT_LAYOUT, private: false },
+  { key: "/check-password", components: <CheckPassword />, layout: DEFAULT_LAYOUT, private: false },
+
+
+
 
 ];
 

@@ -10,13 +10,13 @@ import SearchBar from "./SearchBar";
 
 export default function Header() {
   const links = [
-    "Home",
-    "Groceries",
-    "Best Sellers",
-    "Prime",
-    "New Releases",
-    "Books",
-    "Log in",
+    { label: "Home", to: "/" },
+    { label: "Groceries", to: "/groceries" },
+    { label: "Best Sellers", to: "/best-sellers" },
+    { label: "Prime", to: "/prime" },
+    { label: "New Releases", to: "/new-releases" },
+    { label: "Books", to: "/books" },
+    { label: "Log in", to: "/login" }, // ✅ cái bạn cần
   ];
 
   return (
@@ -34,14 +34,13 @@ export default function Header() {
         <SearchBar />
         <Box sx={{ display: "flex" }}>
           <HeaderLink to="/orders">
-            <Typography fontSize="0.75rem">Returns</Typography>
-            <Typography fontWeight={700}>& Orders</Typography>
+            <Box>
+              <Typography fontSize="0.75rem">Returns</Typography>
+              <Typography fontWeight={700}>& Orders</Typography>
+            </Box>
           </HeaderLink>
 
-          <HeaderLink
-            to="/cart"
-            style={{ display: "flex", alignItems: "flex-end" }}
-          >
+          <HeaderLink to="/cart">
             <ShoppingCartIcon fontSize="large" />
             <Typography fontWeight={700}>Cart</Typography>
           </HeaderLink>
@@ -54,27 +53,19 @@ export default function Header() {
           backgroundColor: COLORS.mediumBlue,
           display: "flex",
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
-        <HeaderLink to="/all" style={{ display: "flex", alignItems: "center" }}>
+        <HeaderLink to="/all">
           <MenuIcon sx={{ mr: "0.25rem" }} />
           <Typography fontWeight={700}>All</Typography>
         </HeaderLink>
 
-       
-
-
         {links.map((l) => (
-          <HeaderLink
-            key={l}
-            to={l === "Log in" ? "/login" : l === "Home" ? "/" : `/${l}`}
-          >
-            <Typography variant="body2">{l}</Typography>
+          <HeaderLink key={l.label} to={l.to}>
+            <Typography variant="body2">{l.label}</Typography>
           </HeaderLink>
         ))}
-
-
-        
       </Box>
     </Box>
   );
