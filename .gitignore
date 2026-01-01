@@ -8,4 +8,5 @@ build/
 .env
 __pycache__/
 export_data.sql
-
+write.py
+all_python_code*

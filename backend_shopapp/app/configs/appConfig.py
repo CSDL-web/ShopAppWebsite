@@ -16,7 +16,8 @@ from app.controllers import (
     order_detail_router,
     favorite_router,
     flyway_router,
-    role_router
+    role_router,
+    product_image_router
 )
 
 def seed_roles():
@@ -43,7 +44,7 @@ def init_routers(app: FastAPI):
     app.include_router(order_router)
     app.include_router(order_detail_router)
     app.include_router(flyway_router)
-
+    app.include_router(product_image_router)
 def create_app() -> FastAPI:
     app = FastAPI(title="ShopApp Backend", version="1.0.0")
 

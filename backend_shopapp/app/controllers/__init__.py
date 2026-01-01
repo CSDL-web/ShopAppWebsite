@@ -11,4 +11,5 @@ from .coupon_condition_router import coupon_condition_router
 from .favorite_router import favorite_router
 from .role_router import role_router            
 from .flyway_schema_history_router import flyway_router 
+from .product_image_router import product_image_router
 
