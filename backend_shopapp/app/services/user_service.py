@@ -1,5 +1,7 @@
 import hashlib
 import bcrypt
+import requests
+import uuid
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
@@ -9,6 +11,7 @@ from app.repositories.user_repo import UserRepository
 from app.repositories.token_repo import TokenRepository
 from app.dtos.user_dto import UserDTO
 from app.dtos.user_login_dto import UserLoginDTO
+from app.dtos.facebook_login_dto import FacebookLoginDTO
 from app.services.token_service import TokenService
 
 class UserService:
@@ -32,16 +35,13 @@ class UserService:
             return False
 
     def register_user(self, user_dto: UserDTO) -> User:
-        if user_dto.phone_number:
-            if self.repo.exists_by_phone(user_dto.phone_number):
-                raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
+        if user_dto.phone_number and self.repo.exists_by_phone(user_dto.phone_number):
+            raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
 
-        if user_dto.email:
-            if self.repo.exists_by_email(user_dto.email):
-                raise HTTPException(status_code=400, detail="Email đã tồn tại")
+        if user_dto.email and self.repo.exists_by_email(user_dto.email):
+            raise HTTPException(status_code=400, detail="Email đã tồn tại")
 
         hashed_password = self._hash_password(user_dto.password)
-
         user_data = user_dto.model_dump()
         user_data['password'] = hashed_password
 
@@ -69,7 +69,50 @@ class UserService:
             raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
 
         sub_identifier = user.phone_number if user.phone_number else user.email
+        if not sub_identifier and user.facebook_account_id:
+            sub_identifier = user.facebook_account_id
 
+        return self._generate_tokens(user, sub_identifier)
+
+    def login_facebook(self, fb_dto: FacebookLoginDTO):
+        try:
+            url = f"https://graph.facebook.com/me?access_token={fb_dto.facebook_token}&fields=id,name"
+            response = requests.get(url)
+            fb_data = response.json()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Lỗi kết nối đến Facebook")
+
+        if "error" in fb_data:
+            raise HTTPException(status_code=400, detail=f"Token Facebook lỗi: {fb_data['error']['message']}")
+
+        fb_id = fb_data.get("id")
+        fb_name = fb_data.get("name", "Người dùng Facebook")
+
+        user = self.repo.get_by_facebook_id(fb_id)
+
+        if not user:
+            random_password = str(uuid.uuid4())
+            hashed_password = self._hash_password(random_password)
+
+            new_user_data = {
+                "fullname": fb_name,
+                "facebook_account_id": fb_id,
+                "password": hashed_password,
+                "role_id": 1,
+                "is_active": True,
+            }
+            user = self.repo.create(new_user_data)
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.facebook_account_id
+        )
+
+        return self._generate_tokens(user, sub_identifier)
+
+    def _generate_tokens(self, user: User, sub_identifier: str):
         access_token_expires = timedelta(minutes=30)
         access_token = TokenService.create_access_token(
             data={"sub": sub_identifier, "id": user.id, "role_id": user.role_id},
@@ -98,7 +141,9 @@ class UserService:
             "access_token": access_token,
             "refresh_token": refresh_token,
             "token_type": "bearer",
-            "user": user
+            "user": user,
+            "expiration": datetime.now() + access_token_expires,
+            "refresh_expiration_date": datetime.now() + refresh_token_expires
         }
 
     def refresh_access_token(self, refresh_token_str: str):
@@ -119,23 +164,37 @@ class UserService:
         if not user:
             raise HTTPException(status_code=404, detail="User không tồn tại")
 
-        sub_identifier = user.phone_number if user.phone_number else user.email
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.facebook_account_id
+        )
 
+        access_token_expires = timedelta(minutes=30)
         new_access_token = TokenService.create_access_token(
-            data={"sub": sub_identifier, "id": user.id, "role_id": user.role_id}
+            data={"sub": sub_identifier, "id": user.id, "role_id": user.role_id},
+            expires_delta=access_token_expires
+        )
+
+        refresh_token_expires = timedelta(days=7)
+        new_refresh_token = TokenService.create_refresh_token(
+            data={"sub": sub_identifier, "id": user.id},
+            expires_delta=refresh_token_expires
         )
 
         stored_token.token = new_access_token
-        stored_token.expiration_date = datetime.now() + timedelta(minutes=30)
+        stored_token.expiration_date = datetime.now() + access_token_expires
+        stored_token.refresh_token = new_refresh_token
+        stored_token.refresh_expiration_date = datetime.now() + refresh_token_expires
+
         self.token_repo.save(stored_token)
 
         return {
             "access_token": new_access_token,
-            "token_type": "bearer"
+            "refresh_token": new_refresh_token,
+            "token_type": "bearer",
+            "expiration": stored_token.expiration_date,
+            "refresh_expiration_date": stored_token.refresh_expiration_date,
+            "is_mobile": stored_token.is_mobile
         }
-
-    def get_all_users(self, skip: int, limit: int):
-        return self.repo.db.query(User).offset(skip).limit(limit).all()
 
     def get_user_by_id(self, user_id: int):
         user = self.repo.get_by_id(user_id)
