@@ -1,71 +1,58 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import MenuIcon from "@mui/icons-material/Menu";
-
-import { COLORS } from "@/styles/colors";
-import HeaderLink from "./HeaderLink";
-import Logo from "./Logo";
+import { Box, Button, Typography } from "@mui/material";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import SearchBar from "./SearchBar";
+import Logo from "./Logo";
 
 export default function Header() {
-  const links = [
-    "Medical Care",
-    "Groceries",
-    "Best Sellers",
-    "Prime",
-    "New Releases",
-    "Books",
-    "Gift Cards",
-  ];
-
   return (
-    <Box sx={{ backgroundColor: COLORS.darkBlue, color: COLORS.white }}>
-      {/* Top bar */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.5rem",
-        }}
-      >
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "1rem 2rem",
+        backgroundColor: "#fff",
+        borderBottom: "1px solid #eee",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Logo />
-        <SearchBar />
-        <Box sx={{ display: "flex" }}>
-          <HeaderLink to="/orders">
-            <Typography fontSize="0.75rem">Returns</Typography>
-            <Typography fontWeight={700}>& Orders</Typography>
-          </HeaderLink>
-
-          <HeaderLink
-            to="/cart"
-            style={{ display: "flex", alignItems: "flex-end" }}
-          >
-            <ShoppingCartIcon fontSize="large" />
-            <Typography fontWeight={700}>Cart</Typography>
-          </HeaderLink>
-        </Box>
       </Box>
 
-      {/* Bottom bar */}
       <Box
         sx={{
-          backgroundColor: COLORS.mediumBlue,
+          flex: 1,
           display: "flex",
           alignItems: "center",
+          mx: 3,
         }}
       >
-        <HeaderLink to="/all" style={{ display: "flex", alignItems: "center" }}>
-          <MenuIcon sx={{ mr: "0.25rem" }} />
-          <Typography fontWeight={700}>All</Typography>
-        </HeaderLink>
+        <SearchBar />
+      </Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+        <Typography sx={{ cursor: "pointer" }} onClick={() => {}}>
+          Shop
+        </Typography>
+        <Typography sx={{ color: "#ccc" }}>|</Typography>
+        <Typography sx={{ cursor: "pointer" }}>Help</Typography>
 
-        {links.map((l) => (
-          <HeaderLink key={l} to={`/${l}`}>
-            <Typography variant="body2">{l}</Typography>
-          </HeaderLink>
-        ))}
+        <Button
+          variant="outlined"
+          startIcon={<ShoppingCartOutlinedIcon />}
+          sx={{
+            textTransform: "none",
+            borderColor: "#000",
+            color: "#000",
+            borderRadius: "6px",
+            px: 2,
+            "&:hover": {
+              borderColor: "#000",
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Your Cart
+        </Button>
       </Box>
     </Box>
   );

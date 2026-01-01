@@ -4,6 +4,10 @@ import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import auth from './authSlice';
 import cartSlice from './cart';
+import categories from './categories';
+
+
+export type DynamicKeyObject = Record<string, any>;
 
 const authPersistConfig = {
   key: 'auth',
@@ -15,7 +19,7 @@ const authPersistConfig = {
 const reducers = {
   auth: persistReducer(authPersistConfig, auth),
   cart: persistReducer(authPersistConfig, cartSlice),
-
+  categories,
 };
 
 const rootReducer = combineReducers(reducers);

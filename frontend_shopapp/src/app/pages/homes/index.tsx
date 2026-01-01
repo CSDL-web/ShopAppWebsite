@@ -5,38 +5,38 @@ import Header from "@/components/headers/Header";
 import ProductCard from "@/components/products/ProductCard";
 import { COLORS } from "@/styles/colors";
 import { products } from "@/components/products/fakeData";
+import Categories from "@/components/categories/Categories";
+import CategorySection from "@/components/categories/CategorySection";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
+
+  const dataCategories = useAppSelector(selectCategoriesData);
+
+  useEffect(() => {
+    dispatch(actionGetCategories({} as any));
+  }, [dispatch]);
+
   return (
     <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
       <Header />
-
-      <Box
-        sx={{
-          height: 300,
-          background:
-            "linear-gradient(180deg, #eaeded 0%, rgba(234,237,237,0) 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography variant="h4" fontWeight={700}></Typography>
-      </Box>
+      <Categories categories={dataCategories.data} />
 
       <Box
         sx={{
           maxWidth: 1400,
-          margin: "-150px auto 0",
           padding: "1rem",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(225px, 1fr))",
-          gap: "1rem",
-          justifyItems: "center",
         }}
       >
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {dataCategories.data.map((cat, i) => (
+          <CategorySection
+            key={i}
+            title={cat.name}
+            products={products.filter((p) => p.category === cat.name)}
+          />
         ))}
       </Box>
     </Box>
