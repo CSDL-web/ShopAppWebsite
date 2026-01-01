@@ -25,7 +25,10 @@ class UserRepository:
     # [MỚI THÊM] Hàm tìm user bằng Facebook ID
     def get_by_facebook_id(self, facebook_id: str) -> Optional[User]:
         return self.db.query(User).filter(User.facebook_account_id == facebook_id).first()
-
+    def get_by_google_account_id(self,  google_id: str):
+        return self.db.query(User).filter(
+            User.google_account_id == google_id
+        ).first()
     def exists_by_phone(self, phone_number: str) -> bool:
         return self.db.query(User).filter(User.phone_number == phone_number).first() is not None
 

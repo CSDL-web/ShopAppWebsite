@@ -10,6 +10,7 @@ from app.dtos.user_dto import UserDTO, UserRead
 from app.dtos.user_login_dto import UserLoginDTO
 from app.dtos.token_dto import RefreshTokenRequest
 from app.dtos.facebook_login_dto import FacebookLoginDTO # [MỚI THÊM]
+from app.dtos.google_login_dto import GoogleLoginDTO
 
 userRouter = APIRouter(prefix="/users", tags=["Users"])
 
@@ -34,6 +35,10 @@ def login_facebook(
     service: UserService = Depends(get_user_service)
 ):
     return service.login_facebook(fb_data)
+
+@userRouter.post("/login-google")
+def login_google(payload: GoogleLoginDTO, service: UserService = Depends(get_user_service)):
+    return service.login_google(payload.credential)
 
 @userRouter.post("/refresh-token")
 def refresh_token(

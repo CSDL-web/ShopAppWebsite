@@ -1,3 +1,4 @@
+import os
 import hashlib
 import bcrypt
 import requests
@@ -13,7 +14,8 @@ from app.dtos.user_dto import UserDTO
 from app.dtos.user_login_dto import UserLoginDTO
 from app.dtos.facebook_login_dto import FacebookLoginDTO
 from app.services.token_service import TokenService
-
+from google.oauth2 import id_token as google_id_token
+from google.auth.transport import requests as google_requests
 class UserService:
     def __init__(self, db: Session):
         self.repo = UserRepository(db)
@@ -110,6 +112,61 @@ class UserService:
             user.email if user.email else user.facebook_account_id
         )
 
+        return self._generate_tokens(user, sub_identifier)
+    def login_google(self, credential: str):
+        GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+        if not GOOGLE_CLIENT_ID:
+            raise HTTPException(status_code=500, detail="Missing GOOGLE_CLIENT_ID in environment")
+
+        try:
+            claims = google_id_token.verify_oauth2_token(
+                credential,
+                google_requests.Request(),
+                GOOGLE_CLIENT_ID
+            )
+        except Exception:
+            raise HTTPException(status_code=401, detail="Invalid Google ID token")
+
+        google_id = claims["sub"]
+        email = claims.get("email")
+        name = claims.get("name")
+        picture = claims.get("picture")
+
+        if not email:
+            raise HTTPException(status_code=400, detail="Google token missing email")
+
+        if claims.get("email_verified") is not True:
+            raise HTTPException(status_code=401, detail="Google email is not verified")
+
+        user = self.repo.get_by_google_account_id(google_id)
+
+        if not user:
+            user = self.repo.get_by_email(email)
+            if user:
+                user.google_account_id = google_id
+                user.fullname = user.fullname or name
+                user.profile_image = user.profile_image or picture
+                self.repo.db.commit()
+                self.repo.db.refresh(user)
+                
+        if not user:
+            random_pw = str(uuid.uuid4())
+            hashed_password = self._hash_password(random_pw)
+            user_data = {
+                "google_account_id": google_id,
+                "email": email,
+                "password": hashed_password,
+                "role_id": 1,
+                "is_active": True,
+                "fullname": name,
+                "profile_image": picture,
+            }
+            user = self.repo.create(user_data)
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number or user.email or user.google_account_id
         return self._generate_tokens(user, sub_identifier)
 
     def _generate_tokens(self, user: User, sub_identifier: str):
