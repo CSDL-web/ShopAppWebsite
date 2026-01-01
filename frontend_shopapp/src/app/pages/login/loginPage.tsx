@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import {
   Box,
@@ -45,21 +45,49 @@ function GoogleIcon() {
 }
 
 export default function SignInPage() {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const raw = localStorage.getItem("demo_user");
+    const user = raw ? JSON.parse(raw) : null;
+
+    if (!user) {
+      setError("Chưa có tài khoản. Vui lòng đăng ký trước.");
+      return;
+    }
+
+    if (email.trim() !== user.email || password !== user.password) {
+      setError("Email hoặc mật khẩu không đúng.");
+      return;
+    }
+
+    // ✅ đăng nhập thành công -> về Home
+    navigate("/");
+  };
+
   return (
     <Box
-    sx={{
+      sx={{
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
         px: 2,
         py: 6,
         background: `
-        radial-gradient(900px 520px at 15% 80%, rgba(200,27,231,.85) 0%, transparent 55%),
-        radial-gradient(900px 520px at 85% 15%, rgba(48,162,222,.85) 0%, transparent 55%),
-        radial-gradient(900px 520px at 15% 10%, rgba(133,86,228,.75) 0%, transparent 55%),
-        linear-gradient(135deg, #c81be7 0%, #8556e4 30%, #5b7be2 55%, #30a2de 100%)
+          radial-gradient(900px 520px at 15% 80%, rgba(200,27,231,.85) 0%, transparent 55%),
+          radial-gradient(900px 520px at 85% 15%, rgba(48,162,222,.85) 0%, transparent 55%),
+          radial-gradient(900px 520px at 15% 10%, rgba(133,86,228,.75) 0%, transparent 55%),
+          linear-gradient(135deg, #c81be7 0%, #8556e4 30%, #5b7be2 55%, #30a2de 100%)
         `,
-    }}
+      }}
     >
       <Paper
         elevation={0}
@@ -78,13 +106,16 @@ export default function SignInPage() {
           Log in by entering your email address and password.
         </Typography>
 
-        <Box sx={{ display: "grid", gap: 2 }}>
+        {/* ✅ form để Enter cũng login được */}
+        <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
           <Box>
             <Typography sx={{ mb: 1, color: "text.secondary" }}>
               Email address
             </Typography>
             <TextField
               fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="email@address.com"
               InputProps={{
                 startAdornment: (
@@ -102,7 +133,9 @@ export default function SignInPage() {
             </Typography>
             <TextField
               fullWidth
-              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••••••"
               InputProps={{
                 startAdornment: (
@@ -112,7 +145,11 @@ export default function SignInPage() {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton edge="end" aria-label="show password">
+                    <IconButton
+                      edge="end"
+                      aria-label="show password"
+                      onClick={() => setShowPassword((v) => !v)}
+                    >
                       <VisibilityRoundedIcon />
                     </IconButton>
                   </InputAdornment>
@@ -121,11 +158,23 @@ export default function SignInPage() {
             />
           </Box>
 
-          <Link href="#" underline="hover" sx={{ color: "primary.main", mt: -1 }}>
+          {error && (
+            <Typography color="error" sx={{ fontSize: 14, mt: -1 }}>
+              {error}
+            </Typography>
+          )}
+
+          <Link
+            component={RouterLink}
+            to="/forgot-password"
+            underline="hover"
+            sx={{ color: "primary.main", mt: -1 }}
+          >
             Forgot password?
           </Link>
 
           <Button
+            type="submit"
             variant="contained"
             size="large"
             sx={{
@@ -163,38 +212,34 @@ export default function SignInPage() {
             <GoogleIcon />
             Sign in with Google
           </Button>
-        <Typography sx={{ color: "text.secondary" }}>
-          Don&apos;t have an account?{" "}
-          <Link
+
+          <Typography sx={{ color: "text.secondary" }}>
+            Don&apos;t have an account?{" "}
+            <Link
+              component={RouterLink}
+              to="/register"
+              underline="hover"
+              sx={{ color: "primary.main" }}
+            >
+              Sign up here
+            </Link>
+          </Typography>
+
+          <Button
             component={RouterLink}
-            to="/register"
-            underline="hover"
-            sx={{ color: "primary.main" }}
+            to="/"
+            variant="text"
+            size="large"
+            sx={{
+              mt: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "text.secondary",
+            }}
           >
-            Sign up here
-          </Link>
-        </Typography>
-
-
-        <Button
-          component={RouterLink}
-          to="/"
-          variant="text"
-          size="large"
-          sx={{
-            mt: 1,
-            textTransform: "none",
-            fontWeight: 600,
-            color: "text.secondary",
-          }}
-        >
-          ← Back to Home
-        </Button>
-
-
-          
+            ← Back to Home
+          </Button>
         </Box>
-
       </Paper>
     </Box>
   );

@@ -2,6 +2,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MenuIcon from "@mui/icons-material/Menu";
+import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+
 
 import { COLORS } from "@/styles/colors";
 import HeaderLink from "./HeaderLink";
@@ -22,30 +24,54 @@ export default function Header() {
   return (
     <Box sx={{ backgroundColor: COLORS.darkBlue, color: COLORS.white }}>
       {/* Top bar */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.5rem",
-        }}
-      >
-        <Logo />
-        <SearchBar />
-        <Box sx={{ display: "flex" }}>
-          <HeaderLink to="/orders">
-            <Box>
-              <Typography fontSize="0.75rem">Returns</Typography>
-              <Typography fontWeight={700}>& Orders</Typography>
-            </Box>
-          </HeaderLink>
+<Box
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    padding: "0.5rem",
+    gap: 2, // 👈 khoảng cách giữa các khối
+  }}
+>
+  {/* LEFT: Logo */}
+  <Logo />
 
-          <HeaderLink to="/cart">
-            <ShoppingCartIcon fontSize="large" />
-            <Typography fontWeight={700}>Cart</Typography>
-          </HeaderLink>
-        </Box>
+  {/* 🔍 SEARCH: căn trái, ngay sau logo */}
+  <Box
+    sx={{
+      width: 520,      // 👈 độ dài cố định
+      maxWidth: "100%",
+      flexShrink: 0,   // 👈 không bị co lại
+    }}
+  >
+    <SearchBar />
+  </Box>
+
+  {/* RIGHT: đẩy hết về phải */}
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      marginLeft: "auto", // 👈 QUAN TRỌNG: đẩy block này sang phải
+    }}
+  >
+    <HeaderLink to="/orders">
+      <Box>
+        <Typography fontSize="0.75rem">Returns</Typography>
+        <Typography fontWeight={700}>& Orders</Typography>
       </Box>
+    </HeaderLink>
+
+    <HeaderLink to="/cart">
+      <ShoppingCartIcon fontSize="large" />
+      <Typography fontWeight={700}>Cart</Typography>
+    </HeaderLink>
+
+    <HeaderLink to="/dashboard/setting">
+      <Typography fontWeight={700}>Settings</Typography>
+    </HeaderLink>
+  </Box>
+</Box>
+
 
       {/* Bottom bar */}
       <Box

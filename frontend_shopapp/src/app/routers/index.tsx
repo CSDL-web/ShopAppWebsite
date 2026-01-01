@@ -18,6 +18,7 @@ const Cart = lazy(() => import("@/app/pages/carts/index"));
 const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
 const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
 const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
+const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 
 
 
@@ -54,7 +55,7 @@ const adminItems: ItemType[] = [
   { key: "/forgot-password", components: <ForgotPassword />, layout: DEFAULT_LAYOUT, private: false },
   { key: "/check-email", components: <CheckEmail />, layout: DEFAULT_LAYOUT, private: false },
   { key: "/check-password", components: <CheckPassword />, layout: DEFAULT_LAYOUT, private: false },
-
+  { key: "/dashboard/setting", components: <Setting />, layout: DEFAULT_LAYOUT, private: false },
 
 
 
