@@ -1,6 +1,17 @@
 export const URL = {
   Home: "/",
   Login: "/login",
+  Register: "/register",
+  ForgotPassword: "/forgot-password",
+  CheckEmail: "/check-email",
+  CheckPassword: "/check-password",
+  Products: "/product/:id",
+  Cart: "/cart",
+  User: "/dashboard/users",
+  Product: "/dashboard/products",
+  Setting: "/dashboard/setting",
+  Categories: "/dashboard/categories"
+
 };
 
 export const DATE_TIME_FORMAT = "YYYY/MM/DD HH:mm:ss";
