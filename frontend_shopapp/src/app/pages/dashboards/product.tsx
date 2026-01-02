@@ -44,8 +44,8 @@ type ProductRow = {
   price: number;
   stock: number;
   rating: number;
-  createdAt: string; // tạm từ uid (để dựng UI)
-  active: boolean; // tạm từ uid
+  createdAt: string; 
+  active: boolean; 
 };
 
 /* Format số 1 chữ số thành 2 chữ số */
