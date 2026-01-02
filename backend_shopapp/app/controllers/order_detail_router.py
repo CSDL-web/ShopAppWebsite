@@ -6,7 +6,7 @@ from app.configs.dbConfig import get_db
 from app.services.order_detail_service import OrderDetailService
 from app.dtos.order_detail_dto import OrderDetailCreate, OrderDetailUpdate, OrderDetailRead
 from app.models.user_model import User
-from app.controllers.user_router import get_current_user
+from app.services.auth_service import get_current_user
 
 order_detail_router = APIRouter(prefix="/order-details", tags=["Order Details"])
 

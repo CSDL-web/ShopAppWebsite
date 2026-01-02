@@ -13,16 +13,21 @@ class Product(Base):
     description = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
-    category_id = Column(Integer,default = 0)
+    
 
-    # quan hệ 1 - Nhiều : (1 sản phầm có nhiều ảnh)
-    images = relationship("ProductImage",back_populates = "product_images", cascade="all, delete") # thuộc tính ảo
-    comments = relationship("Comment", back_populates="product_comments", cascade="all, delete")  # thuộc tính ảo
+    category_id = Column(Integer, ForeignKey("categories.id"))
+
+    category = relationship("Category", back_populates="products")
+
+    images = relationship("ProductImage", back_populates="product", cascade="all, delete") 
+    comments = relationship("Comment", back_populates="product", cascade="all, delete")  
+    order_details = relationship("OrderDetail", back_populates="product")
+    favorites = relationship("Favorite", back_populates="product", cascade="all, delete")
 
 class ProductImage(Base):
     __tablename__ = "product_images"
     id = Column(Integer, primary_key = True, index = True)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     image_url = Column(String(255))
-    product_images = relationship("Product", back_populates="images") # thuộc tínhcascade="all, delete" ảo
     
+    product = relationship("Product", back_populates="images")

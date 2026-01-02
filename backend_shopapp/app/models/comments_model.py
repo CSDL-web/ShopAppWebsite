@@ -12,4 +12,6 @@ class Comment(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    product_comments = relationship("Product",back_populates="comments")
+    product = relationship("Product",back_populates="comments")
+
+    user = relationship("User", back_populates="comments")

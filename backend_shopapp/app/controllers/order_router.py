@@ -7,14 +7,20 @@ from app.services.order_service import OrderService
 from app.dtos.order_dto import OrderCreate, OrderUpdate, OrderRead
 from app.models.user_model import User
 
-from app.controllers.user_router import get_current_user
+from app.services.auth_service import get_current_user
 
 order_router = APIRouter(prefix="/orders", tags=["Orders"])
 
+# [SỬA] Thêm tham số current_user để bắt buộc phải đăng nhập mới được tạo đơn
 @order_router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
-def create_order(order_data: OrderCreate, db: Session = Depends(get_db)):
+def create_order(
+    order_data: OrderCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user) # Bắt buộc đăng nhập
+):
     service = OrderService(db)
-    return service.create_order(order_data)
+    # Truyền thêm user_id của người đang đăng nhập vào service
+    return service.create_order(order_data, current_user.id)
 
 @order_router.get("/me", response_model=List[OrderRead])
 def get_my_orders(
@@ -45,7 +51,7 @@ def update_order(
     try:
         return service.update_order(update_data, current_user)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+         raise HTTPException(status_code=400, detail=str(e))
 
 @order_router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_order(
@@ -58,3 +64,13 @@ def delete_order(
         service.delete_order(order_id, current_user)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@order_router.get("/get-all-orders-admin", response_model=List[OrderRead])
+def get_all_orders_admin(
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    service = OrderService(db)
+    return service.get_all_orders(skip, limit, current_user)

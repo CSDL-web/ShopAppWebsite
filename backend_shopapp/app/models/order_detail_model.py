@@ -7,18 +7,19 @@ class OrderDetail(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     order_id = Column(Integer, ForeignKey("orders.id"))
-    # product_id = Column(Integer, ForeignKey("products.id"))
+    
+    product_id = Column(Integer, ForeignKey("products.id"))
     
     price = Column(DECIMAL(10, 2))
-    
     number_of_products = Column(Integer, default=1)
-    
     total_money = Column(DECIMAL(10, 2), default=0.00)
-    
     color = Column(String(20), default="")
     coupon_id = Column(Integer, ForeignKey("coupons.id"))
 
     # Relationships
     order = relationship("Order", back_populates="order_details")
-    # product = relationship("Product") 
+    
+    
+    product = relationship("Product", back_populates="order_details")
+    
     coupon = relationship("Coupon", back_populates="order_details")

@@ -12,9 +12,9 @@ class OrderStatus(str, Enum):
     cancelled = 'cancelled'
 
 class OrderBase(BaseModel):
-    user_id: Optional[int] = None
+    
     fullname: str = Field(..., max_length=100)
-    email: str = Field(..., max_length=100) # SỬA: Dùng str thường thay vì EmailStr
+    email: str = Field(..., max_length=100) 
     phone_number: str = Field(..., max_length=20)
     address: str = Field(..., max_length=200)
     note: Optional[str] = Field(None, max_length=100)
@@ -40,6 +40,7 @@ class OrderUpdate(BaseModel):
 
 class OrderRead(OrderBase):
     id: int
+    user_id: int
     order_date: Optional[datetime] = None
     
     model_config = ConfigDict(from_attributes=True)
