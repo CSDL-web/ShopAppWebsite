@@ -3,11 +3,10 @@ import { useAppDispatch } from "@/stores";
 import { Box, Button, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
-import { Product } from "./products/fakeData";
+import { Product } from "../stores/products";
 import InStockText from "./inStockText";
 import { removeItem } from "@/stores/cart";
 import CustomHR from "./CustomHR";
-
 
 const CartItem = ({ item }: { item: Product }) => {
   const dispatch = useAppDispatch();

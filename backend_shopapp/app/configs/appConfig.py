@@ -12,7 +12,6 @@ def init_routers(app: FastAPI):
 def create_app() -> FastAPI:
     app = FastAPI(title="ShopApp Backend")
 
-    # 🔥 CORS MIDDLEWARE – PHẢI đặt NGAY SAU FastAPI()
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[

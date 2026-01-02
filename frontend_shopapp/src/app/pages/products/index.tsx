@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { COLORS } from "@/styles/colors";
 import Ratings from "@/components/products/Ratings";
-import { Product, products } from "@/components/products/fakeData";
+import { actionGetProduct, selectProductsData } from "@/stores/products";
 import Header from "@/components/headers/Header";
+import { useAppDispatch, useAppSelector } from "@/stores";
 
 export default function ProductPage() {
-  const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-
-    // 👉 mock version
-    const found = products.find((p) => p.id === Number(id));
-    setProduct(found ?? null);
-
-    // 👉 API version (sau này)
-    // getSingleProduct(Number(id)).then(setProduct);
-  }, [id]);
-
-  if (!product) {
+    const dispatch = useAppDispatch();
+  
+    const dataProduct = useAppSelector(selectProductsData);
+  
+    useEffect(() => {
+      dispatch(actionGetProduct({ skip: 0, limit: 150 } as any));
+    }, [dispatch]);
+  
+  if (!dataProduct) {
     return (
       <Box sx={{ padding: "2rem" }}>
         <Typography>Product not found</Typography>

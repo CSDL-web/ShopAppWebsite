@@ -1,11 +1,15 @@
 import Box from "@mui/material/Box";
 import Header from "@/components/headers/Header";
 import { COLORS } from "@/styles/colors";
-import { products } from "@/components/products/fakeData";
+import { products } from "@/stores/products";
 import Categories from "@/components/categories/Categories";
 import CategorySection from "@/components/categories/CategorySection";
 import { useAppDispatch, useAppSelector } from "@/stores";
-import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
+import {
+  actionGetCategories,
+  actionPostCategories,
+  selectCategoriesData,
+} from "@/stores/categories";
 import { useEffect } from "react";
 
 export default function HomePage() {
@@ -29,11 +33,7 @@ export default function HomePage() {
         }}
       >
         {dataCategories.data.map((cat, i) => (
-          <CategorySection
-            key={i}
-            title={cat.name}
-            products={products.filter((p) => p.category === cat.name)}
-          />
+          <CategorySection key={i} title={cat.name} products={[]} />
         ))}
       </Box>
     </Box>

@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { COLORS } from "@/styles/colors";
-import { Product } from "./fakeData";
+import { Product } from "../../stores/products";
 
 const ProductCard = ({
   product,

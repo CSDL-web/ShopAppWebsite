@@ -3,7 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { useAppDispatch } from "@/stores";
 import CustomHR from "../CustomHR";
 import InStockText from "../inStockText";
-import { Product } from "../products/fakeData";
+import { Product } from "../../stores/products";
 import { removeItem } from "@/stores/cart";
 
 export default function CartItem({ item }: { item: Product }) {
@@ -21,7 +21,7 @@ export default function CartItem({ item }: { item: Product }) {
         {/* LEFT */}
         <Box sx={{ display: "flex" }}>
           <img
-            src={item.image}
+            src={item.thumbnail}
             alt={item.title}
             width={225}
             height={257}

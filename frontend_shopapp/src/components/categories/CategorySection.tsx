@@ -3,7 +3,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import ProductCard from "@/components/products/ProductCard";
-import { Product } from "@/components/products/fakeData";
+import { Product } from "@/stores/products";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
