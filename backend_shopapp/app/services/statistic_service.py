@@ -1,37 +1,31 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, extract, case
-from datetime import date, datetime, timedelta
-from typing import List
+from sqlalchemy import func, desc, distinct
+from datetime import date, timedelta
+import calendar
 
 from app.models.user_model import User
 from app.models.order_model import Order
 from app.models.order_detail_model import OrderDetail
+from app.models.product_model import Product
 
 class StatisticService:
     def __init__(self, db: Session):
         self.db = db
 
-    # ---------------------------------------------------------
-    # 1. NHÓM CHỈ SỐ TỔNG QUAN (CARD STATS)
-    # ---------------------------------------------------------
     def get_dashboard_summary(self):
         today = date.today()
         
-        # 1. Tổng số user
         total_users = self.db.query(func.count(User.id)).scalar()
 
-        # 2. User đăng ký mới HÔM NAY
         new_users_today = self.db.query(func.count(User.id)).filter(
             func.date(User.created_at) == today
         ).scalar()
 
-        # 3. Doanh thu HÔM NAY (Chỉ tính đơn chưa huỷ)
         revenue_today = self.db.query(func.sum(Order.total_money)).filter(
             func.date(Order.order_date) == today,
             Order.status != 'cancelled' 
-        ).scalar() or 0.0 # Nếu None thì trả về 0
+        ).scalar() or 0.0
 
-        # 4. Tổng doanh thu toàn thời gian (Optional - để so sánh)
         total_revenue = self.db.query(func.sum(Order.total_money)).filter(
             Order.status != 'cancelled'
         ).scalar() or 0.0
@@ -43,20 +37,11 @@ class StatisticService:
             "total_revenue": total_revenue
         }
 
-    # ---------------------------------------------------------
-    # 2. BIỂU ĐỒ TĂNG TRƯỞNG USER (THEO THÁNG)
-    # ---------------------------------------------------------
     def get_monthly_new_users(self, year: int = None):
-        """
-        Đếm số user đăng ký theo từng tháng trong năm.
-        Mặc định là năm hiện tại.
-        """
+        """Biểu đồ User theo tháng (CŨ)"""
         if not year:
             year = date.today().year
 
-        # Query Group By Month
-        # Lưu ý: func.month() hoạt động trên MySQL. 
-        # Nếu dùng PostgreSQL thì dùng func.extract('month', User.created_at)
         query = (
             self.db.query(
                 func.month(User.created_at).label("month"),
@@ -68,16 +53,36 @@ class StatisticService:
             .all()
         )
 
-        # Map dữ liệu ra list 12 tháng (để frontend dễ vẽ biểu đồ, tháng nào ko có thì = 0)
         data = {row.month: row.count for row in query}
-        result = [{"month": i, "new_users": data.get(i, 0)} for i in range(1, 13)]
-        
-        return result
+        return [{"month": i, "new_users": data.get(i, 0)} for i in range(1, 13)]
 
-    # ---------------------------------------------------------
-    # 3. BIỂU ĐỒ DOANH THU (THEO THÁNG)
-    # ---------------------------------------------------------
+    def get_daily_new_users(self, month: int, year: int):
+        """Biểu đồ User theo ngày trong tháng (MỚI)"""
+        if not year:
+            year = date.today().year
+        if not month:
+            month = date.today().month
+
+        _, num_days = calendar.monthrange(year, month)
+
+        query = (
+            self.db.query(
+                func.day(User.created_at).label("day"),
+                func.count(User.id).label("count")
+            )
+            .filter(
+                func.year(User.created_at) == year,
+                func.month(User.created_at) == month
+            )
+            .group_by(func.day(User.created_at))
+            .all()
+        )
+        
+        data = {row.day: row.count for row in query}
+        return [{"day": i, "new_users": data.get(i, 0)} for i in range(1, num_days + 1)]
+
     def get_monthly_revenue(self, year: int = None):
+        """Biểu đồ doanh thu (CŨ)"""
         if not year:
             year = date.today().year
 
@@ -88,7 +93,7 @@ class StatisticService:
             )
             .filter(
                 func.year(Order.order_date) == year,
-                Order.status != 'cancelled' # Không tính đơn huỷ
+                Order.status != 'cancelled'
             )
             .group_by(func.month(Order.order_date))
             .order_by(func.month(Order.order_date))
@@ -96,17 +101,79 @@ class StatisticService:
         )
 
         data = {row.month: row.total for row in query}
-        result = [{"month": i, "revenue": data.get(i, 0)} for i in range(1, 13)]
-        
-        return result
+        return [{"month": i, "revenue": data.get(i, 0)} for i in range(1, 13)]
 
-    # ---------------------------------------------------------
-    # 4. TOP 20 VIP USERS (CHI TIÊU NHIỀU NHẤT)
-    # ---------------------------------------------------------
+    def get_operation_stats(self):
+        pending_orders = self.db.query(func.count(Order.id)).filter(Order.status == 'pending').scalar() or 0
+        
+        shipping_orders = self.db.query(func.count(Order.id)).filter(Order.status == 'shipped').scalar() or 0
+        
+        total_orders = self.db.query(func.count(Order.id)).scalar() or 1
+        cancelled_orders = self.db.query(func.count(Order.id)).filter(Order.status == 'cancelled').scalar() or 0
+        cancel_rate = round((cancelled_orders / total_orders) * 100, 2)
+
+        valid_query = self.db.query(
+            func.sum(Order.total_money).label('total_money'),
+            func.count(Order.id).label('total_count')
+        ).filter(Order.status != 'cancelled').first()
+
+        valid_revenue = valid_query.total_money or 0
+        valid_orders_count = valid_query.total_count or 1
+        
+        aov = round(valid_revenue / valid_orders_count, 0)
+
+        return {
+            "pending_orders": pending_orders,
+            "shipping_orders": shipping_orders,
+            "cancel_rate": cancel_rate,
+            "cancel_rate_alert": cancel_rate > 10,
+            "aov": aov
+        }
+
+    def get_dead_stock_products(self, days: int = 30, limit: int = 10):
+        """
+        Lấy danh sách sản phẩm không bán được cái nào trong `days` ngày qua.
+        """
+        check_date = date.today() - timedelta(days=days)
+        
+        sold_product_ids = (
+            self.db.query(distinct(OrderDetail.product_id))
+            .join(Order, Order.id == OrderDetail.order_id)
+            .filter(Order.order_date >= check_date)
+            .filter(Order.status != 'cancelled')
+        )
+
+        dead_stock_products = (
+            self.db.query(Product)
+            .filter(Product.id.notin_(sold_product_ids))
+            .limit(limit)
+            .all()
+        )
+
+        return dead_stock_products
+
+    def get_user_insights(self):
+        total_users = self.db.query(func.count(User.id)).scalar() or 1
+        
+        buying_users = (
+            self.db.query(func.count(distinct(Order.user_id)))
+            .filter(Order.status != 'cancelled')
+            .scalar()
+        ) or 0
+        
+        conversion_rate = round((buying_users / total_users) * 100, 2)
+
+        blocked_users = self.db.query(func.count(User.id)).filter(User.is_active == False).scalar() or 0
+
+        return {
+            "total_users": total_users,
+            "buying_users": buying_users,
+            "conversion_rate": conversion_rate,
+            "blocked_users": blocked_users
+        }
+
     def get_top_spending_users(self, limit: int = 20):
-        """
-        Lấy danh sách user chi nhiều tiền nhất (Dựa trên đơn hàng đã giao thành công - delivered)
-        """
+        """Top VIP (CŨ)"""
         query = (
             self.db.query(
                 User.id,
@@ -117,7 +184,7 @@ class StatisticService:
                 func.count(Order.id).label("order_count")
             )
             .join(Order, User.id == Order.user_id)
-            .filter(Order.status == 'delivered') # Chỉ tính đơn đã giao thành công
+            .filter(Order.status == 'delivered')
             .group_by(User.id)
             .order_by(desc("total_spent"))
             .limit(limit)
@@ -128,7 +195,7 @@ class StatisticService:
             {
                 "user_id": row.id,
                 "fullname": row.fullname,
-                "email": row.email or "", # Handle None
+                "email": row.email or "",
                 "phone": row.phone_number or "",
                 "total_spent": row.total_spent,
                 "order_count": row.order_count
