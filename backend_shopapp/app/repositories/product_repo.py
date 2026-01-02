@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 from app.models.product_model import Product, ProductImage
 from datetime import datetime
+from sqlalchemy import func, desc, asc
+from app.models.order_detail_model import OrderDetail 
 
 class ProductRepository:
     def __init__(self, db: Session):
@@ -65,3 +67,65 @@ class ProductRepository:
             self.db.commit()
             return True
         return False
+
+    
+    def filter_products(
+        self, 
+        keyword: str = None,
+        min_price: float = None, 
+        max_price: float = None, 
+        category_id: int = None,
+        sort_by: str = None,  # 'price_asc', 'price_desc', 'newest', 'best_selling'
+        skip: int = 0, 
+        limit: int = 10
+    ) -> List[Product]:
+        
+        query = self.db.query(Product)
+
+        # 1. Lọc theo từ khóa (nếu có)
+        if keyword:
+            search_fmt = f"%{keyword}%"
+            query = query.filter(Product.name.like(search_fmt))
+
+        # 2. Lọc theo Category
+        if category_id:
+            query = query.filter(Product.category_id == category_id)
+
+        # 3. Lọc theo khoảng giá
+        if min_price is not None:
+            query = query.filter(Product.price >= min_price)
+        if max_price is not None:
+            query = query.filter(Product.price <= max_price)
+
+        # 4. Sắp xếp
+        if sort_by == 'price_asc':
+            query = query.order_by(Product.price.asc())
+            
+        elif sort_by == 'price_desc':
+            query = query.order_by(Product.price.desc())
+            
+        elif sort_by == 'newest':
+            query = query.order_by(Product.created_at.desc())
+            
+        elif sort_by == 'best_selling':
+            # Logic phức tạp: Join với bảng OrderDetail, nhóm theo ProductID và tính tổng số lượng bán
+            query = query.outerjoin(OrderDetail, Product.id == OrderDetail.product_id)\
+                         .group_by(Product.id)\
+                         .order_by(func.sum(OrderDetail.number_of_products).desc())
+        else:
+            # Mặc định sắp xếp theo ngày tạo mới nhất nếu không chọn gì
+            query = query.order_by(Product.created_at.desc())
+
+        return query.offset(skip).limit(limit).all()
+
+    
+    def get_recommendations(self, product_id: int, limit: int = 6) -> List[Product]:
+        # Lấy thông tin sản phẩm hiện tại để biết category_id
+        current_product = self.get_by_id(product_id)
+        if not current_product:
+            return []
+        
+        return self.db.query(Product).filter(
+            Product.category_id == current_product.category_id, # Cùng danh mục
+            Product.id != product_id # Không lấy lại chính nó
+        ).limit(limit).all()

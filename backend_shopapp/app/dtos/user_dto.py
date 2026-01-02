@@ -32,3 +32,24 @@ class UserRead(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserUpdateProfileDTO(BaseModel):
+    fullname: Optional[str] = Field(None, max_length=100)
+    address: Optional[str] = Field(None, max_length=200)
+    date_of_birth: Optional[date] = None
+    facebook_account_id: Optional[str] = None
+    google_account_id: Optional[str] = None
+
+class ChangePasswordDTO(BaseModel):
+    old_password: str = Field(..., min_length=6, description="Mật khẩu hiện tại")
+    new_password: str = Field(..., min_length=6, description="Mật khẩu mới")
+    confirm_new_password: str = Field(..., min_length=6, description="Nhập lại mật khẩu mới")
+
+    @model_validator(mode='after')
+    def check_passwords_match(self):
+        if self.new_password != self.confirm_new_password:
+            raise ValueError('Mật khẩu mới và xác nhận mật khẩu không khớp')
+        return self
+
+class AdminUpdateUserStatusDTO(BaseModel):
+    is_active: bool
