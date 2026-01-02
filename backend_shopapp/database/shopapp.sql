@@ -8,7 +8,7 @@
 -- Phiên bản PHP: 8.2.8
 DROP DATABASE IF EXISTS ShopApp;
 -- Nếu cơ sở dữ liệu ShopApp chưa tồn tại, thực hiện câu lệnh CREATE DATABASE
-CREATE DATABASE IF NOT EXISTS `ShopApp`;
+CREATE DATABASE IF NOT EXISTS ShopApp;
 
 -- Sử dụng cơ sở dữ liệu ShopApp
 USE ShopApp;
