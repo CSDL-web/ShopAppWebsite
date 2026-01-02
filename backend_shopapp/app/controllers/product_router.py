@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.dtos.product_dto import ProductDTO
 from app.services.product_service import ProductService
@@ -23,11 +23,12 @@ def create_product(
 
 @productRouter.get("", response_model=List[ProductDTO])
 def get_all_products(
+    keyword: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
     service: ProductService = Depends(get_product_service)
 ):
-    return service.get_all_products(skip, limit)
+    return service.get_all_products(keyword, skip, limit)
 
 @productRouter.get("/{product_id}", response_model=ProductDTO)
 def get_product_by_id(

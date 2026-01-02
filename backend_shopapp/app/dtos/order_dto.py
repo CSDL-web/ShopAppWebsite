@@ -12,7 +12,7 @@ class OrderStatus(str, Enum):
     cancelled = 'cancelled'
 
 class OrderBase(BaseModel):
-    user_id: Optional[int] = None
+    
     fullname: str = Field(..., max_length=100)
     email: str = Field(..., max_length=100) 
     phone_number: str = Field(..., max_length=20)
@@ -40,6 +40,7 @@ class OrderUpdate(BaseModel):
 
 class OrderRead(OrderBase):
     id: int
+    user_id: int
     order_date: Optional[datetime] = None
     
     model_config = ConfigDict(from_attributes=True)

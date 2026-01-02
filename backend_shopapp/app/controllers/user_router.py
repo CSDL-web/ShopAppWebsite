@@ -35,7 +35,7 @@ def login_facebook(
 ):
     return service.login_facebook(fb_data)
 
-@userRouter.post("/login-google-(add client gg id in .env)")
+@userRouter.post("/login-google")
 def login_google(
     google_data: GoogleLoginDTO,
     service: UserService = Depends(get_user_service)
