@@ -35,9 +35,9 @@ def seed_roles():
 
 def init_routers(app: FastAPI):
     app.include_router(userRouter)
-    app.include_router(statisticRouter)
     app.include_router(categoryRouter)
     app.include_router(productRouter)
+    app.include_router(statisticRouter)
     app.include_router(role_router)
     app.include_router(commentsRouter)
     app.include_router(favorite_router)
