@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import CustomBox from "./shared/CustomBox";
-import { Product } from "@/types/supabase";
-import DeliveryOptions from "./DeliveryOptions";
+
 import { COLORS } from "@/styles/colors";
+import { Product } from "../../stores/products";
+import CustomBox from "../customBox";
+import DeliveryOptions from "../DeliveryOptions";
 
 const CheckoutItem = ({ item }: { item: Product }) => {
   return (
@@ -24,9 +25,7 @@ const CheckoutItem = ({ item }: { item: Product }) => {
       />
 
       <Box sx={{ width: "22rem" }}>
-        <Typography sx={{ fontWeight: 700 }}>
-          {item.title}
-        </Typography>
+        <Typography sx={{ fontWeight: 700 }}>{item.title}</Typography>
 
         <Typography sx={{ fontWeight: 700, color: COLORS.red }}>
           ${item.price}

@@ -4,13 +4,14 @@ import React from "react";
 
 import { useAppSelector } from "@/stores";
 import { getCart } from "@/stores/cart";
-import { Product } from "../products/fakeData";
+import { Product } from "../../stores/products";
 import CheckoutHeader from "./checkout_header";
 import CheckoutSection from "./checkout_section";
 import CheckoutItem from "./checkout_item";
 import CustomBox from "../customBox";
 import CustomButton from "../customButton";
 import ProductLinkText from "../productLinkText";
+import OrderSummary from "../OrderSummary";
 
 const Checkout = () => {
   const cart = useAppSelector(getCart);
@@ -40,12 +41,10 @@ const Checkout = () => {
           </CheckoutSection>
 
           <CheckoutSection number={2} title="Payment Method">
-            <Typography fontWeight={700}>
-              Paying with Galleons
-            </Typography>
+            <Typography fontWeight={700}>Paying with Galleons</Typography>
             <Typography>
-              <span style={{ color: COLORS.teal }}>Billing address:</span>{" "}
-              Harry Potter, 123 Diagon Alley...
+              <span style={{ color: COLORS.teal }}>Billing address:</span> Harry
+              Potter, 123 Diagon Alley...
             </Typography>
           </CheckoutSection>
 

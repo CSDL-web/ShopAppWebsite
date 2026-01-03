@@ -3,11 +3,11 @@ import { Box, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
 
-import { useAppSelector } from 'stores';
+import { useAppSelector } from "stores";
 import CartItem from "./cart_item";
 import { COLORS } from "@/styles/colors";
 import CustomHR from "../CustomHR";
-import { Product } from "../products/fakeData";
+import { Product } from "../../stores/products";
 import ProductLinkText from "../productLinkText";
 import Subtotal from "./subTotal";
 import CustomButton from "../customButton";
@@ -17,7 +17,10 @@ export default function Cart() {
   const cart = useAppSelector(getCart);
   const navigate = useNavigate();
 
-  const total = cart.reduce((sum: number, item: Product) => sum + (item.price ?? 0),0);
+  const total = cart.reduce(
+    (sum: number, item: Product) => sum + (item.price ?? 0),
+    0
+  );
 
   return (
     <Box

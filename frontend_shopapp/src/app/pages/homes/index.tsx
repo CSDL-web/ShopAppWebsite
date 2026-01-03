@@ -1,43 +1,54 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-
 import Header from "@/components/headers/Header";
-import ProductCard from "@/components/products/ProductCard";
 import { COLORS } from "@/styles/colors";
-import { products } from "@/components/products/fakeData";
+import { actionGetProduct, selectProductsData } from "@/stores/products";
+import Categories from "@/components/categories/Categories";
+import CategorySection from "@/components/categories/CategorySection";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
+
+  const dataCategories = useAppSelector(selectCategoriesData);
+  const product = useAppSelector(selectProductsData);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        dispatch(actionGetCategories()).unwrap(),
+        dispatch(actionGetProduct({ skip: 0, limit: 1001 })).unwrap(),
+      ]);
+    };
+
+    fetchData();
+  }, [dispatch]);
+
   return (
     <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
       <Header />
-
-      <Box
-        sx={{
-          height: 300,
-          background:
-            "linear-gradient(180deg, #eaeded 0%, rgba(234,237,237,0) 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography variant="h4" fontWeight={700}></Typography>
-      </Box>
+      <Categories categories={dataCategories.data} />
 
       <Box
         sx={{
           maxWidth: 1400,
-          margin: "-150px auto 0",
           padding: "1rem",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(225px, 1fr))",
-          gap: "1rem",
-          justifyItems: "center",
         }}
       >
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
+        {dataCategories.data.map((cat) => {
+          const productsByCategory = product.data.filter(
+            (p) => p.category_id === cat.id
+          );
+
+          return (
+            <CategorySection
+              key={cat.id}
+              title={cat.name}
+              products={productsByCategory}
+            />
+          );
+        })}
       </Box>
     </Box>
   );

@@ -15,9 +15,6 @@ export default function HeaderLink({ to, children, style }: Props) {
         color: COLORS.white,
         textDecoration: "none",
         margin: "0.5rem",
-        display: "inline-flex",      // ✅ giúp icon + text canh đẹp
-        alignItems: "center",        // ✅ canh giữa
-        gap: "0.25rem",              // ✅ khoảng cách nhỏ
         ...style,
       }}
     >

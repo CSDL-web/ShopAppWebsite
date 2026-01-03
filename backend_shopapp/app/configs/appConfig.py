@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from app.configs.dbConfig import Base, engine
+from fastapi.staticfiles import StaticFiles
 
+from app.configs.dbConfig import Base, engine
+from app.controllers import userRouter, categoryRouter
 from app.models.role_model import Role
 
 from app.controllers import (
@@ -17,7 +19,8 @@ from app.controllers import (
     favorite_router,
     flyway_router,
     role_router,
-    product_image_router
+    product_image_router,
+    statisticRouter,
 )
 
 def seed_roles():
@@ -34,9 +37,10 @@ def seed_roles():
 
 def init_routers(app: FastAPI):
     app.include_router(userRouter)
-    app.include_router(role_router)
     app.include_router(categoryRouter)
     app.include_router(productRouter)
+    app.include_router(statisticRouter)
+    app.include_router(role_router)
     app.include_router(commentsRouter)
     app.include_router(favorite_router)
     app.include_router(coupon_router)
@@ -45,11 +49,10 @@ def init_routers(app: FastAPI):
     app.include_router(order_detail_router)
     app.include_router(flyway_router)
     app.include_router(product_image_router)
+    
+
 def create_app() -> FastAPI:
     app = FastAPI(title="ShopApp Backend", version="1.0.0")
-
-    Base.metadata.create_all(bind=engine)
-
     seed_roles()
 
     app.add_middleware(
@@ -59,6 +62,13 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    
+    app.mount(
+        "/backend_shopapp/uploads",
+        StaticFiles(directory="/app/app/uploads"),
+        name="uploads"
+    )
+
 
     init_routers(app)
     return app

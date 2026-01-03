@@ -12,7 +12,6 @@ role_router = APIRouter(prefix="/roles", tags=["Roles"])
 
 @role_router.post("", response_model=RoleRead, status_code=status.HTTP_201_CREATED)
 def create_role(role_data: RoleCreate, db: Session = Depends(get_db)):
-    # Code tạm gọi repo trực tiếp nếu chưa có Service
     from app.repositories.role_repo import RoleRepository
     repo = RoleRepository(db)
     if repo.get_by_name(role_data.name):
@@ -21,6 +20,7 @@ def create_role(role_data: RoleCreate, db: Session = Depends(get_db)):
 
 @role_router.get("", response_model=List[RoleRead])
 def get_all_roles(db: Session = Depends(get_db)):
+    """id = 1 là user, 2 là admin"""
     from app.repositories.role_repo import RoleRepository
     return RoleRepository(db).get_all()
 

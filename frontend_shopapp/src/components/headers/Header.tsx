@@ -1,97 +1,172 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import MenuIcon from "@mui/icons-material/Menu";
-import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-
-
-import { COLORS } from "@/styles/colors";
-import HeaderLink from "./HeaderLink";
-import Logo from "./Logo";
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import FeedbackIcon from "@mui/icons-material/Feedback";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useState } from "react";
 import SearchBar from "./SearchBar";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const links = [
-    { label: "Home", to: "/" },
-    { label: "Groceries", to: "/groceries" },
-    { label: "Best Sellers", to: "/best-sellers" },
-    { label: "Prime", to: "/prime" },
-    { label: "New Releases", to: "/new-releases" },
-    { label: "Books", to: "/books" },
-    { label: "Log in", to: "/login" }, // ✅ cái bạn cần
-  ];
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  return (
-    <Box sx={{ backgroundColor: COLORS.darkBlue, color: COLORS.white }}>
-      {/* Top bar */}
-<Box
-  sx={{
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const itemStyle = {
     display: "flex",
     alignItems: "center",
-    padding: "0.5rem",
-    gap: 2, // 👈 khoảng cách giữa các khối
-  }}
->
-  {/* LEFT: Logo */}
-  <Logo />
+    gap: 1.5,
+    borderRadius: 2,
+    py: 1.2,
+  };
 
-  {/* 🔍 SEARCH: căn trái, ngay sau logo */}
-  <Box
-    sx={{
-      width: 520,      // 👈 độ dài cố định
-      maxWidth: "100%",
-      flexShrink: 0,   // 👈 không bị co lại
-    }}
-  >
-    <SearchBar />
-  </Box>
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: "2rem",
+        py: "1rem",
+        backgroundColor: "#fff",
+        borderBottom: "1px solid #eee",
+      }}
+    >
+      <Typography fontWeight={600}></Typography>
 
-  {/* RIGHT: đẩy hết về phải */}
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      marginLeft: "auto", // 👈 QUAN TRỌNG: đẩy block này sang phải
-    }}
-  >
-    <HeaderLink to="/orders">
-      <Box>
-        <Typography fontSize="0.75rem">Returns</Typography>
-        <Typography fontWeight={700}>& Orders</Typography>
-      </Box>
-    </HeaderLink>
+      <IconButton onClick={handleOpen}>
+        <Avatar sx={{ width: 40, height: 40, bgcolor: "#e0e0e0" }}>
+          <PersonIcon sx={{ color: "#757575" }} />
+        </Avatar>
+      </IconButton>
 
-    <HeaderLink to="/cart">
-      <ShoppingCartIcon fontSize="large" />
-      <Typography fontWeight={700}>Cart</Typography>
-    </HeaderLink>
-
-    <HeaderLink to="/dashboard/setting">
-      <Typography fontWeight={700}>Settings</Typography>
-    </HeaderLink>
-  </Box>
-</Box>
-
-
-      {/* Bottom bar */}
-      <Box
-        sx={{
-          backgroundColor: COLORS.mediumBlue,
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{
+          sx: {
+            width: 320,
+            borderRadius: 3,
+            mt: 1,
+            p: 1,
+            boxShadow: "0px 8px 24px rgba(0,0,0,0.12)",
+          },
         }}
       >
-        <HeaderLink to="/all">
-          <MenuIcon sx={{ mr: "0.25rem" }} />
-          <Typography fontWeight={700}>All</Typography>
-        </HeaderLink>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            p: 1.5,
+            borderRadius: 2,
+            cursor: "pointer",
+            "&:hover": { bgcolor: "#f5f5f5" },
+          }}
+        >
+          <Avatar sx={{ width: 48, height: 48, bgcolor: "#e0e0e0" }}>
+            <PersonIcon sx={{ color: "#757575" }} />
+          </Avatar>
+          <Box>
+            <Typography fontWeight={600}></Typography>
+            <Typography fontSize={13} color="text.secondary">
+              Xem tất cả trang cá nhân
+            </Typography>
+          </Box>
+        </Box>
 
-        {links.map((l) => (
-          <HeaderLink key={l.label} to={l.to}>
-            <Typography variant="body2">{l.label}</Typography>
-          </HeaderLink>
-        ))}
+        <Divider sx={{ my: 1 }} />
+
+        <MenuItem sx={itemStyle}>
+          <SettingsIcon />
+          <Typography>Cài đặt</Typography>
+        </MenuItem>
+
+        <MenuItem sx={itemStyle}>
+          <HelpOutlineIcon />
+          <Typography>Trợ giúp và hỗ trợ</Typography>
+        </MenuItem>
+
+        <MenuItem sx={{ ...itemStyle, color: "error.main" }}>
+          <LogoutIcon />
+          <Typography>Đăng xuất</Typography>
+        </MenuItem>
+      </Menu>
+
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          mx: 3,
+        }}
+      >
+        <SearchBar />
+      </Box>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+        <Typography
+          onClick={() => {
+            if (!isHome) {
+              navigate("/");
+            }
+          }}
+          sx={{
+            cursor: isHome ? "default" : "pointer",
+            fontWeight: isHome ? 600 : 400,
+            color: isHome ? "text.primary" : "text.secondary",
+            textDecoration: isHome ? "underline" : "none",
+            pointerEvents: isHome ? "none" : "auto",
+          }}
+        >
+          Shop
+        </Typography>
+        <Typography sx={{ color: "#ccc" }}>|</Typography>
+        <Typography sx={{ cursor: "pointer" }}>Help</Typography>
+
+        <Button
+          variant="outlined"
+          startIcon={<ShoppingCartOutlinedIcon />}
+          sx={{
+            textTransform: "none",
+            borderColor: "#000",
+            color: "#000",
+            borderRadius: "6px",
+            px: 2,
+            "&:hover": {
+              borderColor: "#000",
+              backgroundColor: "#f5f5f5",
+            },
+          }}
+        >
+          Your Cart
+        </Button>
       </Box>
     </Box>
   );
