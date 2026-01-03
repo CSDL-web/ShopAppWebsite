@@ -8,9 +8,7 @@ export const URL = {
   Products: "/product/:id",
   Cart: "/cart",
   user: "/dashboard/users",
-  product: "/dashboard/products"
-  Products: "/product/:id",
-  Cart: "/cart",
+  product: "/dashboard/products",
   Categories: "/categories/:name",
 };
 

@@ -18,10 +18,7 @@ const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
 const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
 const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
-const Login = lazy(() => import("app/pages/login/loginPage"));
-const Home = lazy(() => import("@/app/pages/homes/index"));
-const Products = lazy(() => import("@/app/pages/products/index"));
-const Cart = lazy(() => import("@/app/pages/carts/index"));
+
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
 
 interface ItemType {
@@ -65,6 +62,10 @@ const userItems: ItemType[] = [
   {
     key: URL.CheckEmail,
     components: <CheckEmail />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
     key: URL.Categories,
     components: <CateProduct />,
     layout: DEFAULT_LAYOUT,
@@ -144,6 +145,9 @@ const adminItems: ItemType[] = [
   {
     key: "/dashboard/setting",
     components: <Setting />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
   {
     key: URL.Categories,
     components: <CateProduct />,
