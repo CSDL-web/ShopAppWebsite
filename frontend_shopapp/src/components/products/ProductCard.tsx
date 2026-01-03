@@ -36,7 +36,7 @@ const ProductCard = ({
         style={{ width: "100%", height: 250, objectFit: "contain" }}
       /> */}
       <Typography fontWeight={500} color={COLORS.black}>
-        {product.title.slice(0, 40)}...
+        {product.name.slice(0, 40)}...
       </Typography>
       <Typography fontWeight={700} color={COLORS.black}>
         ${product.price}
