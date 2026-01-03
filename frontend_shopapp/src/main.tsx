@@ -7,25 +7,7 @@ import { SnackbarProvider } from "notistack";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { store, persistor } from "./stores";
 import Routers from "./app/routers";
-import "./styles/index.scss";
-
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#9c27b0",
-    },
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    fontFamily: "'Roboto', sans-serif",
-  },
-});
+import theme from "./styles/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {

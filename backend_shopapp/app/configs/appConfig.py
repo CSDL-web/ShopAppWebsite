@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from app.configs.dbConfig import Base, engine
+from fastapi.staticfiles import StaticFiles
 
+from app.configs.dbConfig import Base, engine
+from app.controllers import userRouter, categoryRouter
 from app.models.role_model import Role
 
 from app.controllers import (
@@ -51,9 +53,6 @@ def init_routers(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(title="ShopApp Backend", version="1.0.0")
-
-    Base.metadata.create_all(bind=engine)
-
     seed_roles()
 
     app.add_middleware(
@@ -63,6 +62,13 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    
+    app.mount(
+        "/backend_shopapp/uploads",
+        StaticFiles(directory="/app/app/uploads"),
+        name="uploads"
+    )
+
 
     init_routers(app)
     return app
