@@ -1,6 +1,14 @@
 export const URL = {
   Home: "/",
   Login: "/login",
+  Register: "/register",
+  ForgotPassword: "/forgot-password",
+  CheckEmail: "/check-email",
+  CheckPassword: "/check-password",
+  Products: "/product/:id",
+  Cart: "/cart",
+  user: "/dashboard/users",
+  product: "/dashboard/products"
   Products: "/product/:id",
   Cart: "/cart",
   Categories: "/categories/:name",

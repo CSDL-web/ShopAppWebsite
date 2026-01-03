@@ -4,6 +4,7 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import auth from "./authSlice";
 import cartSlice from "./cart";
+import user from "./user";
 import categories from "./categories";
 import products from "./products";
 
@@ -26,6 +27,7 @@ const authPersistConfig = {
 const reducers = {
   auth: persistReducer(authPersistConfig, auth),
   cart: persistReducer(authPersistConfig, cartSlice),
+  user,
   categories,
   products,
 };

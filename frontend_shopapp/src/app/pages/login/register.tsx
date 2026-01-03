@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-
 import {
   Box,
   Paper,
@@ -11,17 +10,22 @@ import {
   Link,
   IconButton,
   InputAdornment,
-  Switch,
+  Checkbox,
   FormControlLabel,
 } from "@mui/material";
 
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import { useDispatch } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { actionResgister, postRegisterUser } from "@/stores/user";
+import { useEffect } from "react";
 
 function GoogleIcon() {
   return (
     <Box component="span" sx={{ display: "inline-flex", mr: 1 }} aria-hidden>
+      {/* ... giữ nguyên svg ... */}
       <svg width="18" height="18" viewBox="0 0 48 48">
         <path
           fill="#FFC107"
@@ -44,33 +48,71 @@ function GoogleIcon() {
   );
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
+  const registerUser = useAppSelector(postRegisterUser);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [touched, setTouched] = React.useState({
+    email: false,
+    password: false,
+  });
   const [showPassword, setShowPassword] = React.useState(false);
-  const [error, setError] = React.useState("");
 
-  const onSubmit = (e: React.FormEvent) => {
+  const isValidEmail = (v: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const isValidPassword = (v: string) => v.trim().length >= 8;
+
+  const emailErr =
+    touched.email && email.trim().length === 0
+      ? "Email is required."
+      : touched.email && !isValidEmail(email)
+      ? "Please enter a valid email address."
+      : "";
+
+  const passErr =
+    touched.password && password.trim().length === 0
+      ? "Password is required."
+      : touched.password && !isValidPassword(password)
+      ? "Password must be at least 8 characters."
+      : "";
+
+  const canSubmit = isValidEmail(email) && isValidPassword(password);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
 
-    const raw = localStorage.getItem("demo_user");
-    const user = raw ? JSON.parse(raw) : null;
+    setTouched({
+      email: true,
+      password: true,
+    });
 
-    if (!user) {
-      setError("Chưa có tài khoản. Vui lòng đăng ký trước.");
-      return;
+    if (!canSubmit) return;
+
+    const payload = {
+      fullname: "ass",
+      phone_number: "022234234222",
+      password,
+      address: "hanoi",
+      date_of_birth: "2026-01-03",
+      email,
+      role_id: 1,
+    };
+
+    try {
+      const resultAction = await dispatch(actionResgister(payload));
+      console.log(resultAction);
+
+      if (actionResgister.fulfilled.match(resultAction)) {
+        navigate("/check-password");
+      } else {
+        console.error("Register failed", resultAction.payload);
+      }
+    } catch (err) {
+      console.error("Unexpected error", err);
     }
-
-    if (email.trim() !== user.email || password !== user.password) {
-      setError("Email hoặc mật khẩu không đúng.");
-      return;
-    }
-
-    // ✅ đăng nhập thành công -> về Home
-    navigate("/");
   };
 
   return (
@@ -98,16 +140,32 @@ export default function SignInPage() {
           backgroundColor: "#f5f6f7",
         }}
       >
-        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-          Sign in
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+          Create Your Account
         </Typography>
 
-        <Typography sx={{ color: "text.secondary", mb: 3, maxWidth: 380 }}>
-          Log in by entering your email address and password.
-        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "grid", gap: 2 }}
+        >
+          <Button
+            variant="outlined"
+            size="large"
+            sx={{
+              py: 1.2,
+              borderRadius: "12px",
+              textTransform: "none",
+              fontWeight: 700,
+              backgroundColor: "#fff",
+            }}
+          >
+            <GoogleIcon />
+            Continue with Google
+          </Button>
 
-        {/* ✅ form để Enter cũng login được */}
-        <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
+          <Divider sx={{ my: 0.5 }}>Or</Divider>
+
           <Box>
             <Typography sx={{ mb: 1, color: "text.secondary" }}>
               Email address
@@ -116,6 +174,9 @@ export default function SignInPage() {
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+              error={Boolean(emailErr)}
+              helperText={emailErr || " "}
               placeholder="email@address.com"
               InputProps={{
                 startAdornment: (
@@ -135,6 +196,9 @@ export default function SignInPage() {
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+              error={Boolean(passErr)}
+              helperText={passErr || " "}
               type={showPassword ? "text" : "password"}
               placeholder="••••••••••••"
               InputProps={{
@@ -158,70 +222,55 @@ export default function SignInPage() {
             />
           </Box>
 
-          {error && (
-            <Typography color="error" sx={{ fontSize: 14, mt: -1 }}>
-              {error}
-            </Typography>
-          )}
-
-          <Link
-            component={RouterLink}
-            to="/forgot-password"
-            underline="hover"
-            sx={{ color: "primary.main", mt: -1 }}
-          >
-            Forgot password?
-          </Link>
+          <FormControlLabel
+            control={<Checkbox />}
+            label="Receive news, updates and deals"
+            sx={{ color: "text.secondary" }}
+          />
 
           <Button
             type="submit"
             variant="contained"
             size="large"
+            disabled={!canSubmit}
             sx={{
-              mt: 1,
+              mt: 0.5,
               py: 1.4,
               borderRadius: "12px",
               textTransform: "none",
               fontWeight: 700,
               backgroundColor: "#6f49ff",
               "&:hover": { backgroundColor: "#5d3df0" },
+              "&.Mui-disabled": {
+                backgroundColor: "rgba(111,73,255,0.35)",
+                color: "rgba(255,255,255,0.9)",
+              },
             }}
           >
-            Log in
+            Create Account
           </Button>
 
-          <FormControlLabel
-            control={<Switch />}
-            label="Remember me"
-            sx={{ mt: 0.5, color: "text.secondary" }}
-          />
-
-          <Divider sx={{ my: 1.5 }}>Or</Divider>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 1.2,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              backgroundColor: "#fff",
-            }}
-          >
-            <GoogleIcon />
-            Sign in with Google
-          </Button>
+          <Typography sx={{ mt: 1, color: "text.secondary", fontSize: 14 }}>
+            By creating an account, you are agree to the{" "}
+            <Link href="#" underline="hover">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="#" underline="hover">
+              Privacy Policy
+            </Link>
+            .
+          </Typography>
 
           <Typography sx={{ color: "text.secondary" }}>
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
               component={RouterLink}
-              to="/register"
+              to="/login"
               underline="hover"
               sx={{ color: "primary.main" }}
             >
-              Sign up here
+              Log in here
             </Link>
           </Typography>
 
