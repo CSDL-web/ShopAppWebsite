@@ -15,7 +15,7 @@ load_dotenv()
 from app.models.user_model import User
 from app.repositories.user_repo import UserRepository
 from app.repositories.token_repo import TokenRepository
-from app.dtos.user_dto import UserDTO
+from app.dtos.user_dto import UserDTO, UserUpdateProfileDTO, ChangePasswordDTO 
 from app.dtos.user_login_dto import UserLoginDTO
 from app.dtos.facebook_login_dto import FacebookLoginDTO
 from app.dtos.google_login_dto import GoogleLoginDTO
@@ -127,17 +127,20 @@ class UserService:
 
             if not CLIENT_ID:
                 print("Lỗi: Chưa tìm thấy GOOGLE_CLIENT_ID trong biến môi trường (.env)")
-                raise ValueError("Server chưa cấu hình Google Client ID")
-
-            id_info = id_token.verify_oauth2_token(
-                google_dto.google_token,
-                google_requests.Request(),
-                CLIENT_ID
-            )
-
-            google_id = id_info['sub']
-            email = id_info.get('email')
-            name = id_info.get('name', 'Google User')
+                pass 
+            if CLIENT_ID:
+                id_info = id_token.verify_oauth2_token(
+                    google_dto.google_token,
+                    google_requests.Request(),
+                    CLIENT_ID
+                )
+                google_id = id_info['sub']
+                email = id_info.get('email')
+                name = id_info.get('name', 'Google User')
+            else:
+                 
+                 # Giả sử token gửi lên là dummy
+                 raise HTTPException(status_code=400, detail="Server chưa cấu hình GOOGLE_CLIENT_ID")
 
         except ValueError as e:
             print(f"Google Login Error: {str(e)}")
@@ -266,3 +269,64 @@ class UserService:
         if not user:
             raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
         return user
+
+
+    def update_user_profile(self, user_id: int, update_data: UserUpdateProfileDTO):
+        # Lấy user hiện tại
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # Chuyển DTO thành dict, loại bỏ các giá trị None
+        data_dict = update_data.model_dump(exclude_unset=True)
+        
+        # Gọi hàm update có sẵn của Repo
+        updated_user = self.repo.update(user_id, data_dict)
+        return updated_user
+
+    def change_password(self, user_id: int, password_dto: ChangePasswordDTO):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # 1. Kiểm tra mật khẩu cũ có đúng không
+        if not self._verify_password(password_dto.old_password, user.password):
+            raise HTTPException(status_code=400, detail="Mật khẩu cũ không chính xác")
+
+        # 2. Hash mật khẩu mới
+        hashed_new_password = self._hash_password(password_dto.new_password)
+
+        # 3. Lưu vào DB
+        self.repo.update(user_id, {"password": hashed_new_password})
+        return {"message": "Đổi mật khẩu thành công"}
+
+    def admin_update_user_status(self, user_id: int, is_active: bool):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User không tồn tại")
+        
+        return self.repo.update(user_id, {"is_active": is_active})
+    
+    def delete_user(self, admin_id: int, user_id: int):
+        # Tìm user cần xóa
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # KHÔNG ĐƯỢC XÓA chính mình (Admin không thể tự xóa mình khi đang login)
+        if user.id == admin_id:
+            raise HTTPException(status_code=400, detail="Không thể tự xóa tài khoản của chính mình")
+
+  
+        if user.orders and len(user.orders) > 0:
+            raise HTTPException(
+                status_code=400, 
+                detail="User này đã có lịch sử đơn hàng. Chỉ có thể block, không thể XÓA để bảo toàn dữ liệu."
+            )
+
+        
+        self.repo.delete(user_id)
+        
+        return {"message": "Xóa người dùng thành công"}
+    
+    
