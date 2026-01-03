@@ -30,6 +30,10 @@ class ProductService:
             raise HTTPException(status_code=404, detail="Sản phẩm không tồn tại")
         return product
 
+    # [MỚI THÊM] Service gọi Repo để lấy list sản phẩm theo danh mục
+    def get_products_by_category(self, category_id: int, skip: int, limit: int):
+        return self.repo.get_by_category_id(category_id, skip, limit)
+
     def update_product(self, product_id: int, product_dto: ProductDTO):
         product_data = product_dto.model_dump(exclude={"images"}, exclude_unset=True)
         image_urls = [img.image_url for img in product_dto.images] if product_dto.images else None
@@ -45,7 +49,6 @@ class ProductService:
             raise HTTPException(status_code=404, detail="Không tìm thấy sản phẩm")
         return {"message": "Xóa thành công"}
 
-    
     def get_filtered_products(
         self, 
         keyword: Optional[str],
@@ -68,7 +71,6 @@ class ProductService:
             keyword, min_price, max_price, category_id, sort_by, skip, limit
         )
 
-   
     def get_recommendations(self, product_id: int, limit: int):
         product = self.repo.get_by_id(product_id)
         if not product:

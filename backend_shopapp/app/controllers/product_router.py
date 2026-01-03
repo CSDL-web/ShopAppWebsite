@@ -43,6 +43,19 @@ def get_product_recommendations(
     """
     return service.get_recommendations(product_id, limit)
 
+# [MỚI THÊM] API lấy danh sách sản phẩm theo Category ID
+@productRouter.get("/category/{category_id}", response_model=List[ProductDTO])
+def get_products_by_category(
+    category_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    service: ProductService = Depends(get_product_service)
+):
+    """
+    Lấy danh sách sản phẩm thuộc về một Category cụ thể.
+    """
+    return service.get_products_by_category(category_id, skip, limit)
+
 @productRouter.post("", response_model=ProductDTO, status_code=status.HTTP_201_CREATED)
 def create_product(
     product_dto: ProductDTO,

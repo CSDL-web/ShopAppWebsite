@@ -23,7 +23,8 @@ class ProductRepository:
                 img = ProductImage(product_id=db_product.id, image_url=url)
                 self.db.add(img)
             self.db.commit()
-            self.db.refresh(db_product)
+        
+        self.db.refresh(db_product)
             
         return db_product
 
@@ -32,6 +33,12 @@ class ProductRepository:
 
     def get_all(self, skip: int = 0, limit: int = 50) -> List[Product]:
         return self.db.query(Product).offset(skip).limit(limit).all()
+
+    # [MỚI THÊM] Hàm lấy sản phẩm theo category_id
+    def get_by_category_id(self, category_id: int, skip: int = 0, limit: int = 50) -> List[Product]:
+        return self.db.query(Product).filter(
+            Product.category_id == category_id
+        ).offset(skip).limit(limit).all()
 
     def search_by_name(self, keyword: str, skip: int = 0, limit: int = 50) -> List[Product]:
         search_fmt = f"%{keyword}%"
@@ -68,7 +75,6 @@ class ProductRepository:
             return True
         return False
 
-    
     def filter_products(
         self, 
         keyword: str = None,
@@ -118,7 +124,6 @@ class ProductRepository:
 
         return query.offset(skip).limit(limit).all()
 
-    
     def get_recommendations(self, product_id: int, limit: int = 6) -> List[Product]:
         # Lấy thông tin sản phẩm hiện tại để biết category_id
         current_product = self.get_by_id(product_id)
