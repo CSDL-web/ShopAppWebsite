@@ -8,3 +8,11 @@ sqlalchemy
 pydantic
 pymysql
 cryptography
+debugpy
+python-jose[cryptography]
+passlib[bcrypt]
+email-validator
+requests
+google-auth
+
+
