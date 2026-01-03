@@ -17,16 +17,32 @@ import {
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import { useDispatch } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { actionResgister, postRegisterUser } from "@/stores/user";
+import { useEffect } from "react";
 
 function GoogleIcon() {
   return (
     <Box component="span" sx={{ display: "inline-flex", mr: 1 }} aria-hidden>
       {/* ... giữ nguyên svg ... */}
       <svg width="18" height="18" viewBox="0 0 48 48">
-        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 12.9 2 4 10.9 4 22s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-1.5z" />
-        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 16.3 2 9.7 6.3 6.3 14.7z" />
-        <path fill="#4CAF50" d="M24 42c5.2 0 10-2 13.6-5.2l-6.3-5.3c-1.9 1.5-4.3 2.5-7.3 2.5-5.3 0-9.8-3.4-11.4-8.2l-6.7 5.2C9.4 37.8 16.2 42 24 42z" />
-        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.6 5.5l.1.1 6.3 5.3C39.5 36.6 44 32 44 22c0-1.3-.1-2.7-.4-1.5z" />
+        <path
+          fill="#FFC107"
+          d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 12.9 2 4 10.9 4 22s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-1.5z"
+        />
+        <path
+          fill="#FF3D00"
+          d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 16.3 2 9.7 6.3 6.3 14.7z"
+        />
+        <path
+          fill="#4CAF50"
+          d="M24 42c5.2 0 10-2 13.6-5.2l-6.3-5.3c-1.9 1.5-4.3 2.5-7.3 2.5-5.3 0-9.8-3.4-11.4-8.2l-6.7 5.2C9.4 37.8 16.2 42 24 42z"
+        />
+        <path
+          fill="#1976D2"
+          d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.6 5.5l.1.1 6.3 5.3C39.5 36.6 44 32 44 22c0-1.3-.1-2.7-.4-1.5z"
+        />
       </svg>
     </Box>
   );
@@ -34,13 +50,19 @@ function GoogleIcon() {
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
+  const registerUser = useAppSelector(postRegisterUser);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [touched, setTouched] = React.useState({ email: false, password: false });
+  const [touched, setTouched] = React.useState({
+    email: false,
+    password: false,
+  });
   const [showPassword, setShowPassword] = React.useState(false);
 
-  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const isValidEmail = (v: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
   const isValidPassword = (v: string) => v.trim().length >= 8;
 
   const emailErr =
@@ -59,24 +81,38 @@ export default function SignUpPage() {
 
   const canSubmit = isValidEmail(email) && isValidPassword(password);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTouched({ email: true, password: true });
+
+    setTouched({
+      email: true,
+      password: true,
+    });
+
     if (!canSubmit) return;
 
-    // ✅ Demo: lưu "account" tạm vào localStorage
-    // Sau này có API thì thay đoạn này bằng call server.
-    localStorage.setItem(
-      "demo_user",
-      JSON.stringify({
-        email: email.trim(),
-        password: password, // demo thôi (thực tế KHÔNG lưu plain password)
-        createdAt: Date.now(),
-      })
-    );
+    const payload = {
+      fullname: "ass",
+      phone_number: "022234234222",
+      password,
+      address: "hanoi",
+      date_of_birth: "2026-01-03",
+      email,
+      role_id: 1,
+    };
 
-    // ✅ Chuyển qua trang đặt mật khẩu (check-password)
-    navigate("/check-password");
+    try {
+      const resultAction = await dispatch(actionResgister(payload));
+      console.log(resultAction);
+
+      if (actionResgister.fulfilled.match(resultAction)) {
+        navigate("/check-password");
+      } else {
+        console.error("Register failed", resultAction.payload);
+      }
+    } catch (err) {
+      console.error("Unexpected error", err);
+    }
   };
 
   return (
@@ -108,7 +144,11 @@ export default function SignUpPage() {
           Create Your Account
         </Typography>
 
-        <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "grid", gap: 2 }}
+        >
           <Button
             variant="outlined"
             size="large"
@@ -127,7 +167,9 @@ export default function SignUpPage() {
           <Divider sx={{ my: 0.5 }}>Or</Divider>
 
           <Box>
-            <Typography sx={{ mb: 1, color: "text.secondary" }}>Email address</Typography>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Email address
+            </Typography>
             <TextField
               fullWidth
               value={email}
@@ -147,7 +189,9 @@ export default function SignUpPage() {
           </Box>
 
           <Box>
-            <Typography sx={{ mb: 1, color: "text.secondary" }}>Password</Typography>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Password
+            </Typography>
             <TextField
               fullWidth
               value={password}
@@ -165,7 +209,11 @@ export default function SignUpPage() {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton edge="end" aria-label="show password" onClick={() => setShowPassword((v) => !v)}>
+                    <IconButton
+                      edge="end"
+                      aria-label="show password"
+                      onClick={() => setShowPassword((v) => !v)}
+                    >
                       <VisibilityRoundedIcon />
                     </IconButton>
                   </InputAdornment>
@@ -216,7 +264,12 @@ export default function SignUpPage() {
 
           <Typography sx={{ color: "text.secondary" }}>
             Already have an account?{" "}
-            <Link component={RouterLink} to="/login" underline="hover" sx={{ color: "primary.main" }}>
+            <Link
+              component={RouterLink}
+              to="/login"
+              underline="hover"
+              sx={{ color: "primary.main" }}
+            >
               Log in here
             </Link>
           </Typography>
@@ -226,7 +279,12 @@ export default function SignUpPage() {
             to="/"
             variant="text"
             size="large"
-            sx={{ mt: 1, textTransform: "none", fontWeight: 600, color: "text.secondary" }}
+            sx={{
+              mt: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "text.secondary",
+            }}
           >
             ← Back to Home
           </Button>

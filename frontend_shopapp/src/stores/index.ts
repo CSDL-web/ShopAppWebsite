@@ -1,28 +1,37 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import auth from './authSlice';
-import cartSlice from './cart';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import auth from "./authSlice";
+import cartSlice from "./cart";
+import user from "./user";
 
 const authPersistConfig = {
-  key: 'auth',
+  key: "auth",
   storage,
-  whitelist: ['user', 'isLogin', 'target', 'userInfo', 'originalNavMenu', 'treeMenu'],
+  whitelist: [
+    "user",
+    "isLogin",
+    "target",
+    "userInfo",
+    "originalNavMenu",
+    "treeMenu",
+  ],
   version: 1,
 };
 
 const reducers = {
   auth: persistReducer(authPersistConfig, auth),
   cart: persistReducer(authPersistConfig, cartSlice),
-
+  user,
 };
 
 const rootReducer = combineReducers(reducers);
 
 export const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
 export const persistor = persistStore(store);

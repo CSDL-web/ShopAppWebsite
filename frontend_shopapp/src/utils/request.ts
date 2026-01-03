@@ -6,7 +6,7 @@ import { actionLogout } from "../stores/authSlice";
 import { enqueueSnackbar } from "notistack";
 
 export const instanceAxios = axios.create({
-  baseURL: `//localhost:5173/`,
+  baseURL: `//localhost:5000/`,
 });
 
 instanceAxios.defaults.headers.common["Content-Type"] = "application/json";
