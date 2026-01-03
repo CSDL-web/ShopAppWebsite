@@ -12,4 +12,5 @@ export const COLORS = {
   white: "#ffffff",
   black: "#000000",
   darkYellow: "#f5ca00",
+  primary: "#ff6f61",
 };

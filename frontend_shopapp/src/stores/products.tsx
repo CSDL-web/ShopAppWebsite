@@ -7,7 +7,7 @@ export type Product = {
   id: number;
   name: string;
   price: number;
-  thumbnail: number;
+  thumbnail: string;
   category_id: number;
   description: string;
   created_at: Date;
@@ -26,6 +26,7 @@ const initialState: ProductState = {
   error: null,
 };
 
+
 export const actionGetProduct = createAsyncThunk(
   "product/actionGetProduct",
   async (data: { skip: number; limit: number }, { rejectWithValue }) => {
@@ -36,7 +37,7 @@ export const actionGetProduct = createAsyncThunk(
         params: { skip: data.skip, limit: data.limit },
         paramsSerializer: (params) => qs.stringify(params, { allowDots: true }),
       });
-      return response.data;
+      return response;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error);
@@ -45,7 +46,7 @@ export const actionGetProduct = createAsyncThunk(
 );
 
 export const slice = createSlice({
-  name: "categories",
+  name: "products",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -54,13 +55,14 @@ export const slice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        actionGetProduct.fulfilled,
-        (state, action: PayloadAction<ProductState>) => {
-          state.loading = false;
-          state.data = action.payload.data;
-        }
-      )
+      .addCase(actionGetProduct.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.data = action.payload.data.filter(
+          (p: Product) => p.thumbnail !== null && p.thumbnail !== ""
+        );
+      })
+
       .addCase(actionGetProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -71,27 +73,3 @@ export const selectProductsData = (state: RootState): ProductState =>
   state.products;
 
 export default slice.reducer;
-
-export const products: Product[] = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    thumbnail: 1,
-    category_id: 1,
-    description: "Description for Product 1",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 150,
-    thumbnail: 2,
-    category_id: 2,
-    description: "Description for Product 2",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  // Thêm các sản phẩm khác tương tự...
-];

@@ -1,24 +1,28 @@
 import Box from "@mui/material/Box";
 import Header from "@/components/headers/Header";
 import { COLORS } from "@/styles/colors";
-import { products } from "@/stores/products";
+import { actionGetProduct, selectProductsData } from "@/stores/products";
 import Categories from "@/components/categories/Categories";
 import CategorySection from "@/components/categories/CategorySection";
 import { useAppDispatch, useAppSelector } from "@/stores";
-import {
-  actionGetCategories,
-  actionPostCategories,
-  selectCategoriesData,
-} from "@/stores/categories";
+import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
 import { useEffect } from "react";
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
 
   const dataCategories = useAppSelector(selectCategoriesData);
+  const product = useAppSelector(selectProductsData);
 
   useEffect(() => {
-    dispatch(actionGetCategories({} as any));
+    const fetchData = async () => {
+      await Promise.all([
+        dispatch(actionGetCategories()).unwrap(),
+        dispatch(actionGetProduct({ skip: 0, limit: 1001 })).unwrap(),
+      ]);
+    };
+
+    fetchData();
   }, [dispatch]);
 
   return (
@@ -32,9 +36,19 @@ export default function HomePage() {
           padding: "1rem",
         }}
       >
-        {dataCategories.data.map((cat, i) => (
-          <CategorySection key={i} title={cat.name} products={[]} />
-        ))}
+        {dataCategories.data.map((cat) => {
+          const productsByCategory = product.data.filter(
+            (p) => p.category_id === cat.id
+          );
+
+          return (
+            <CategorySection
+              key={cat.id}
+              title={cat.name}
+              products={productsByCategory}
+            />
+          );
+        })}
       </Box>
     </Box>
   );

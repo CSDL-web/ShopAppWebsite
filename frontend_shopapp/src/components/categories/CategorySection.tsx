@@ -5,6 +5,7 @@ import { useState } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import { Product } from "@/stores/products";
 import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 
 interface Props {
   title: string;
@@ -13,6 +14,12 @@ interface Props {
 
 export default function CategorySection({ title, products }: Props) {
   const navigate = useNavigate();
+
+  const randomProducts = useMemo(() => {
+    return [...products].sort(() => Math.random() - 0.5).slice(0, 4);
+  }, [products]);
+
+  console.log(randomProducts);
 
   return (
     <Box sx={{ mb: 6 }}>
@@ -39,7 +46,7 @@ export default function CategorySection({ title, products }: Props) {
       </Box>
 
       <Box display="grid" gridTemplateColumns="repeat(4, 1fr)" gap="1rem">
-        {products.slice(0, 4).map((p) => (
+        {randomProducts.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
       </Box>
