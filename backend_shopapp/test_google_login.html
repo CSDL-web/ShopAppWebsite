@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Test Google Login lấy Token</h2>
+    <div id="g_id_onload"
+         data-client_id="146170312076-gdqo88b5jkml79ict8brjls145qon901.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+
+    <h3>Token của bạn (Copy cái này ném vào Swagger/Postman):</h3>
+    <textarea id="token_area" rows="10" cols="100"></textarea>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleCredentialResponse(response) {
+
+            console.log("Encoded JWT ID token: " + response.credential);
+            document.getElementById("token_area").value = response.credential;
+            
+            // Tự động gọi API test luôn nếu muốn (cần bật CORS ở Backend)
+            // fetch('http://localhost:8080/users/login-google', { ... })
+        }
+    </script>
+</body>
+</html>

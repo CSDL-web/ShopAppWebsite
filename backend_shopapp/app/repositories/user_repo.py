@@ -47,3 +47,11 @@ class UserRepository:
 
     def get_users(self, skip: int = 0, limit: int = 10):
         return self.db.query(User).offset(skip).limit(limit).all()
+    
+    def delete(self, user_id: int) -> bool:
+        user = self.get_by_id(user_id)
+        if user:
+            self.db.delete(user)
+            self.db.commit()
+            return True
+        return False
