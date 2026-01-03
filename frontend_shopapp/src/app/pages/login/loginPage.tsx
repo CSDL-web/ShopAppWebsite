@@ -100,7 +100,12 @@ export default function SignInPage() {
       >
         <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
           Sign in
+          abc
         </Typography>
+        <Typography sx={{ color: "red", fontWeight: 900 }}>
+  THIS IS MY LOGIN PAGE
+</Typography>
+
 
         <Typography sx={{ color: "text.secondary", mb: 3, maxWidth: 380 }}>
           Log in by entering your email address and password.
@@ -224,6 +229,11 @@ export default function SignInPage() {
               Sign up here
             </Link>
           </Typography>
+
+          <Typography sx={{ color: "red", fontWeight: 900 }}>
+  THIS IS MY LOGIN PAGE
+</Typography>
+
 
           <Button
             component={RouterLink}

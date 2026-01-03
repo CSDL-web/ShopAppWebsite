@@ -22,6 +22,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import { api } from "@/lib/api";
+
 
 type CategoryRow = {
   uid: number;      // key thật
@@ -42,6 +44,8 @@ const createdAtFromUid = (uid: number) => {
 const reindex = (list: CategoryRow[]) => list.map((r, i) => ({ ...r, id: i + 1 }));
 
 export default function CategoriesPage() {
+  console.log(import.meta.env.VITE_API_URL);
+
   const [rows, setRows] = useState<CategoryRow[]>([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,17 +56,32 @@ export default function CategoriesPage() {
   const [form, setForm] = useState({ name: "", active: "true" });
 
   // mock load
-  useEffect(() => {
-    setLoading(true);
-    const mock: CategoryRow[] = [
-      { uid: 1, id: 0, name: "smartphones", createdAt: createdAtFromUid(1), active: true },
-      { uid: 2, id: 0, name: "laptops", createdAt: createdAtFromUid(2), active: true },
-      { uid: 3, id: 0, name: "fragrances", createdAt: createdAtFromUid(3), active: false },
-      { uid: 4, id: 0, name: "skincare", createdAt: createdAtFromUid(4), active: true },
-    ];
-    setRows(reindex(mock));
-    setLoading(false);
-  }, []);
+useEffect(() => {
+  (async () => {
+    try {
+      setLoading(true);
+
+      const res = await api.get<{ id: number; name: string }[]>(
+        "/categories/get_all_categories"
+      );
+
+      const mapped: CategoryRow[] = res.data.map((c, idx) => ({
+        uid: c.id,
+        id: idx + 1,
+        name: c.name,
+        createdAt: createdAtFromUid(c.id), // tạm
+        active: true, // backend chưa trả thì để true
+      }));
+
+      setRows(mapped);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
 
   const filteredRows = useMemo(() => {
     const k = q.trim().toLowerCase();
@@ -270,3 +289,4 @@ export default function CategoriesPage() {
     </Box>
   );
 }
+

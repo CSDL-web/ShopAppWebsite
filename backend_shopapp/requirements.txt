@@ -14,5 +14,7 @@ passlib[bcrypt]
 email-validator
 requests
 google-auth
+python-jose[cryptography]
+
 
 
