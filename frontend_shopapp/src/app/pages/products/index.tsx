@@ -35,7 +35,6 @@ export default function ProductPage() {
           gap: "2rem",
         }}
       >
-        {/* IMAGE */}
         <Box
           sx={{
             flex: 1,
@@ -44,8 +43,8 @@ export default function ProductPage() {
           }}
         >
           <img
-            src={product.image}
-            alt={product.title}
+            src={dataProduct.data?.thumbnail}
+            alt={dataProduct.data?.name}
             style={{
               width: "100%",
               maxHeight: 450,
