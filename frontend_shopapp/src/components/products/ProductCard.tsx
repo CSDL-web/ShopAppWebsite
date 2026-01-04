@@ -36,6 +36,9 @@ const ProductCard = ({
         flexDirection: "column",
         justifyContent: "space-between",
         cursor: "pointer",
+        border: "1px solid #ff9966",
+borderRadius: "8px",
+
       }}
     >
       {imgSrc ? (
