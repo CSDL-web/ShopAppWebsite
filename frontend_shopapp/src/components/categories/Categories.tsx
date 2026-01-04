@@ -8,6 +8,7 @@ interface Props {
 
 export default function Categories({ categories }: Props) {
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   return (
     <Box
@@ -23,7 +24,9 @@ export default function Categories({ categories }: Props) {
       {categories.map((c: any) => (
         <Box
           key={c.id}
-          onClick={() => navigate(`/categories/${c.name}/${encodeURIComponent(c.id)}`)}
+          onClick={() =>
+            navigate(`/categories/${c.name}/${encodeURIComponent(c.id)}`)
+          }
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -46,22 +49,25 @@ export default function Categories({ categories }: Props) {
               justifyContent: "center",
             }}
           >
-            {c.image ? (
-              <img
-                src={c.image}
-                alt={c.name}
-                style={{ width: "70%", objectFit: "contain" }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  width: 60,
-                  height: 40,
-                  backgroundColor: "#eee",
-                  borderRadius: "6px",
-                }}
-              />
-            )}
+            <img
+              src={`${API_URL}/backend_shopapp/uploads/${c.id}.jpg`}
+              alt={c.name}
+              loading="lazy"
+              onError={(e) => {
+                const target = e.currentTarget;
+
+                if (!target.dataset.fallback) {
+                  target.dataset.fallback = "true";
+                  target.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                }
+              }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                transition: "transform 0.3s ease",
+              }}
+            />
           </Box>
 
           <Typography

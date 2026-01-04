@@ -1,11 +1,29 @@
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { COLORS } from "@/styles/colors";
 import { Product } from "../../stores/products";
-import buildImageSrc from "../UploadImg";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+export const buildImageUrl = (img?: string | null): string => {
+  if (!img) return `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+  return img.startsWith("http")
+    ? img
+    : `${API_URL}/backend_shopapp/uploads/${img}`;
+};
+
+export const getMainImage = (product: Product): string | null => {
+  if (product.images?.length) {
+    const first = product.images[0];
+    if (typeof first === "string") return first;
+    if (first.image_url) return first.image_url;
+  }
+  if (product.thumbnail) return product.thumbnail;
+
+  return null;
+};
 
 const ProductCard = ({
   product,
@@ -18,7 +36,9 @@ const ProductCard = ({
 
   const width = size === "large" ? 400 : 225;
   const height = size === "large" ? 500 : 420;
-  const imgSrc = buildImageSrc(product.thumbnail);
+
+  const mainImage = getMainImage(product);
+  const imgSrc = buildImageUrl(mainImage);
 
   return (
     <Box
@@ -38,39 +58,23 @@ const ProductCard = ({
         cursor: "pointer",
       }}
     >
-      {imgSrc ? (
-        <img
-          src={imgSrc}
-          alt={product.name}
-          onError={(e) => {
-            const target = e.currentTarget;
+      <img
+        src={imgSrc}
+        alt={product.name}
+        onError={(e) => {
+          e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+        }}
+        style={{
+          width: "100%",
+          height: 250,
+          objectFit: "contain",
+        }}
+      />
 
-            // ⛔ tránh loop vô hạn
-            if (!target.dataset.fallback) {
-              target.dataset.fallback = "true";
-              target.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-            }
-          }}
-          style={{
-            width: "100%",
-            height: 250,
-            objectFit: "contain",
-          }}
-        />
-      ) : (
-        <img
-          src={`${API_URL}/backend_shopapp/uploads/notfound.jpeg`}
-          alt="not found"
-          style={{
-            width: "100%",
-            height: 250,
-            objectFit: "contain",
-          }}
-        />
-      )}
       <Typography fontWeight={500} color={COLORS.black}>
         {product.name.slice(0, 40)}...
       </Typography>
+
       <Typography fontWeight={700} color={COLORS.black}>
         ${product.price}
       </Typography>

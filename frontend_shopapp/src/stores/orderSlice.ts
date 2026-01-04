@@ -71,9 +71,11 @@ export const createOrder = createAsyncThunk(
   "order/createOrder",
   async (orderData: OrderRequest, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/orders/create`, orderData, {
+      console.log(localStorage.getItem("accessToken"));
+      const response = await axios.post(`${API_URL}/orders`, orderData, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -144,30 +146,36 @@ const orderSlice = createSlice({
         state.error = action.payload as string;
         state.success = false;
       })
-      
+
       // Fetch User Orders
       .addCase(fetchUserOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
-        state.loading = false;
-        state.orders = action.payload;
-      })
+      .addCase(
+        fetchUserOrders.fulfilled,
+        (state, action: PayloadAction<Order[]>) => {
+          state.loading = false;
+          state.orders = action.payload;
+        }
+      )
       .addCase(fetchUserOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      
+
       // Fetch Order By ID
       .addCase(fetchOrderById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchOrderById.fulfilled, (state, action: PayloadAction<Order>) => {
-        state.loading = false;
-        state.currentOrder = action.payload;
-      })
+      .addCase(
+        fetchOrderById.fulfilled,
+        (state, action: PayloadAction<Order>) => {
+          state.loading = false;
+          state.currentOrder = action.payload;
+        }
+      )
       .addCase(fetchOrderById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -175,11 +183,13 @@ const orderSlice = createSlice({
   },
 });
 
-export const { clearOrderError, clearOrderSuccess, resetOrderState } = orderSlice.actions;
+export const { clearOrderError, clearOrderSuccess, resetOrderState } =
+  orderSlice.actions;
 
 // Selectors
 export const selectOrders = (state: RootState) => state.order.orders;
-export const selectCurrentOrder = (state: RootState) => state.order.currentOrder;
+export const selectCurrentOrder = (state: RootState) =>
+  state.order.currentOrder;
 export const selectOrderLoading = (state: RootState) => state.order.loading;
 export const selectOrderError = (state: RootState) => state.order.error;
 export const selectOrderSuccess = (state: RootState) => state.order.success;
