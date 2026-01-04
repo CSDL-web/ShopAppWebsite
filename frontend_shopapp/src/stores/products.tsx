@@ -5,7 +5,7 @@ import { RootState } from ".";
 
 export type Image = {
   id: number;
-  url: string;
+  image_url: string;
 };
 
 export type Product = {

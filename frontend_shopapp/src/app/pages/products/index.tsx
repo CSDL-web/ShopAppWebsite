@@ -55,7 +55,7 @@ export default function ProductPage() {
     if (product.images?.length) {
       const first = product.images[0];
       if (typeof first === "string") return first;
-      if (first.url) return first.url;
+      if (first.image_url) return first.image_url;
     }
     return null;
   };
@@ -85,12 +85,6 @@ export default function ProductPage() {
             sx={{ cursor: "pointer", color: "#fff" }}
           >
             Home
-          </Link>
-          <Link
-            onClick={() => navigate(-1)}
-            sx={{ cursor: "pointer", color: "#fff" }}
-          >
-            Products
           </Link>
           <Typography fontWeight={800} color="#fff">
             {product.name}
@@ -306,7 +300,7 @@ export default function ProductPage() {
                 const imgSrc =
                   typeof image === "string"
                     ? buildImageUrl(image)
-                    : buildImageUrl(image.url);
+                    : buildImageUrl(image.image_url);
 
                 return (
                   <Box

@@ -143,7 +143,7 @@ export default function Checkout() {
       tracking_number: `TRACK-${Date.now()}`,
       payment_method: formData.payment_method,
       active: true,
-      coupon_id: 0,
+      coupon_id: 1,
     };
 
     // Dispatch create order action
