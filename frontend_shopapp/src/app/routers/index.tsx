@@ -4,7 +4,6 @@ import { URL } from "../../constants";
 import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/users/user";
 import Product from "@/app/pages/dashboards/product";
-import Layout from "@/app/pages/login/layout";
 import ProductContainer from "../pages/searchs/searchPage";
 
 const DEFAULT_LAYOUT = "default";
