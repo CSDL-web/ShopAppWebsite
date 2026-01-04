@@ -53,7 +53,6 @@ export default function CartItem({ item }: { item: CartItemType }) {
               Eligible for FREE Shipping & FREE Returns
             </Typography>
 
-            {/* QUANTITY - truyền product.name thay vì product.id */}
             <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
               <Button
                 size="small"
@@ -71,7 +70,7 @@ export default function CartItem({ item }: { item: CartItemType }) {
                 size="small"
                 variant="outlined"
                 onClick={() =>
-                  dispatch(decreaseQuantity(getProductKey(product)))
+                  dispatch(increaseQuantity(getProductKey(product)))
                 }
               >
                 +
@@ -81,7 +80,7 @@ export default function CartItem({ item }: { item: CartItemType }) {
             <Button
               size="small"
               sx={{ mt: 1, padding: 0, textTransform: "none" }}
-              onClick={() => dispatch(removeItem(product.name))}
+              onClick={() => dispatch(removeItem(getProductKey(product)))}
             >
               Delete
             </Button>

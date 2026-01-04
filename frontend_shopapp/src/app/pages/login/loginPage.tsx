@@ -220,22 +220,6 @@ export default function SignInPage() {
 
           <Divider sx={{ my: 1.5 }}>Or</Divider>
 
-          <Button
-            component={RouterLink}
-            to="/register"
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 1.2,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              backgroundColor: "#fff",
-            }}
-          >
-            Create New Account
-          </Button>
-
           <Typography sx={{ color: "text.secondary" }}>
             Don&apos;t have an account?{" "}
             <Link
