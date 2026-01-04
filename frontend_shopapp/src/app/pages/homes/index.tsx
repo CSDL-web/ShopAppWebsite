@@ -1,11 +1,14 @@
 import Box from "@mui/material/Box";
 import Header from "@/components/headers/Header";
-import { COLORS } from "@/styles/colors";
-import { actionGetProduct, selectProductsData } from "@/stores/products";
 import Categories from "@/components/categories/Categories";
 import CategorySection from "@/components/categories/CategorySection";
+
+import { actionGetProduct, selectProductsData } from "@/stores/products";
+import {
+  actionGetCategories,
+  selectCategoriesData,
+} from "@/stores/categories";
 import { useAppDispatch, useAppSelector } from "@/stores";
-import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
 import { useEffect } from "react";
 
 export default function HomePage() {
@@ -26,21 +29,22 @@ export default function HomePage() {
   }, [dispatch]);
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
+    // 🔴 NỀN NGOÀI: ĐỎ SÁNG
+    <Box sx={{ backgroundColor: "#ff3333", minHeight: "100vh" }}>
       <Header />
-      <Categories categories={dataCategories.data} />
 
-      <Box
-        sx={{
-          maxWidth: 1400,
-          padding: "1rem",
-        }}
-      >
+      {/* 🟠 PHẦN TRÊN (Categories): CAM */}
+      <Box sx={{ backgroundColor: "#FF3333", py: 1.5 }}>
+        <Categories categories={dataCategories.data} />
+      </Box>
+
+      {/* 📦 CÁC MỤC SẢN PHẨM */}
+      <Box sx={{ maxWidth: 1400, mx: "auto", p: 3 }}>
         {dataCategories.data.map((cat) => {
           const productsByCategory = product.data.filter(
             (p) => p.category_id === cat.id
           );
-          
+
           return (
             <CategorySection
               key={cat.id}

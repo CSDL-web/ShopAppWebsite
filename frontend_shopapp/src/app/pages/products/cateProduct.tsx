@@ -1,73 +1,54 @@
-import Header from "@/components/headers/Header";
-import { useAppDispatch, useAppSelector } from "@/stores";
-import { actionGetProductByCategories } from "@/stores/products";
-import { COLORS } from "@/styles/colors";
 import Box from "@mui/material/Box";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
-import { useEffect, useMemo } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
 import ProductCard from "@/components/products/ProductCard";
-import PaginationControl from "@/components/PaginationControl";
+import { Product } from "@/stores/products";
+import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 
-const PAGE_SIZE = 12;
+interface Props {
+  categoryId: number;
+  title: string;
+  products: Product[];
+}
 
-export default function CateProduct() {
-  const dispatch = useAppDispatch();
-  const { id, name } = useParams();
-  const [searchParams] = useSearchParams();
-  const page = Number(searchParams.get("page") || 1);
-  const categoryId = Number(id);
+export default function CategorySection({ categoryId, title, products }: Props) {
+  const navigate = useNavigate();
 
-  const { data, loading } = useAppSelector((state) => state.products);
-
-  useEffect(() => {
-    if (!categoryId || isNaN(categoryId)) return;
-
-    dispatch(
-      actionGetProductByCategories({
-        category_id: categoryId,
-      })
-    );
-  }, [categoryId, dispatch]);
-
-  const validProducts = useMemo(
-    () => data.filter((p) => p.thumbnail && p.thumbnail.trim() !== ""),
-    [data]
-  );
-
-  const paginatedProducts = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return validProducts.slice(start, start + PAGE_SIZE);
-  }, [validProducts, page]);
+  const randomProducts = useMemo(() => {
+    return [...products].sort(() => Math.random() - 0.5).slice(0, 4);
+  }, [products]);
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
-      <Header />
-
-      <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
-        <Typography variant="h5" fontWeight={600} mb={3}>
-          {name}
+    <Box sx={{ mb: 6 }}>
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <Typography fontSize={20} fontWeight={600}>
+          {title}
         </Typography>
 
-        {loading && <Typography>Loading...</Typography>}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+            color: "#555",
+            fontSize: 14,
+            "&:hover": { color: "#000" },
+          }}
+          onClick={() =>
+            navigate(`/categories/${categoryId}/${encodeURIComponent(title)}`)
+          }
+        >
+          <Typography fontSize={14}>Xem thêm</Typography>
+          <ArrowForwardIosIcon sx={{ fontSize: 14 }} />
+        </Box>
+      </Box>
 
-        {!loading && validProducts.length === 0 && (
-          <Typography>No products found</Typography>
-        )}
-
-        <Grid container spacing={3}>
-          {paginatedProducts.map((product) => (
-            <Grid key={product.id}>
-              <ProductCard product={product} />
-            </Grid>
-          ))}
-        </Grid>
-
-        <PaginationControl
-          totalItems={validProducts.length}
-          pageSize={PAGE_SIZE}
-        />
+      <Box display="grid" gridTemplateColumns="repeat(4, 1fr)" gap="1rem">
+        {randomProducts.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
       </Box>
     </Box>
   );
