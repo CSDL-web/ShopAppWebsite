@@ -4,9 +4,17 @@ import Cart from "@/components/carts/cart";
 
 const CartPage = () => {
   return (
-    <Container maxWidth="xl">
-      <Cart />
-    </Container>
+<Container
+  maxWidth="xl"
+  sx={{
+    backgroundColor: "#cccccc", // 👉 màu nền trang
+    minHeight: "100vh",
+    py: 4,
+  }}
+>
+  <Cart />
+</Container>
+
   );
 };
 

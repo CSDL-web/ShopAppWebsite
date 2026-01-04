@@ -78,7 +78,7 @@ export default function Header() {
         justifyContent: "space-between",
         px: "2rem",
         py: "1rem",
-        backgroundColor: "#fff",
+        backgroundColor: "#ff9966",
         borderBottom: "1px solid #eee",
       }}
     >

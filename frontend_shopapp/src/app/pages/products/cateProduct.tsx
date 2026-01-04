@@ -42,7 +42,7 @@ export default function CateProduct() {
   }, [validProducts, page]);
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: "#ffffcc", minHeight: "100vh" }}>
       <Header />
 
       <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
@@ -56,7 +56,7 @@ export default function CateProduct() {
           <Typography>No products found</Typography>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={5}>
           {paginatedProducts.map((product) => (
             <Grid key={product.id}>
               <ProductCard product={product} />

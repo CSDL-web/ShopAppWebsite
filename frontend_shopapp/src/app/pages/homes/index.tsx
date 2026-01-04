@@ -26,8 +26,14 @@ export default function HomePage() {
   }, [dispatch]);
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
+    <Box
+      sx={{
+        backgroundColor: "#ffcc33", // ✅ CHỈ ĐỔI MÀU NỀN Ở ĐÂY
+        minHeight: "100vh",
+      }}
+    >
       <Header />
+
       <Categories categories={dataCategories.data} />
 
       <Box
@@ -40,7 +46,7 @@ export default function HomePage() {
           const productsByCategory = product.data.filter(
             (p) => p.category_id === cat.id
           );
-          
+
           return (
             <CategorySection
               key={cat.id}
