@@ -18,6 +18,7 @@ const ProductCard = ({
 
   const width = size === "large" ? 400 : 225;
   const height = size === "large" ? 500 : 420;
+  const imgSrc = buildImageSrc(product.thumbnail);
 
   return (
     <Box
@@ -33,18 +34,30 @@ const ProductCard = ({
         cursor: "pointer",
       }}
     >
-      <img
-        src={buildImageSrc(product.thumbnail)}
-        alt={product.name}
-        style={{ width: "100%", height: 250, objectFit: "contain" }}
-        onError={(e) => {
-          const img = e.currentTarget;
-          img.onerror = null;
-
-          img.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-        }}
-      />
-
+      {imgSrc ? (
+        <img
+          src={imgSrc}
+          alt={product.name}
+          style={{
+            width: "100%",
+            height: 250,
+            objectFit: "contain",
+          }}
+          onError={(e) => {
+            e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+          }}
+        />
+      ) : (
+        <img
+          src={`${API_URL}/backend_shopapp/uploads/notfound.jpeg`}
+          alt="not found"
+          style={{
+            width: "100%",
+            height: 250,
+            objectFit: "contain",
+          }}
+        />
+      )}
       <Typography fontWeight={500} color={COLORS.black}>
         {product.name.slice(0, 40)}...
       </Typography>

@@ -5,6 +5,7 @@ import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/users/user";
 import Product from "@/app/pages/dashboards/product";
 import Layout from "@/app/pages/login/layout";
+import ProductContainer from "../pages/searchs/searchPage";
 
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
@@ -19,7 +20,6 @@ const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
 const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
-const SearchPage = lazy(() => import("@/app/pages/searchs/searchPage"));
 
 interface ItemType {
   key: string;
@@ -72,8 +72,8 @@ const userItems: ItemType[] = [
     private: false,
   },
   {
-    key: "/search/:query",
-    components: <SearchPage />,
+    key: "/search",
+    components: <ProductContainer />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },
@@ -160,8 +160,8 @@ const adminItems: ItemType[] = [
     private: false,
   },
   {
-    key: "/search/:query",
-    components: <SearchPage />,
+    key: "/search",
+    components: <ProductContainer />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },
