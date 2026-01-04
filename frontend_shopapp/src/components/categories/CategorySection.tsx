@@ -15,6 +15,8 @@ interface Props {
 export default function CategorySection({ title, products }: Props) {
   const navigate = useNavigate();
 
+  console.log(title, products);
+
   const randomProducts = useMemo(() => {
     return [...products].sort(() => Math.random() - 0.5).slice(0, 4);
   }, [products]);
@@ -36,7 +38,13 @@ export default function CategorySection({ title, products }: Props) {
             fontSize: 14,
             "&:hover": { color: "#000" },
           }}
-          onClick={() => navigate(`/categories/${encodeURIComponent(title)}`)}
+          onClick={() =>
+            navigate(
+              `/categories/${title}/${encodeURIComponent(
+                products[0]?.category_id
+              )}`
+            )
+          }
         >
           <Typography fontSize={14}>Xem thêm</Typography>
           <ArrowForwardIosIcon sx={{ fontSize: 14 }} />

@@ -9,7 +9,7 @@ export const URL = {
   Cart: "/cart",
   user: "/dashboard/users",
   product: "/dashboard/products",
-  Categories: "/categories/:name",
+  Categories: "/categories/:name/:id",
 };
 
 export const DATE_TIME_FORMAT = "YYYY/MM/DD HH:mm:ss";

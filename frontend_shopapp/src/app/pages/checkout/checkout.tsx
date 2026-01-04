@@ -18,57 +18,23 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/stores";
 import { getCart, clearCart } from "@/stores/cart";
+import { 
+  createOrder, 
+  selectOrderLoading, 
+  selectOrderError, 
+  selectOrderSuccess,
+  clearOrderError,
+  OrderItem
+} from "@/stores/orderSlice";
 import Header from "@/components/headers/Header";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-interface OrderRequest {
-  fullname: string;
-  email: string;
-  phone_number: string;
-  address: string;
-  note: string;
-  status: string;
-  total_money: number;
-  shipping_method: string;
-  shipping_address: string;
-  shipping_date: string;
-  tracking_number: string;
-  payment_method: string;
-  active: boolean;
-  coupon_id: number;
-  cart_items: Array<{
-    product_id: string | number;
-    quantity: number;
-    price: number;
-  }>;
-}
-
-interface OrderResponse {
-  id: number;
-  user_id: number;
-  order_date: string;
-  fullname: string;
-  email: string;
-  phone_number: string;
-  address: string;
-  note: string;
-  status: string;
-  total_money: number;
-  shipping_method: string;
-  shipping_address: string;
-  shipping_date: string;
-  tracking_number: string;
-  payment_method: string;
-  active: boolean;
-  coupon_id: number;
-}
 
 export default function Checkout() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const cart = useAppSelector(getCart);
+  const loading = useAppSelector(selectOrderLoading);
+  const error = useAppSelector(selectOrderError);
+  const success = useAppSelector(selectOrderSuccess);
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -81,10 +47,8 @@ export default function Checkout() {
     payment_method: "cod",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [localError, setLocalError] = useState("");
 
   // Tính tổng tiền
   const totalMoney = cart.reduce(
@@ -92,13 +56,27 @@ export default function Checkout() {
     0
   );
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
   useEffect(() => {
     if (cart.length === 0) {
       navigate("/cart");
     }
   }, [cart, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      setOpenSnackbar(true);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      dispatch(clearCart());
+      
+      setTimeout(() => {
+        navigate("/order-confirmation");
+      }, 2000);
+    }
+  }, [success, dispatch, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -117,17 +95,19 @@ export default function Checkout() {
   };
 
   const validateForm = (): boolean => {
+    setLocalError("");
+    dispatch(clearOrderError());
+
     const requiredFields = [
       "fullname",
       "email",
       "phone_number",
       "address",
-      "shipping_address",
     ];
 
     for (const field of requiredFields) {
       if (!formData[field as keyof typeof formData].trim()) {
-        setError(`Vui lòng điền đầy đủ thông tin ${field}`);
+        setLocalError(`Vui lòng điền đầy đủ thông tin ${field}`);
         return false;
       }
     }
@@ -135,14 +115,14 @@ export default function Checkout() {
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError("Email không hợp lệ");
+      setLocalError("Email không hợp lệ");
       return false;
     }
 
     // Validate phone number (Vietnamese format)
     const phoneRegex = /(0[3|5|7|8|9])+([0-9]{8})\b/;
     if (!phoneRegex.test(formData.phone_number)) {
-      setError("Số điện thoại không hợp lệ");
+      setLocalError("Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)");
       return false;
     }
 
@@ -155,71 +135,52 @@ export default function Checkout() {
       return;
     }
 
-    setLoading(true);
-    setError("");
+    // Prepare cart items for API
+    const cartItems: OrderItem[] = cart.map((item) => ({
+      product_id: item.product.id || item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+      product_name: item.product.name,
+    }));
 
-    try {
-      const orderData: OrderRequest = {
-        fullname: formData.fullname,
-        email: formData.email,
-        phone_number: formData.phone_number,
-        address: formData.address,
-        note: formData.note,
-        status: "pending",
-        total_money: totalMoney,
-        shipping_method: formData.shipping_method,
-        shipping_address: formData.shipping_address || formData.address,
-        shipping_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0], // 3 days from now
-        tracking_number: `TRACK-${Date.now()}`,
-        payment_method: formData.payment_method,
-        active: true,
-        coupon_id: 0,
-        cart_items: cart.map((item) => ({
-          product_id: item.product.id || item.product.name,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
-      };
+    // Calculate shipping cost
+    const shippingCost = formData.shipping_method === "express" ? 10 : 5;
+    const totalWithShipping = totalMoney + shippingCost;
 
-      console.log("Submitting order:", orderData);
+    // Prepare order data
+    const orderData = {
+      fullname: formData.fullname,
+      email: formData.email,
+      phone_number: formData.phone_number,
+      address: formData.address,
+      note: formData.note,
+      status: "pending",
+      total_money: totalWithShipping,
+      shipping_method: formData.shipping_method,
+      shipping_address: formData.shipping_address || formData.address,
+      shipping_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      tracking_number: `TRACK-${Date.now()}`,
+      payment_method: formData.payment_method,
+      active: true,
+      coupon_id: 0,
+      cart_items: cartItems,
+    };
 
-      const response = await axios.post(
-        `${API_URL}/orders/create`,
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200 || response.status === 201) {
-        setSuccess(true);
-        dispatch(clearCart()); // Clear cart after successful order
-        
-        // Redirect to order confirmation page after 2 seconds
-        setTimeout(() => {
-          navigate("/order-confirmation", { 
-            state: { orderId: response.data.id } 
-          });
-        }, 2000);
-      }
-    } catch (err: any) {
-      console.error("Order error:", err);
-      setError(
-        err.response?.data?.message || 
-        "Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại."
-      );
-    } finally {
-      setLoading(false);
-      setOpenSnackbar(true);
-    }
+    // Dispatch create order action
+    dispatch(createOrder(orderData));
+    setOpenSnackbar(true);
   };
 
   const handleBackToCart = () => {
     navigate("/cart");
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+    setLocalError("");
+    dispatch(clearOrderError());
   };
 
   if (cart.length === 0) {
@@ -263,6 +224,7 @@ export default function Checkout() {
                 value={formData.fullname}
                 onChange={handleInputChange}
                 required
+                error={!!localError && !formData.fullname}
               />
 
               <Box sx={{ display: "flex", gap: 2 }}>
@@ -274,6 +236,7 @@ export default function Checkout() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
+                  error={!!localError && !formData.email}
                 />
                 <TextField
                   fullWidth
@@ -282,6 +245,7 @@ export default function Checkout() {
                   value={formData.phone_number}
                   onChange={handleInputChange}
                   required
+                  error={!!localError && !formData.phone_number}
                 />
               </Box>
 
@@ -294,6 +258,7 @@ export default function Checkout() {
                 required
                 multiline
                 rows={2}
+                error={!!localError && !formData.address}
               />
 
               <TextField
@@ -315,9 +280,9 @@ export default function Checkout() {
                     label="Phương thức vận chuyển"
                     onChange={handleSelectChange}
                   >
-                    <MenuItem value="standard">Giao hàng tiêu chuẩn (3-5 ngày)</MenuItem>
-                    <MenuItem value="express">Giao hàng nhanh (1-2 ngày)</MenuItem>
-                    <MenuItem value="pickup">Nhận tại cửa hàng</MenuItem>
+                    <MenuItem value="standard">Giao hàng tiêu chuẩn (3-5 ngày) +$5.00</MenuItem>
+                    <MenuItem value="express">Giao hàng nhanh (1-2 ngày) +$10.00</MenuItem>
+                    <MenuItem value="pickup">Nhận tại cửa hàng (Miễn phí)</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -357,16 +322,16 @@ export default function Checkout() {
             <Divider sx={{ mb: 2 }} />
 
             {/* Cart Items */}
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2, maxHeight: 200, overflow: "auto" }}>
               {cart.map((item) => (
                 <Box
                   key={item.product.id || item.product.name}
                   sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
                 >
-                  <Typography>
+                  <Typography variant="body2">
                     {item.product.name} x {item.quantity}
                   </Typography>
-                  <Typography fontWeight={600}>
+                  <Typography variant="body2" fontWeight={600}>
                     ${(item.product.price * item.quantity).toFixed(2)}
                   </Typography>
                 </Box>
@@ -385,7 +350,11 @@ export default function Checkout() {
               <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
                 <Typography>Phí vận chuyển:</Typography>
                 <Typography>
-                  {formData.shipping_method === "express" ? "$10.00" : "$5.00"}
+                  {formData.shipping_method === "express" 
+                    ? "$10.00" 
+                    : formData.shipping_method === "standard" 
+                    ? "$5.00" 
+                    : "Miễn phí"}
                 </Typography>
               </Box>
 
@@ -396,7 +365,9 @@ export default function Checkout() {
                   Tổng cộng:
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="primary">
-                  ${(totalMoney + (formData.shipping_method === "express" ? 10 : 5)).toFixed(2)}
+                  ${(totalMoney + 
+                    (formData.shipping_method === "express" ? 10 : 
+                     formData.shipping_method === "standard" ? 5 : 0)).toFixed(2)}
                 </Typography>
               </Box>
             </Box>
@@ -436,17 +407,17 @@ export default function Checkout() {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
-          onClose={() => setOpenSnackbar(false)}
-          severity={success ? "success" : error ? "error" : "info"}
+          onClose={handleCloseSnackbar}
+          severity={success ? "success" : error || localError ? "error" : "info"}
           sx={{ width: "100%" }}
         >
           {success
             ? "Đặt hàng thành công! Đang chuyển hướng..."
-            : error || "Vui lòng kiểm tra lại thông tin"}
+            : error || localError || "Vui lòng kiểm tra lại thông tin"}
         </Alert>
       </Snackbar>
     </Box>
