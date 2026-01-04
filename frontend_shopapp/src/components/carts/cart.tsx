@@ -11,7 +11,7 @@ import CustomButton from "@/components/customButton";
 export default function Cart() {
   const cart = useAppSelector(getCart);
   const navigate = useNavigate();
-
+  
   const total = cart.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0

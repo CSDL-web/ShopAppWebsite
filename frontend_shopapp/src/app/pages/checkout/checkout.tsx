@@ -18,13 +18,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/stores";
 import { getCart, clearCart } from "@/stores/cart";
-import { 
-  createOrder, 
-  selectOrderLoading, 
-  selectOrderError, 
+import {
+  createOrder,
+  selectOrderLoading,
+  selectOrderError,
   selectOrderSuccess,
   clearOrderError,
-  OrderItem
+  OrderItem,
 } from "@/stores/orderSlice";
 import Header from "@/components/headers/Header";
 
@@ -57,12 +57,6 @@ export default function Checkout() {
   );
 
   useEffect(() => {
-    if (cart.length === 0) {
-      navigate("/cart");
-    }
-  }, [cart, navigate]);
-
-  useEffect(() => {
     if (error) {
       setOpenSnackbar(true);
     }
@@ -71,7 +65,7 @@ export default function Checkout() {
   useEffect(() => {
     if (success) {
       dispatch(clearCart());
-      
+
       setTimeout(() => {
         navigate("/order-confirmation");
       }, 2000);
@@ -98,12 +92,7 @@ export default function Checkout() {
     setLocalError("");
     dispatch(clearOrderError());
 
-    const requiredFields = [
-      "fullname",
-      "email",
-      "phone_number",
-      "address",
-    ];
+    const requiredFields = ["fullname", "email", "phone_number", "address"];
 
     for (const field of requiredFields) {
       if (!formData[field as keyof typeof formData].trim()) {
@@ -174,6 +163,7 @@ export default function Checkout() {
   };
 
   const handleBackToCart = () => {
+    
     navigate("/cart");
   };
 
@@ -208,7 +198,13 @@ export default function Checkout() {
           Thanh toán
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 3, flexDirection: { xs: "column", md: "row" } }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 3,
+            flexDirection: { xs: "column", md: "row" },
+          }}
+        >
           {/* LEFT COLUMN - Form */}
           <Paper sx={{ flex: 2, p: 3, borderRadius: 2 }}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
@@ -280,9 +276,15 @@ export default function Checkout() {
                     label="Phương thức vận chuyển"
                     onChange={handleSelectChange}
                   >
-                    <MenuItem value="standard">Giao hàng tiêu chuẩn (3-5 ngày) +$5.00</MenuItem>
-                    <MenuItem value="express">Giao hàng nhanh (1-2 ngày) +$10.00</MenuItem>
-                    <MenuItem value="pickup">Nhận tại cửa hàng (Miễn phí)</MenuItem>
+                    <MenuItem value="standard">
+                      Giao hàng tiêu chuẩn (3-5 ngày) +$5.00
+                    </MenuItem>
+                    <MenuItem value="express">
+                      Giao hàng nhanh (1-2 ngày) +$10.00
+                    </MenuItem>
+                    <MenuItem value="pickup">
+                      Nhận tại cửa hàng (Miễn phí)
+                    </MenuItem>
                   </Select>
                 </FormControl>
 
@@ -294,7 +296,9 @@ export default function Checkout() {
                     label="Phương thức thanh toán"
                     onChange={handleSelectChange}
                   >
-                    <MenuItem value="cod">Thanh toán khi nhận hàng (COD)</MenuItem>
+                    <MenuItem value="cod">
+                      Thanh toán khi nhận hàng (COD)
+                    </MenuItem>
                     <MenuItem value="banking">Chuyển khoản ngân hàng</MenuItem>
                     <MenuItem value="credit_card">Thẻ tín dụng</MenuItem>
                   </Select>
@@ -326,7 +330,11 @@ export default function Checkout() {
               {cart.map((item) => (
                 <Box
                   key={item.product.id || item.product.name}
-                  sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
                 >
                   <Typography variant="body2">
                     {item.product.name} x {item.quantity}
@@ -342,18 +350,22 @@ export default function Checkout() {
 
             {/* Summary */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
                 <Typography>Tạm tính:</Typography>
                 <Typography>${totalMoney.toFixed(2)}</Typography>
               </Box>
 
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
                 <Typography>Phí vận chuyển:</Typography>
                 <Typography>
-                  {formData.shipping_method === "express" 
-                    ? "$10.00" 
-                    : formData.shipping_method === "standard" 
-                    ? "$5.00" 
+                  {formData.shipping_method === "express"
+                    ? "$10.00"
+                    : formData.shipping_method === "standard"
+                    ? "$5.00"
                     : "Miễn phí"}
                 </Typography>
               </Box>
@@ -365,9 +377,15 @@ export default function Checkout() {
                   Tổng cộng:
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="primary">
-                  ${(totalMoney + 
-                    (formData.shipping_method === "express" ? 10 : 
-                     formData.shipping_method === "standard" ? 5 : 0)).toFixed(2)}
+                  $
+                  {(
+                    totalMoney +
+                    (formData.shipping_method === "express"
+                      ? 10
+                      : formData.shipping_method === "standard"
+                      ? 5
+                      : 0)
+                  ).toFixed(2)}
                 </Typography>
               </Box>
             </Box>
@@ -397,7 +415,8 @@ export default function Checkout() {
             </Button>
 
             <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
-              Bằng cách đặt hàng, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi.
+              Bằng cách đặt hàng, bạn đồng ý với Điều khoản dịch vụ và Chính
+              sách bảo mật của chúng tôi.
             </Typography>
           </Paper>
         </Box>
@@ -412,7 +431,9 @@ export default function Checkout() {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity={success ? "success" : error || localError ? "error" : "info"}
+          severity={
+            success ? "success" : error || localError ? "error" : "info"
+          }
           sx={{ width: "100%" }}
         >
           {success

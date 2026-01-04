@@ -53,7 +53,6 @@ const createdAtFromUid = (uid: number) => {
 const reindex = (list: UserRow[]) =>
   list.map((r, idx) => ({ ...r, id: idx + 1 }));
 
-/* ================= PAGE ================= */
 
 export default function UsersPage() {
   const [rows, setRows] = useState<UserRow[]>([]);
@@ -61,7 +60,6 @@ export default function UsersPage() {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
 
-  /* ===== FETCH ===== */
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);

@@ -20,6 +20,7 @@ import { useState } from "react";
 import SearchBar from "./SearchBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/stores";
+import { selectIsAuthenticated } from "@/stores/authSlice";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -32,6 +33,7 @@ export default function Header() {
   const cartCount = useAppSelector((state) =>
     state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -39,6 +41,15 @@ export default function Header() {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleCheckoutCart = () => {
+    const token = isAuthenticated || !!localStorage.getItem("accessToken");
+    if (token) {
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
   };
 
   const itemStyle = {
@@ -173,7 +184,7 @@ export default function Header() {
               <ShoppingCartOutlinedIcon />
             </Badge>
           }
-          onClick={() => navigate("/cart")}
+          onClick={handleCheckoutCart}
           sx={{
             textTransform: "none",
             borderColor: "#000",

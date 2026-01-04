@@ -13,12 +13,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <React.StrictMode>
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <QueryClientProvider client={queryClient}>
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <CssBaseline />
           <SnackbarProvider
             maxSnack={3}
-            autoHideDuration={5173}
+            autoHideDuration={5000}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
           >
             <BrowserRouter>
@@ -37,5 +37,4 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </QueryClientProvider>
     </PersistGate>
   </Provider>
-  // </React.StrictMode>
 );

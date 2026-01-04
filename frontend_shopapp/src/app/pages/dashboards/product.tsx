@@ -84,7 +84,6 @@ export default function ProductsPage() {
     active: "true",
   });
 
-  /* Gọi API DummyJSON để lấy products */
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -93,8 +92,8 @@ export default function ProductsPage() {
       const data: { products: ApiProduct[] } = await res.json();
 
       const mapped: ProductRow[] = (data.products ?? []).map((p) => ({
-        uid: p.id, // key thật lấy từ API
-        id: 0, // sẽ được reindex lại
+        uid: p.id, 
+        id: 0, 
         thumbnail: p.thumbnail,
         title: p.title ?? "",
         category: p.category ?? "",
@@ -113,12 +112,10 @@ export default function ProductsPage() {
     }
   };
 
-  /* Load dữ liệu 1 lần khi vào trang */
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  /* Lọc dữ liệu theo search */
   const filteredRows = useMemo(() => {
     const k = q.trim().toLowerCase();
     if (!k) return rows;

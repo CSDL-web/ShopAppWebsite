@@ -6,6 +6,7 @@ import Header from "@/components/headers/Header";
 import { Product } from "@/stores/products";
 import { COLORS } from "@/styles/colors";
 import PaginationControl from "@/components/PaginationControl";
+import request from "@/utils/request";
 
 const PAGE_SIZE = 20;
 
@@ -36,10 +37,9 @@ export default function SearchPage() {
       params.append("skip", "0");
       params.append("limit", "1001");
 
-      const res = await fetch(
-        `http://localhost:5000/products/filter?${params.toString()}`
-      );
-      const data: Product[] = await res.json();
+      const res = await request({ url: "/products/filter", method: "GET" });
+
+      const data: Product[] = await res.data();
 
       setAllProducts(data.filter((p) => p.thumbnail?.trim()));
 

@@ -5,6 +5,7 @@ import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/users/user";
 import Product from "@/app/pages/dashboards/product";
 import ProductContainer from "../pages/searchs/searchPage";
+import ProtectedRoute from "../pages/login/ProtectedPage";
 
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
@@ -16,177 +17,120 @@ const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
 const Login = lazy(() => import("@/app/pages/login/loginPage"));
 const Register = lazy(() => import("@/app/pages/login/register"));
+const Checkout = lazy(() => import("@/app/pages/checkout/checkout"));
+
 interface ItemType {
   key: string;
   components: ReactElement;
   layout: string;
-  private: boolean;
+  requireAuth: boolean;
+  adminOnly?: boolean;
 }
 
-const userItems: ItemType[] = [
+const publicRoutes: ItemType[] = [
   {
     key: URL.Home,
     components: <Home />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
   {
     key: URL.Products,
     components: <Products />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
-  {
-    key: URL.Cart,
-    components: <Cart />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-
   {
     key: URL.Categories,
     components: <CateProduct />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
   {
     key: "/search",
     components: <ProductContainer />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
   {
     key: URL.Login,
     components: <Login />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
   {
     key: URL.Register,
     components: <Register />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
+  },
+  {
+    key: URL.Checkout,
+    components: <Checkout />,
+    layout: DEFAULT_LAYOUT,
+    requireAuth: false,
   },
 ];
 
-const adminItems: ItemType[] = [
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Products,
-    components: <Products />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+const protectedRoutes: ItemType[] = [
   {
     key: URL.Cart,
     components: <Cart />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: true,
+    adminOnly: false,
   },
+];
 
+const adminRoutes: ItemType[] = [
   {
     key: "/dashboard/users",
     components: <User />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: true,
+    adminOnly: true,
   },
   {
     key: "/dashboard/products",
     components: <Product />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: true,
+    adminOnly: true,
   },
   {
     key: "/dashboard/setting",
     components: <Setting />,
     layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Categories,
-    components: <CateProduct />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: "/search",
-    components: <ProductContainer />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Register,
-    components: <Register />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: true,
+    adminOnly: true,
   },
 ];
 
-const sharedItems: ItemType[] = [
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Products,
-    components: <Products />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Register,
-    components: <Register />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-    {
-    key: URL.Categories,
-    components: <CateProduct />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+const allRoutes: ItemType[] = [
+  ...publicRoutes,
+  ...protectedRoutes,
+  ...adminRoutes,
 ];
-
-function getItems(isTargetAdmin: boolean) {
-  return isTargetAdmin
-    ? adminItems.concat(sharedItems)
-    : userItems.concat(sharedItems);
-}
 
 export default function Routers() {
-  const items = getItems(true);
-  const token = localStorage.getItem("token");
-
   return (
     <Routes>
-      {items.map((item) => {
+      {allRoutes.map((item) => {
         let element = <Suspense fallback={null}>{item.components}</Suspense>;
 
         if (item.layout === DEFAULT_LAYOUT) {
           element = <DefaultLayout>{element}</DefaultLayout>;
         }
 
-        if (item.private && !token) {
-          element = <Navigate to={URL.Login} replace />;
+        if (item.requireAuth) {
+          element = (
+            <ProtectedRoute
+              requireAuth={item.requireAuth}
+              adminOnly={item.adminOnly || false}
+            >
+              {element}
+            </ProtectedRoute>
+          );
         }
 
         return <Route key={item.key} path={item.key} element={element} />;

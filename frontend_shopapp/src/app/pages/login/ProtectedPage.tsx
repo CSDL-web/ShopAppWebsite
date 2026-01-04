@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
@@ -25,6 +25,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const user = useSelector(selectUser);
   const location = useLocation();
 
+  useEffect(() => {
+    if (requireAuth && isAuthenticated) {
+      const tokenExpiration = localStorage.getItem("refresh_expiration_date");
+      if (tokenExpiration) {
+        const expirationTime = new Date(tokenExpiration).getTime();
+        const currentTime = new Date().getTime();
+
+        if (currentTime > expirationTime) {
+          enqueueSnackbar("Your session has expired. Please login again.", {
+            variant: "warning",
+          });
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          localStorage.removeItem("tokenExpiration");
+          localStorage.removeItem("refreshTokenExpiration");
+          window.location.href = "/login";
+        }
+      }
+    }
+  }, [isAuthenticated, requireAuth, location]);
+
   if (loading === "pending") {
     return (
       <Box
@@ -42,11 +64,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (requireAuth && !isAuthenticated) {
     enqueueSnackbar("Please login to continue", { variant: "warning" });
-
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Route yêu cầu role admin
   if (requireAuth && adminOnly && user?.role_id !== 2) {
+    enqueueSnackbar("Access denied. Admin only.", { variant: "error" });
+    return <Navigate to="/" replace />;
+  }
+
+  if (
+    !requireAuth &&
+    isAuthenticated &&
+    (location.pathname === "/login" || location.pathname === "/register")
+  ) {
     return <Navigate to="/" replace />;
   }
 
