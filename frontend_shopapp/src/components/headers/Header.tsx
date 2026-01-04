@@ -43,6 +43,16 @@ export default function Header() {
     py: 1.2,
   };
 
+  const [keyword, setKeyword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = keyword.trim();
+    if (!value) return;
+
+    navigate(`/search/${encodeURIComponent(value)}`);
+  };
+
   return (
     <Box
       sx={{

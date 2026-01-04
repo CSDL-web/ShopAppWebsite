@@ -18,8 +18,8 @@ const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
 const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
 const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
-
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
+const SearchPage = lazy(() => import("@/app/pages/searchs/searchPage"));
 
 interface ItemType {
   key: string;
@@ -71,6 +71,12 @@ const userItems: ItemType[] = [
     layout: DEFAULT_LAYOUT,
     private: false,
   },
+  {
+    key: "/search/:query",
+    components: <SearchPage />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
 ];
 
 const adminItems: ItemType[] = [
@@ -105,7 +111,6 @@ const adminItems: ItemType[] = [
     private: false,
   },
 
-  // ✅ ADD route User vào đây
   {
     key: "/dashboard/users",
     components: <User />,
@@ -151,6 +156,12 @@ const adminItems: ItemType[] = [
   {
     key: URL.Categories,
     components: <CateProduct />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: "/search/:query",
+    components: <SearchPage />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },

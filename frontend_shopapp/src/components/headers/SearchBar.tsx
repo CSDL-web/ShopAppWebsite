@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
@@ -6,9 +7,20 @@ import SearchIcon from "@mui/icons-material/Search";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!query.trim()) return;
+
+    navigate(`/search/${encodeURIComponent(query.trim())}`);
+  };
 
   return (
     <Paper
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -21,14 +33,16 @@ export default function SearchBar() {
         flexShrink: 0,
       }}
     >
-      <SearchIcon sx={{ fontSize: 18, color: "#999" }} />
+      <IconButton type="submit" size="small">
+        <SearchIcon sx={{ fontSize: 18, color: "#999" }} />
+      </IconButton>
 
       <InputBase
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search..."
         sx={{
-          ml: 1,
+          ml: 0.5,
           flex: 1,
           fontSize: "0.875rem",
         }}
