@@ -1,162 +1,351 @@
-import { Box, Typography, Button } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
-import Header from "@/components/headers/Header";
-import { COLORS } from "@/styles/colors";
-import { Product } from "@/stores/products";
+import * as React from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export default function ProductPage() {
-  const API_URL = import.meta.env.VITE_API_URL;
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  Link,
+  IconButton,
+  InputAdornment,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 
-  const location = useLocation();
+import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
+import PhoneIphoneRoundedIcon from "@mui/icons-material/PhoneIphoneRounded";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+
+export default function SignUpPage() {
   const navigate = useNavigate();
 
-  const product = location.state as Product | null;
+  const [fullName, setFullName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [address, setAddress] = React.useState("");
 
-  if (!product) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Typography>Product not found</Typography>
-        <Button onClick={() => navigate(-1)}>Go back</Button>
-      </Box>
+  // ✅ đổi Email -> User Account
+  const [userAccount, setUserAccount] = React.useState("");
+
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+
+  // ✅ mỗi ô 1 mắt riêng
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
+  // ✅ chỉ hiện lỗi sau khi đã “đụng” vào field (blur)
+  const [touched, setTouched] = React.useState({
+    fullName: false,
+    phone: false,
+    address: false,
+    userAccount: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  // ✅ username: 4-20 ký tự, chỉ chữ + số (bạn muốn _ . thì nói mình)
+  const isValidUserAccount = (v: string) => /^[a-zA-Z0-9]{4,20}$/.test(v.trim());
+  const isValidPhone = (v: string) => /^[0-9]{9,11}$/.test(v.trim());
+  const isValidPassword = (v: string) => v.trim().length >= 8;
+
+  // ✅ Không hiện lỗi "required" khi để trống.
+  const userAccountErr =
+    touched.userAccount &&
+    userAccount.trim() !== "" &&
+    !isValidUserAccount(userAccount)
+      ? "User account must be 4–20 letters or numbers."
+      : "";
+
+  const phoneErr =
+    touched.phone && phone.trim() !== "" && !isValidPhone(phone)
+      ? "Phone number must be 9–11 digits."
+      : "";
+
+  const passErr =
+    touched.password && password.trim() !== "" && !isValidPassword(password)
+      ? "Password must be at least 8 characters."
+      : "";
+
+  const confirmErr =
+    touched.confirmPassword &&
+    confirmPassword.trim() !== "" &&
+    password.trim() !== "" &&
+    confirmPassword !== password
+      ? "Passwords do not match."
+      : "";
+
+  // ✅ vẫn bắt buộc nhập đủ thì mới cho submit (nút bị khóa)
+  const canSubmit =
+    fullName.trim() !== "" &&
+    phone.trim() !== "" &&
+    isValidPhone(phone) &&
+    address.trim() !== "" &&
+    userAccount.trim() !== "" &&
+    isValidUserAccount(userAccount) &&
+    password.trim() !== "" &&
+    isValidPassword(password) &&
+    confirmPassword.trim() !== "" &&
+    confirmPassword === password;
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // ✅ mark touched để hiện lỗi “sai định dạng” (không hiện required)
+    setTouched({
+      fullName: true,
+      phone: true,
+      address: true,
+      userAccount: true,
+      password: true,
+      confirmPassword: true,
+    });
+
+    if (!canSubmit) return;
+
+    localStorage.setItem(
+      "demo_user",
+      JSON.stringify({
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+        userAccount: userAccount.trim(),
+        password, // demo only
+        createdAt: Date.now(),
+      })
     );
-  }
 
-  const buildImageUrl = (img?: string | null) => {
-    if (!img) {
-      return `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-    }
-    return img.startsWith("http")
-      ? img
-      : `${API_URL}/backend_shopapp/uploads/${img}`;
+    navigate("/check-password");
   };
-
-  const getMainImage = () => {
-    if (product.thumbnail) return product.thumbnail;
-
-    if (product.images?.length) {
-      const first = product.images[0];
-      if (typeof first === "string") return first;
-      if (first.url) return first.url;
-    }
-
-    return null;
-  };
-
-  const mainImage = getMainImage();
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
-      <Header />
-
-      <Box
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "grid",
+        placeItems: "center",
+        px: 2,
+        py: 6,
+        background: `
+          radial-gradient(900px 520px at 15% 80%, rgba(200,27,231,.85) 0%, transparent 55%),
+          radial-gradient(900px 520px at 85% 15%, rgba(48,162,222,.85) 0%, transparent 55%),
+          radial-gradient(900px 520px at 15% 10%, rgba(133,86,228,.75) 0%, transparent 55%),
+          linear-gradient(135deg, #c81be7 0%, #8556e4 30%, #5b7be2 55%, #30a2de 100%)
+        `,
+      }}
+    >
+      <Paper
+        elevation={0}
         sx={{
-          maxWidth: 1200,
-          margin: "2rem auto",
-          display: "flex",
-          gap: 4,
-          backgroundColor: "#fff",
-          p: 3,
+          width: "min(520px, 100%)",
+          borderRadius: "28px",
+          p: { xs: 3, sm: 5 },
+          backgroundColor: "#f5f6f7",
         }}
       >
-        {/* IMAGE */}
-        <Box sx={{ flex: 1 }}>
-          <img
-            src={buildImageUrl(mainImage)}
-            alt={product.name}
-            style={{
-              width: "100%",
-              maxHeight: 450,
-              objectFit: "contain",
-            }}
-            onError={(e) => {
-              e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+          Create Your Account
+        </Typography>
+
+        {/* ✅ bỏ đăng nhập Google */}
+        <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
+          <TextField
+            fullWidth
+            label="Full name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, fullName: true }))}
+            helperText={" "}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
             }}
           />
-        </Box>
 
-        {/* INFO */}
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h5" fontWeight={600}>
-            {product.name}
+          <TextField
+            fullWidth
+            label="Phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
+            error={Boolean(phoneErr)}
+            helperText={phoneErr || " "}
+            placeholder="0123456789"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIphoneRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, address: true }))}
+            helperText={" "}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LocationOnOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* ✅ Email -> User account */}
+          <TextField
+            fullWidth
+            label="User account"
+            value={userAccount}
+            onChange={(e) => setUserAccount(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, userAccount: true }))}
+            error={Boolean(userAccountErr)}
+            helperText={userAccountErr || " "}
+            placeholder="username123"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutlineRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+            error={Boolean(passErr)}
+            helperText={passErr || " "}
+            placeholder="••••••••••••"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    aria-label="show password"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    <VisibilityRoundedIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Confirm password"
+            type={showConfirmPassword ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, confirmPassword: true }))}
+            error={Boolean(confirmErr)}
+            helperText={confirmErr || " "}
+            placeholder="••••••••••••"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    aria-label="show confirm password"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                  >
+                    <VisibilityRoundedIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <FormControlLabel
+            control={<Checkbox />}
+            label="Receive news, updates and deals"
+            sx={{ color: "text.secondary" }}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={!canSubmit}
+            sx={{
+              mt: 0.5,
+              py: 1.4,
+              borderRadius: "12px",
+              textTransform: "none",
+              fontWeight: 700,
+              backgroundColor: "#6f49ff",
+              "&:hover": { backgroundColor: "#5d3df0" },
+              "&.Mui-disabled": {
+                backgroundColor: "rgba(111,73,255,0.35)",
+                color: "rgba(255,255,255,0.9)",
+              },
+            }}
+          >
+            Create Account
+          </Button>
+
+          <Typography sx={{ mt: 1, color: "text.secondary", fontSize: 14 }}>
+            By creating an account, you agree to the{" "}
+            <Link href="#" underline="hover">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="#" underline="hover">
+              Privacy Policy
+            </Link>
+            .
           </Typography>
 
-          <Typography variant="body1" sx={{ my: 2 }}>
-            {product.description || "No description available."}
-          </Typography>
-
-          <Typography variant="h6" fontWeight={700} my={2}>
-            ${product.price}
+          <Typography sx={{ color: "text.secondary" }}>
+            Already have an account?{" "}
+            <Link
+              component={RouterLink}
+              to="/login"
+              underline="hover"
+              sx={{ color: "primary.main" }}
+            >
+              Log in here
+            </Link>
           </Typography>
 
           <Button
-            variant="contained"
-            sx={{
-              backgroundColor: COLORS.orange,
-              color: COLORS.black,
-              mt: 2,
-            }}
+            component={RouterLink}
+            to="/"
+            variant="text"
+            size="large"
+            sx={{ mt: 1, textTransform: "none", fontWeight: 600, color: "text.secondary" }}
           >
-            Add to Cart
+            ← Back to Home
           </Button>
-
-          {product.category_id && (
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Category ID: {product.category_id}
-            </Typography>
-          )}
         </Box>
-      </Box>
-
-      {/* MORE IMAGES */}
-      {product.images && product.images.length > 1 && (
-        <Box
-          sx={{
-            maxWidth: 1200,
-            margin: "2rem auto",
-            backgroundColor: "#fff",
-            p: 3,
-          }}
-        >
-          <Typography variant="h6" fontWeight={600} mb={2}>
-            More Images
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
-            {product.images.slice(0, 4).map((image, index) => {
-              const imgSrc =
-                typeof image === "string"
-                  ? buildImageUrl(image)
-                  : buildImageUrl(image.url);
-
-              return (
-                <Box
-                  key={index}
-                  sx={{
-                    minWidth: 150,
-                    height: 150,
-                    border: "1px solid #e0e0e0",
-                    borderRadius: 1,
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={imgSrc}
-                    alt={`${product.name} - ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-                    }}
-                  />
-                </Box>
-              );
-            })}
-          </Box>
-        </Box>
-      )}
+      </Paper>
     </Box>
   );
 }

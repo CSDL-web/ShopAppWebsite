@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+
 import {
   Box,
   Paper,
   Typography,
   TextField,
   Button,
-  Divider,
   Link,
   IconButton,
   InputAdornment,
@@ -14,105 +14,53 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
-import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-import { useDispatch } from "react-redux";
-import { useAppDispatch, useAppSelector } from "@/stores";
-import { actionResgister, postRegisterUser } from "@/stores/user";
-import { useEffect } from "react";
-
-function GoogleIcon() {
-  return (
-    <Box component="span" sx={{ display: "inline-flex", mr: 1 }} aria-hidden>
-      {/* ... giữ nguyên svg ... */}
-      <svg width="18" height="18" viewBox="0 0 48 48">
-        <path
-          fill="#FFC107"
-          d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 12.9 2 4 10.9 4 22s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-1.5z"
-        />
-        <path
-          fill="#FF3D00"
-          d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 16.3 2 9.7 6.3 6.3 14.7z"
-        />
-        <path
-          fill="#4CAF50"
-          d="M24 42c5.2 0 10-2 13.6-5.2l-6.3-5.3c-1.9 1.5-4.3 2.5-7.3 2.5-5.3 0-9.8-3.4-11.4-8.2l-6.7 5.2C9.4 37.8 16.2 42 24 42z"
-        />
-        <path
-          fill="#1976D2"
-          d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.6 5.5l.1.1 6.3 5.3C39.5 36.6 44 32 44 22c0-1.3-.1-2.7-.4-1.5z"
-        />
-      </svg>
-    </Box>
-  );
-}
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
+import PhoneIphoneRoundedIcon from "@mui/icons-material/PhoneIphoneRounded";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 
 export default function SignUpPage() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  const registerUser = useAppSelector(postRegisterUser);
-  const [email, setEmail] = React.useState("");
+  const [fullName, setFullName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [userAccount, setUserAccount] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [touched, setTouched] = React.useState({
-    email: false,
-    password: false,
-  });
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+
+  // ✅ mỗi ô 1 mắt riêng
   const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  const isValidEmail = (v: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-  const isValidPassword = (v: string) => v.trim().length >= 8;
+  // ✅ chỉ cần nhập đủ ô (không validate định dạng)
+  const canSubmit =
+    fullName.trim() !== "" &&
+    phone.trim() !== "" &&
+    address.trim() !== "" &&
+    userAccount.trim() !== "" &&
+    password.trim() !== "" &&
+    confirmPassword.trim() !== "";
 
-  const emailErr =
-    touched.email && email.trim().length === 0
-      ? "Email is required."
-      : touched.email && !isValidEmail(email)
-      ? "Please enter a valid email address."
-      : "";
-
-  const passErr =
-    touched.password && password.trim().length === 0
-      ? "Password is required."
-      : touched.password && !isValidPassword(password)
-      ? "Password must be at least 8 characters."
-      : "";
-
-  const canSubmit = isValidEmail(email) && isValidPassword(password);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    setTouched({
-      email: true,
-      password: true,
-    });
-
     if (!canSubmit) return;
 
-    const payload = {
-      fullname: "ass",
-      phone_number: "022234234222",
-      password,
-      address: "hanoi",
-      date_of_birth: "2026-01-03",
-      email,
-      role_id: 1,
-    };
+    localStorage.setItem(
+      "demo_user",
+      JSON.stringify({
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+        userAccount: userAccount.trim(),
+        password, // demo only
+        confirmPassword, // demo only
+        createdAt: Date.now(),
+      })
+    );
 
-    try {
-      const resultAction = await dispatch(actionResgister(payload));
-      console.log(resultAction);
-
-      if (actionResgister.fulfilled.match(resultAction)) {
-        navigate("/check-password");
-      } else {
-        console.error("Register failed", resultAction.payload);
-      }
-    } catch (err) {
-      console.error("Unexpected error", err);
-    }
+    navigate("/check-password");
   };
 
   return (
@@ -144,83 +92,124 @@ export default function SignUpPage() {
           Create Your Account
         </Typography>
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: "grid", gap: 2 }}
-        >
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 1.2,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              backgroundColor: "#fff",
+        <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
+          <TextField
+            fullWidth
+            label="Full name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            helperText=" "
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
             }}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
+          />
 
-          <Divider sx={{ my: 0.5 }}>Or</Divider>
+          <TextField
+            fullWidth
+            label="Phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            helperText=" "
+            placeholder="0123456789"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIphoneRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
 
-          <Box>
-            <Typography sx={{ mb: 1, color: "text.secondary" }}>
-              Email address
-            </Typography>
-            <TextField
-              fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-              error={Boolean(emailErr)}
-              helperText={emailErr || " "}
-              placeholder="email@address.com"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailOutlineRoundedIcon color="primary" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
+          <TextField
+            fullWidth
+            label="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            helperText=" "
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LocationOnOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
 
-          <Box>
-            <Typography sx={{ mb: 1, color: "text.secondary" }}>
-              Password
-            </Typography>
-            <TextField
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-              error={Boolean(passErr)}
-              helperText={passErr || " "}
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••••••"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlinedIcon color="primary" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      aria-label="show password"
-                      onClick={() => setShowPassword((v) => !v)}
-                    >
-                      <VisibilityRoundedIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
+          <TextField
+            fullWidth
+            label="User account"
+            value={userAccount}
+            onChange={(e) => setUserAccount(e.target.value)}
+            helperText=" "
+            placeholder="username"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineRoundedIcon color="primary" />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            helperText=" "
+            placeholder="••••••••••••"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    aria-label="show password"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    <VisibilityRoundedIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Confirm password"
+            type={showConfirmPassword ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            helperText=" "
+            placeholder="••••••••••••"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon color="primary" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    aria-label="show confirm password"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                  >
+                    <VisibilityRoundedIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
           <FormControlLabel
             control={<Checkbox />}
@@ -250,26 +239,9 @@ export default function SignUpPage() {
             Create Account
           </Button>
 
-          <Typography sx={{ mt: 1, color: "text.secondary", fontSize: 14 }}>
-            By creating an account, you are agree to the{" "}
-            <Link href="#" underline="hover">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="#" underline="hover">
-              Privacy Policy
-            </Link>
-            .
-          </Typography>
-
           <Typography sx={{ color: "text.secondary" }}>
             Already have an account?{" "}
-            <Link
-              component={RouterLink}
-              to="/login"
-              underline="hover"
-              sx={{ color: "primary.main" }}
-            >
+            <Link component={RouterLink} to="/login" underline="hover" sx={{ color: "primary.main" }}>
               Log in here
             </Link>
           </Typography>
@@ -279,12 +251,7 @@ export default function SignUpPage() {
             to="/"
             variant="text"
             size="large"
-            sx={{
-              mt: 1,
-              textTransform: "none",
-              fontWeight: 600,
-              color: "text.secondary",
-            }}
+            sx={{ mt: 1, textTransform: "none", fontWeight: 600, color: "text.secondary" }}
           >
             ← Back to Home
           </Button>

@@ -15,39 +15,14 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
-import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-
-function GoogleIcon() {
-  return (
-    <Box component="span" sx={{ display: "inline-flex", mr: 1 }} aria-hidden>
-      <svg width="18" height="18" viewBox="0 0 48 48">
-        <path
-          fill="#FFC107"
-          d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 12.9 2 4 10.9 4 22s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-1.5z"
-        />
-        <path
-          fill="#FF3D00"
-          d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 16.3 2 9.7 6.3 6.3 14.7z"
-        />
-        <path
-          fill="#4CAF50"
-          d="M24 42c5.2 0 10-2 13.6-5.2l-6.3-5.3c-1.9 1.5-4.3 2.5-7.3 2.5-5.3 0-9.8-3.4-11.4-8.2l-6.7 5.2C9.4 37.8 16.2 42 24 42z"
-        />
-        <path
-          fill="#1976D2"
-          d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.6 5.5l.1.1 6.3 5.3C39.5 36.6 44 32 44 22c0-1.3-.1-2.7-.4-1.5z"
-        />
-      </svg>
-    </Box>
-  );
-}
 
 export default function SignInPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -64,12 +39,16 @@ export default function SignInPage() {
       return;
     }
 
-    if (email.trim() !== user.email || password !== user.password) {
-      setError("Email hoặc mật khẩu không đúng.");
+    // ✅ hỗ trợ cả user.username (mới) và user.email (cũ) để khỏi lỗi dữ liệu cũ
+    const okUser =
+      username.trim() === (user.username ?? "") ||
+      username.trim() === (user.email ?? "");
+
+    if (!okUser || password !== user.password) {
+      setError("User hoặc mật khẩu không đúng.");
       return;
     }
 
-    // ✅ đăng nhập thành công -> về Home
     navigate("/");
   };
 
@@ -103,24 +82,23 @@ export default function SignInPage() {
         </Typography>
 
         <Typography sx={{ color: "text.secondary", mb: 3, maxWidth: 380 }}>
-          Log in by entering your email address and password.
+          Log in by entering your user and password.
         </Typography>
 
-        {/* ✅ form để Enter cũng login được */}
         <Box component="form" onSubmit={onSubmit} sx={{ display: "grid", gap: 2 }}>
           <Box>
             <Typography sx={{ mb: 1, color: "text.secondary" }}>
-              Email address
+              User
             </Typography>
             <TextField
               fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@address.com"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="your_username"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <MailOutlineRoundedIcon color="primary" />
+                    <PersonOutlineRoundedIcon color="primary" />
                   </InputAdornment>
                 ),
               }}
@@ -196,8 +174,9 @@ export default function SignInPage() {
             sx={{ mt: 0.5, color: "text.secondary" }}
           />
 
+          {/* ✅ BỎ ĐĂNG NHẬP GOOGLE: xoá luôn phần dưới nếu không cần */}
+          {/* 
           <Divider sx={{ my: 1.5 }}>Or</Divider>
-
           <Button
             variant="outlined"
             size="large"
@@ -209,9 +188,9 @@ export default function SignInPage() {
               backgroundColor: "#fff",
             }}
           >
-            <GoogleIcon />
             Sign in with Google
           </Button>
+          */}
 
           <Typography sx={{ color: "text.secondary" }}>
             Don&apos;t have an account?{" "}
