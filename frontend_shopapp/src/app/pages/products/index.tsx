@@ -1,24 +1,39 @@
-import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
+import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Divider,
+  Breadcrumbs,
+  Link,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ImageIcon from "@mui/icons-material/Image";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/headers/Header";
-import { COLORS } from "@/styles/colors";
 import { Product } from "@/stores/products";
 import { useAppDispatch } from "@/stores";
 import { addToCart } from "@/stores/cart";
-import { useState } from "react";
 
 export default function ProductPage() {
   const API_URL = import.meta.env.VITE_API_URL;
-
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const [openToast, setOpenToast] = useState(false);
 
   const product = location.state as Product | null;
 
-  console.log("PRODUCT PAGE STATE:", product);
+  const ORANGE_BG = "#ff7a00";
+  const RED_BORDER = "#d81b60";
+  const RED_HOVER = "#ad1457";
+
   if (!product) {
     return (
       <Box sx={{ p: 4 }}>
@@ -29,9 +44,7 @@ export default function ProductPage() {
   }
 
   const buildImageUrl = (img?: string | null) => {
-    if (!img) {
-      return `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-    }
+    if (!img) return `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
     return img.startsWith("http")
       ? img
       : `${API_URL}/backend_shopapp/uploads/${img}`;
@@ -39,84 +52,299 @@ export default function ProductPage() {
 
   const getMainImage = () => {
     if (product.thumbnail) return product.thumbnail;
-
     if (product.images?.length) {
       const first = product.images[0];
       if (typeof first === "string") return first;
       if (first.url) return first.url;
     }
-
     return null;
   };
 
   const handleAddToCart = () => {
     console.log("Adding product to cart:", product.name);
 
-    if (!product.name) {
-      console.error("Product has no name!");
-      return;
+    const productWithId = { ...product };
+
+    if (!productWithId.id) {
+      productWithId.name = product.name;
     }
 
-    dispatch(addToCart(product));
+    console.log("Product with ID:", productWithId.id);
+    dispatch(addToCart(productWithId));
     setOpenToast(true);
   };
 
   const mainImage = getMainImage();
 
   return (
-    <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: ORANGE_BG, minHeight: "100vh" }}>
       <Header />
 
-      <Box
-        sx={{
-          maxWidth: 1200,
-          margin: "2rem auto",
-          display: "flex",
-          gap: 4,
-          backgroundColor: "#fff",
-          p: 3,
-        }}
-      >
-        <Box sx={{ flex: 1 }}>
-          <img
-            src={buildImageUrl(mainImage)}
-            alt={product.name}
-            style={{ width: "100%", maxHeight: 450, objectFit: "contain" }}
-            onError={(e) => {
-              e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-            }}
-          />
-        </Box>
-
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h5" fontWeight={600}>
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: 2, mt: 2 }}>
+        <Breadcrumbs sx={{ color: "#fff", mb: 2 }}>
+          <Link
+            onClick={() => navigate("/")}
+            sx={{ cursor: "pointer", color: "#fff" }}
+          >
+            Home
+          </Link>
+          <Link
+            onClick={() => navigate(-1)}
+            sx={{ cursor: "pointer", color: "#fff" }}
+          >
+            Products
+          </Link>
+          <Typography fontWeight={800} color="#fff">
             {product.name}
           </Typography>
-
-          <Typography sx={{ my: 2 }}>
-            {product.description || "No description available."}
-          </Typography>
-
-          <Typography variant="h6" fontWeight={700} my={2}>
-            ${product.price}
-          </Typography>
-
-          <Button
-            variant="contained"
-            onClick={handleAddToCart}
-            sx={{
-              backgroundColor: COLORS.orange,
-              color: COLORS.black,
-              mt: 2,
-              "&:hover": { backgroundColor: COLORS.orange, opacity: 0.9 },
-            }}
-          >
-            Add to Cart
-          </Button>
-        </Box>
+        </Breadcrumbs>
       </Box>
 
-      {/* 🔥 TOAST */}
+      {/* MAIN */}
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: 2 }}>
+        <Paper
+          sx={{
+            p: 3,
+            borderRadius: 4,
+            backgroundColor: "#fff",
+            border: `3px solid ${RED_BORDER}`,
+          }}
+        >
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 3,
+            }}
+          >
+            {/* IMAGE */}
+            <Paper
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `3px solid ${RED_BORDER}`,
+                backgroundColor: "#fff",
+              }}
+            >
+              <img
+                src={buildImageUrl(mainImage)}
+                alt={product.name}
+                style={{
+                  width: "100%",
+                  height: 420,
+                  objectFit: "contain",
+                }}
+                onError={(e) => {
+                  e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                }}
+              />
+            </Paper>
+
+            {/* INFO */}
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                border: `3px solid ${RED_BORDER}`,
+              }}
+            >
+              <Typography variant="h5" fontWeight={900}>
+                <Inventory2Icon
+                  sx={{ color: RED_BORDER, mr: 1, verticalAlign: "middle" }}
+                />
+                {product.name}
+              </Typography>
+
+              <Divider sx={{ my: 2, borderColor: RED_BORDER }} />
+
+              {/* PRICE BOX */}
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  border: `3px solid ${RED_BORDER}`,
+                  mb: 2,
+                }}
+              >
+                <Typography variant="body2" fontWeight={700}>
+                  PRICE
+                </Typography>
+                <Typography
+                  variant="h5"
+                  fontWeight={900}
+                  sx={{ color: RED_BORDER }}
+                >
+                  ${product.price}
+                </Typography>
+              </Box>
+
+              <Typography sx={{ mb: 2 }}>
+                {product.description || "No description available."}
+              </Typography>
+
+              {/* ADD TO CART BUTTON */}
+              <Button
+                variant="contained"
+                startIcon={<ShoppingCartIcon />}
+                onClick={handleAddToCart}
+                sx={{
+                  backgroundColor: RED_BORDER,
+                  color: "#fff",
+                  fontWeight: 900,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.2,
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: RED_HOVER,
+                  },
+                }}
+              >
+                Add to Cart
+              </Button>
+
+              <Button
+                startIcon={<ArrowBackIcon />}
+                variant="text"
+                onClick={() => navigate(-1)}
+                sx={{
+                  ml: 1.5,
+                  fontWeight: 800,
+                  color: RED_BORDER,
+                }}
+              >
+                Back
+              </Button>
+
+              {/* POLICY BOX */}
+              <Box sx={{ position: "relative", mt: 3 }}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: 2,
+                    backgroundColor: RED_BORDER,
+                    zIndex: 0,
+                  }}
+                />
+
+                <Box
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    border: `3px solid ${RED_BORDER}`,
+                    backgroundColor: "#fff",
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                >
+                  <Typography
+                    fontWeight={900}
+                    mb={1}
+                    sx={{ color: RED_BORDER }}
+                  >
+                    Ưu đãi & Chính sách
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      mb: 0.5,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <ShieldOutlinedIcon
+                      sx={{ color: RED_BORDER, fontSize: 20 }}
+                    />
+                    Trả hàng <strong>miễn phí trong vòng 15 ngày</strong>
+                  </Typography>
+
+                  <Typography sx={{ mb: 0.5 }}>
+                    🚚 Nhận hàng từ <strong>1 – 3 ngày</strong> kể từ ngày đặt
+                    hàng
+                  </Typography>
+
+                  <Typography>
+                    🎁 <strong>Tặng voucher giảm 20%</strong> (tối đa{" "}
+                    <strong>100.000 VND</strong>) nếu đơn hàng đến muộn hơn dự
+                    kiến
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Box>
+        </Paper>
+
+        {/* MORE IMAGES */}
+        {product.images && product.images.length > 1 && (
+          <Paper
+            sx={{
+              mt: 3,
+              p: 3,
+              backgroundColor: "#fff",
+              borderRadius: 4,
+              border: `3px solid ${RED_BORDER}`,
+            }}
+          >
+            <Typography variant="h6" fontWeight={900} mb={2}>
+              <ImageIcon
+                sx={{ color: RED_BORDER, mr: 1, verticalAlign: "middle" }}
+              />
+              MORE IMAGES
+            </Typography>
+
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(2,1fr)",
+                  md: "repeat(4,1fr)",
+                },
+                gap: 2,
+              }}
+            >
+              {product.images.slice(0, 8).map((image, index) => {
+                const imgSrc =
+                  typeof image === "string"
+                    ? buildImageUrl(image)
+                    : buildImageUrl(image.url);
+
+                return (
+                  <Box
+                    key={index}
+                    sx={{
+                      height: 140,
+                      borderRadius: 2,
+                      border: `3px solid ${RED_BORDER}`,
+                      overflow: "hidden",
+                      transition: "0.2s",
+                      "&:hover": {
+                        transform: "scale(1.03)",
+                      },
+                    }}
+                  >
+                    <img
+                      src={imgSrc}
+                      alt={`${product.name}-${index}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                      }}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
+          </Paper>
+        )}
+      </Box>
+
+      {/* TOAST NOTIFICATION */}
       <Snackbar
         open={openToast}
         autoHideDuration={2000}
@@ -124,7 +352,7 @@ export default function ProductPage() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert severity="success" variant="filled">
-          Added to cart successfully
+          "{product.name}" đã được thêm vào giỏ hàng!
         </Alert>
       </Snackbar>
     </Box>
