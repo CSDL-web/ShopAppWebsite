@@ -61,7 +61,6 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    console.log("Adding product to cart:", product.name);
 
     const productWithId = { ...product };
 
@@ -69,7 +68,6 @@ export default function ProductPage() {
       productWithId.name = product.name;
     }
 
-    console.log("Product with ID:", productWithId.id);
     dispatch(addToCart(productWithId));
     setOpenToast(true);
   };

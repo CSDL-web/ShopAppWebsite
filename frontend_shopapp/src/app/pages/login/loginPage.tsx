@@ -41,18 +41,17 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [localError, setLocalError] = React.useState("");
 
-  // Redirect to home if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
       navigate("/", { replace: true });
     }
+    console.log(isAuthenticated);
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError("");
 
-    // Validate
     if (!phoneNumber.trim()) {
       setLocalError("Phone number is required");
       return;
@@ -74,9 +73,6 @@ export default function SignInPage() {
       await dispatch(
         loginUser({ account: phoneNumber.trim(), password })
       ).unwrap();
-
-      // Redirection will happen automatically via useEffect above
-      // because isAuthenticated will become true
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -115,14 +111,12 @@ export default function SignInPage() {
           Log in by entering your phone number and password.
         </Typography>
 
-        {/* Hiển thị lỗi từ Redux */}
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
 
-        {/* Hiển thị lỗi local validation */}
         {localError && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {localError}

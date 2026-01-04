@@ -62,7 +62,6 @@ export const loginUser = createAsyncThunk(
         data: credentials,
       });
 
-      console.log("Login response:", res.data);
 
       const {
         access_token,
@@ -129,7 +128,6 @@ export const registerUser = createAsyncThunk(
         Object.assign(payload, { date_of_birth: data.date_of_birth });
       }
 
-      console.log("Register payload:", payload);
 
       const res = await request({
         url: "/users/register",
@@ -137,7 +135,6 @@ export const registerUser = createAsyncThunk(
         data: payload,
       });
 
-      console.log("Register response:", res.data);
 
       if (res.data.access_token) {
         const { access_token, refresh_token, user } = res.data;
@@ -209,8 +206,6 @@ export const refreshToken = createAsyncThunk(
         method: "POST",
         data: { refresh_token },
       });
-
-      console.log("Refresh token response:", res.data);
 
       const { access_token, refresh_token: new_refresh_token, user } = res.data;
 
