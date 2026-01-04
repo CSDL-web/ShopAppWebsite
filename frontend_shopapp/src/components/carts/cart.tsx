@@ -1,78 +1,52 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
-
-import { useAppSelector } from "stores";
-import CartItem from "./cart_item";
-import { COLORS } from "@/styles/colors";
-import CustomHR from "../CustomHR";
-import { Product } from "../../stores/products";
-import ProductLinkText from "../productLinkText";
-import Subtotal from "./subTotal";
-import CustomButton from "../customButton";
+import { useAppSelector } from "@/stores";
 import { getCart } from "@/stores/cart";
+import CartItem from "./cart_item";
+import Subtotal from "./subTotal";
+import { COLORS } from "@/styles/colors";
+import CustomButton from "@/components/customButton";
 
 export default function Cart() {
   const cart = useAppSelector(getCart);
   const navigate = useNavigate();
 
   const total = cart.reduce(
-    (sum: number, item: Product) => sum + (item.price ?? 0),
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   );
 
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        margin: "3rem 0",
-        gap: "2rem",
-      }}
-    >
-      {/* LEFT: CART ITEMS */}
+    <Box sx={{ display: "flex", gap: "2rem", margin: "3rem 0" }}>
+      {/* LEFT */}
       <Box
-        sx={{
-          backgroundColor: COLORS.white,
-          padding: "2rem",
-          width: "55vw",
-        }}
+        sx={{ backgroundColor: COLORS.white, padding: "2rem", width: "60%" }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="h4" fontWeight={700}>
-            Shopping Cart
-          </Typography>
-          <Typography>Price</Typography>
-        </Box>
+        <Typography variant="h4" fontWeight={700}>
+          Shopping Cart
+        </Typography>
 
-        <CustomHR />
+        {cart.length === 0 && (
+          <Typography sx={{ mt: 2 }}>Your cart is empty</Typography>
+        )}
 
-        {cart.map((item: Product) => (
-          <CartItem key={item.id} item={item} />
+        {cart.map((item) => (
+          <CartItem key={item.product.id} item={item} />
         ))}
 
         <Subtotal
-          items={cart.length}
+          items={totalItems}
           price={total}
           sx={{ textAlign: "right" }}
         />
       </Box>
 
-      {/* RIGHT: SUMMARY */}
+      {/* RIGHT */}
       <Box
-        sx={{
-          backgroundColor: COLORS.white,
-          padding: "1rem",
-          width: "15vw",
-          height: "fit-content",
-        }}
+        sx={{ backgroundColor: COLORS.white, padding: "1.5rem", width: "25%" }}
       >
         <Typography
           sx={{
@@ -82,16 +56,11 @@ export default function Cart() {
             fontSize: "0.875rem",
           }}
         >
-          <CheckCircleIcon sx={{ marginRight: "0.25rem" }} />
+          <CheckCircleIcon sx={{ mr: 0.5 }} />
           Your order qualifies for FREE Shipping.
         </Typography>
 
-        <Typography sx={{ marginLeft: "1.8rem", fontSize: "0.875rem" }}>
-          Choose this option at checkout.{" "}
-          <ProductLinkText>See details</ProductLinkText>
-        </Typography>
-
-        <Subtotal items={cart.length} price={total} />
+        <Subtotal items={totalItems} price={total} />
 
         <CustomButton onClick={() => navigate("/checkout")}>
           Proceed to Checkout

@@ -46,7 +46,6 @@ export const actionResgister = createAsyncThunk(
           "Content-Type": "application/json",
         },
       });
-      console.log(res);
 
       return res;
     } catch (error) {

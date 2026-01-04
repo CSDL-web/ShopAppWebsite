@@ -19,8 +19,6 @@ export default function CategorySection({ title, products }: Props) {
     return [...products].sort(() => Math.random() - 0.5).slice(0, 4);
   }, [products]);
 
-  console.log(randomProducts);
-
   return (
     <Box sx={{ mb: 6 }}>
       <Box display="flex" justifyContent="space-between" mb={2}>

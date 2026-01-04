@@ -34,7 +34,6 @@ export const actionGetCategories = createAsyncThunk(
         url: "categories/get_all_categories",
         method: "GET",
       });
-      console.log(response);
       return response as unknown as CategoriesState;
     } catch (error) {
       console.log(error);
@@ -46,15 +45,12 @@ export const actionGetCategories = createAsyncThunk(
 export const actionPostCategories = createAsyncThunk(
   "categories/actionPostCategories",
   async (data: { id: number; name: string }, { rejectWithValue }) => {
-    console.log(data);
-    
     try {
       const response = await request({
         url: "categories/create_new_category",
         method: "POST",
         data,
       });
-      console.log(response);
       return response as unknown as CategoriesState;
     } catch (error) {
       console.log(error);
@@ -62,7 +58,6 @@ export const actionPostCategories = createAsyncThunk(
     }
   }
 );
-
 
 export const slice = createSlice({
   name: "categories",

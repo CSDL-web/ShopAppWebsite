@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   Divider,
@@ -18,6 +19,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
 import SearchBar from "./SearchBar";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/stores";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -26,6 +28,10 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
+
+  const cartCount = useAppSelector((state) =>
+    state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -162,7 +168,12 @@ export default function Header() {
 
         <Button
           variant="outlined"
-          startIcon={<ShoppingCartOutlinedIcon />}
+          startIcon={
+            <Badge badgeContent={cartCount} color="error">
+              <ShoppingCartOutlinedIcon />
+            </Badge>
+          }
+          onClick={() => navigate("/cart")}
           sx={{
             textTransform: "none",
             borderColor: "#000",

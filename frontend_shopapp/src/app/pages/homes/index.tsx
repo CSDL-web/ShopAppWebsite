@@ -40,7 +40,7 @@ export default function HomePage() {
           const productsByCategory = product.data.filter(
             (p) => p.category_id === cat.id
           );
-
+          
           return (
             <CategorySection
               key={cat.id}

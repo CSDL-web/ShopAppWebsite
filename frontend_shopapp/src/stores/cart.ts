@@ -1,32 +1,86 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "./index";
+import { Product } from "@/stores/products";
+import { RootState } from "@/stores";
 
-export interface CartState {
-  cart: any;
-}
-
-const initialState: CartState = {
-  cart: [],
+export type CartItem = {
+  product: Product;
+  quantity: number;
 };
 
-export const cartSlice = createSlice({
+export type CartState = {
+  items: CartItem[];
+};
+
+const initialState: CartState = {
+  items: [],
+};
+
+// Trong cartSlice.ts
+const getProductKey = (product: Product): string => {
+  // Tạo key từ name + price để tránh trùng
+  return `${product.name}_${product.price}`;
+};
+
+const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction) => {
-      state.cart.push(action.payload);
+    addToCart: (state, action: PayloadAction<Product>) => {
+      const productKey = getProductKey(action.payload);
+
+      const found = state.items.find(
+        (i) => getProductKey(i.product) === productKey
+      );
+
+      if (found) {
+        found.quantity += 1;
+      } else {
+        state.items.push({
+          product: action.payload,
+          quantity: 1,
+        });
+      }
     },
-    clearCart: (state) => {
-      state.cart = [];
+
+    increaseQuantity: (state, action: PayloadAction<string>) => {
+      // action.payload bây giờ là productKey
+      const item = state.items.find(
+        (i) => getProductKey(i.product) === action.payload
+      );
+      if (item) item.quantity += 1;
     },
-    removeItem: (state, action) => {
-      state.cart.splice(action.payload, 1);
+
+    decreaseQuantity: (state, action: PayloadAction<string>) => {
+      const item = state.items.find(
+        (i) => getProductKey(i.product) === action.payload
+      );
+
+      if (!item) return;
+
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+      } else {
+        state.items = state.items.filter(
+          (i) => getProductKey(i.product) !== action.payload
+        );
+      }
+    },
+
+    removeItem: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter(
+        (i) => getProductKey(i.product) !== action.payload
+      );
     },
   },
 });
 
-export const { addToCart, clearCart, removeItem } = cartSlice.actions;
+export const {
+  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
+  removeItem,
+} = cartSlice.actions;
 
-export const getCart = (state: RootState) => state.cart.cart;
+export const getCart = (state: RootState) => state.cart.items;
 
 export default cartSlice.reducer;

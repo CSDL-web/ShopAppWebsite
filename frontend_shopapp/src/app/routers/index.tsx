@@ -196,10 +196,6 @@ function getItems(isTargetAdmin: boolean) {
 
 export default function Routers() {
   const items = getItems(true);
-  console.log(
-    "ROUTES:",
-    items.map((i) => i.key)
-  );
   const token = localStorage.getItem("token");
 
   return (

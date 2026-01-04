@@ -25,7 +25,6 @@ const OrderSummary = ({ subtotal, tax, total }: OrderSummaryProps) => {
   return (
     <CustomBox sx={{ width: "15vw", marginLeft: "2rem" }}>
       <CustomButton
-        onClick={() => console.log("Place order")}
         sx={{ width: "100%" }}
       >
         Place Your Order

@@ -1,17 +1,24 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/headers/Header";
 import { COLORS } from "@/styles/colors";
 import { Product } from "@/stores/products";
+import { useAppDispatch } from "@/stores";
+import { addToCart } from "@/stores/cart";
+import { useState } from "react";
 
 export default function ProductPage() {
   const API_URL = import.meta.env.VITE_API_URL;
 
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [openToast, setOpenToast] = useState(false);
 
   const product = location.state as Product | null;
 
+  console.log("PRODUCT PAGE STATE:", product);
   if (!product) {
     return (
       <Box sx={{ p: 4 }}>
@@ -42,6 +49,18 @@ export default function ProductPage() {
     return null;
   };
 
+  const handleAddToCart = () => {
+    console.log("Adding product to cart:", product.name);
+
+    if (!product.name) {
+      console.error("Product has no name!");
+      return;
+    }
+
+    dispatch(addToCart(product));
+    setOpenToast(true);
+  };
+
   const mainImage = getMainImage();
 
   return (
@@ -58,29 +77,23 @@ export default function ProductPage() {
           p: 3,
         }}
       >
-        {/* IMAGE */}
         <Box sx={{ flex: 1 }}>
           <img
             src={buildImageUrl(mainImage)}
             alt={product.name}
-            style={{
-              width: "100%",
-              maxHeight: 450,
-              objectFit: "contain",
-            }}
+            style={{ width: "100%", maxHeight: 450, objectFit: "contain" }}
             onError={(e) => {
               e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
             }}
           />
         </Box>
 
-        {/* INFO */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h5" fontWeight={600}>
             {product.name}
           </Typography>
 
-          <Typography variant="body1" sx={{ my: 2 }}>
+          <Typography sx={{ my: 2 }}>
             {product.description || "No description available."}
           </Typography>
 
@@ -90,73 +103,30 @@ export default function ProductPage() {
 
           <Button
             variant="contained"
+            onClick={handleAddToCart}
             sx={{
               backgroundColor: COLORS.orange,
               color: COLORS.black,
               mt: 2,
+              "&:hover": { backgroundColor: COLORS.orange, opacity: 0.9 },
             }}
           >
             Add to Cart
           </Button>
-
-          {product.category_id && (
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Category ID: {product.category_id}
-            </Typography>
-          )}
         </Box>
       </Box>
 
-      {/* MORE IMAGES */}
-      {product.images && product.images.length > 1 && (
-        <Box
-          sx={{
-            maxWidth: 1200,
-            margin: "2rem auto",
-            backgroundColor: "#fff",
-            p: 3,
-          }}
-        >
-          <Typography variant="h6" fontWeight={600} mb={2}>
-            More Images
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
-            {product.images.slice(0, 4).map((image, index) => {
-              const imgSrc =
-                typeof image === "string"
-                  ? buildImageUrl(image)
-                  : buildImageUrl(image.url);
-
-              return (
-                <Box
-                  key={index}
-                  sx={{
-                    minWidth: 150,
-                    height: 150,
-                    border: "1px solid #e0e0e0",
-                    borderRadius: 1,
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={imgSrc}
-                    alt={`${product.name} - ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
-                    }}
-                  />
-                </Box>
-              );
-            })}
-          </Box>
-        </Box>
-      )}
+      {/* 🔥 TOAST */}
+      <Snackbar
+        open={openToast}
+        autoHideDuration={2000}
+        onClose={() => setOpenToast(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert severity="success" variant="filled">
+          Added to cart successfully
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

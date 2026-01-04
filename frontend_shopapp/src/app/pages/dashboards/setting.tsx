@@ -347,7 +347,6 @@ export default function UserSettingsPage() {
                 }}
                 onClick={() => {
                   // TODO: gọi API save settings
-                  console.log({ firstName, lastName, emails, currentPw, newPw, avatarUrl });
                   alert("Saved (demo)");
                 }}
               >

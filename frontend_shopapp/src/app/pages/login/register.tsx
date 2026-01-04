@@ -103,8 +103,6 @@ export default function SignUpPage() {
 
     try {
       const resultAction = await dispatch(actionResgister(payload));
-      console.log(resultAction);
-
       if (actionResgister.fulfilled.match(resultAction)) {
         navigate("/check-password");
       } else {

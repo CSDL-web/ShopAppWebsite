@@ -1,8 +1,6 @@
-import { SxProps, Theme } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import React from "react";
+import { Typography, SxProps, Theme } from "@mui/material";
 
-const Subtotal = ({
+export default function Subtotal({
   items,
   price,
   sx,
@@ -10,16 +8,13 @@ const Subtotal = ({
   items: number;
   price: number;
   sx?: SxProps<Theme>;
-}) => {
+}) {
   return (
     <Typography
-      variant="h3"
       sx={{ fontSize: "1.25rem", fontWeight: 500, margin: "1rem 0", ...sx }}
     >
       Subtotal ({items} items):{" "}
-      <span style={{ fontWeight: 700 }}>${price}</span>{" "}
+      <span style={{ fontWeight: 700 }}>${price.toFixed(2)}</span>
     </Typography>
   );
-};
-
-export default Subtotal;
+}
