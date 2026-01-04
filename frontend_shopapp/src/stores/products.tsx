@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import qs from "qs";
 import { RootState } from ".";
 
@@ -44,7 +44,33 @@ export const actionGetProduct = createAsyncThunk(
       });
       return response;
     } catch (error) {
-      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const actionGetProductByCategories = createAsyncThunk(
+  "product/actionGetProductByCategories",
+  async (
+    data: {
+      category_id: number;
+      skip?: number;
+      limit?: number;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await request({
+        url: `/products/category/${data.category_id}`,
+        method: "GET",
+        params: {
+          skip: data.skip,
+          limit: data.limit,
+        },
+        paramsSerializer: (params) => qs.stringify(params, { allowDots: true }),
+      });
+      return response;
+    } catch (error) {
       return rejectWithValue(error);
     }
   }
@@ -56,6 +82,7 @@ export const slice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // ===== ALL PRODUCTS =====
       .addCase(actionGetProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -63,17 +90,31 @@ export const slice = createSlice({
       .addCase(actionGetProduct.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.data = action.payload.data.filter(
-          (p: Product) => p.thumbnail !== null && p.thumbnail !== ""
-        );
+        state.data =
+          action.payload?.data?.filter((p: Product) => p.thumbnail) || [];
+      })
+      .addCase(actionGetProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
 
-      .addCase(actionGetProduct.rejected, (state, action) => {
+      // ===== PRODUCTS BY CATEGORY =====
+      .addCase(actionGetProductByCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(actionGetProductByCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data =
+          action.payload?.data?.products ?? action.payload?.data ?? [];
+      })
+      .addCase(actionGetProductByCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
+
 export const selectProductsData = (state: RootState): ProductState =>
   state.products;
 

@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Container, Box, Pagination } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import SearchResults from "@/components/search/SearchResults";
 import Header from "@/components/headers/Header";
 import { Product } from "@/stores/products";
 import { COLORS } from "@/styles/colors";
+import PaginationControl from "@/components/PaginationControl";
 
 const PAGE_SIZE = 20;
 
 export default function SearchPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const page = Number(searchParams.get("page") || 1);
 
   const keyword = searchParams.get("keyword");
@@ -32,19 +33,16 @@ export default function SearchPage() {
       if (categoryId) params.append("category_id", categoryId);
       if (sortBy) params.append("sort_by", sortBy);
 
-      // 🔥 Lấy toàn bộ dữ liệu để FE paginate
       params.append("skip", "0");
       params.append("limit", "1001");
 
-      const url = `http://localhost:5000/products/filter?${params.toString()}`;
-      const res = await fetch(url);
+      const res = await fetch(
+        `http://localhost:5000/products/filter?${params.toString()}`
+      );
       const data: Product[] = await res.json();
 
-      const filteredData = data.filter(
-        (p) => p.thumbnail && p.thumbnail.trim() !== ""
-      );
+      setAllProducts(data.filter((p) => p.thumbnail?.trim()));
 
-      setAllProducts(filteredData);
       setLoading(false);
     };
 
@@ -53,32 +51,20 @@ export default function SearchPage() {
 
   const paginatedProducts = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    return allProducts.slice(start, end);
+    return allProducts.slice(start, start + PAGE_SIZE);
   }, [allProducts, page]);
-
-  const totalPages = Math.ceil(allProducts.length / PAGE_SIZE);
 
   return (
     <Box sx={{ backgroundColor: COLORS.lightGray, minHeight: "100vh" }}>
       <Header />
+
       <Container maxWidth={false}>
         <SearchResults products={paginatedProducts} loading={loading} />
 
-        {totalPages > 1 && (
-          <Box display="flex" justifyContent="center" mt={4}>
-            <Pagination
-              page={page}
-              count={totalPages}
-              onChange={(_, value) => {
-                setSearchParams((prev) => {
-                  prev.set("page", String(value));
-                  return prev;
-                });
-              }}
-            />
-          </Box>
-        )}
+        <PaginationControl
+          totalItems={allProducts.length}
+          pageSize={PAGE_SIZE}
+        />
       </Container>
     </Box>
   );

@@ -63,6 +63,7 @@ export const actionPostCategories = createAsyncThunk(
   }
 );
 
+
 export const slice = createSlice({
   name: "categories",
   initialState,

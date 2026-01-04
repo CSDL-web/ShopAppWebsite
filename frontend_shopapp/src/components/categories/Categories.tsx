@@ -23,7 +23,7 @@ export default function Categories({ categories }: Props) {
       {categories.map((c: any) => (
         <Box
           key={c.id}
-          onClick={() => navigate(`/categories/${encodeURIComponent(c.name)}`)}
+          onClick={() => navigate(`/categories/${c.name}/${encodeURIComponent(c.id)}`)}
           sx={{
             display: "flex",
             flexDirection: "column",

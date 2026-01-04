@@ -42,13 +42,19 @@ const ProductCard = ({
         <img
           src={imgSrc}
           alt={product.name}
+          onError={(e) => {
+            const target = e.currentTarget;
+
+            // ⛔ tránh loop vô hạn
+            if (!target.dataset.fallback) {
+              target.dataset.fallback = "true";
+              target.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+            }
+          }}
           style={{
             width: "100%",
             height: 250,
             objectFit: "contain",
-          }}
-          onError={(e) => {
-            e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
           }}
         />
       ) : (
