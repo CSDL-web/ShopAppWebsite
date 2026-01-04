@@ -10,14 +10,9 @@ import ProductContainer from "../pages/searchs/searchPage";
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
 
-const Login = lazy(() => import("@/app/pages/login/loginPage"));
-const Register = lazy(() => import("@/app/pages/login/register"));
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
-const ForgotPassword = lazy(() => import("@/app/pages/login/forgot-password"));
-const CheckEmail = lazy(() => import("@/app/pages/login/check-email"));
-const CheckPassword = lazy(() => import("@/app/pages/login/check-password"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
 
@@ -29,18 +24,6 @@ interface ItemType {
 }
 
 const userItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Register,
-    components: <Register />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
   {
     key: URL.Home,
     components: <Home />,
@@ -59,12 +42,7 @@ const userItems: ItemType[] = [
     layout: DEFAULT_LAYOUT,
     private: false,
   },
-  {
-    key: URL.CheckEmail,
-    components: <CheckEmail />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+
   {
     key: URL.Categories,
     components: <CateProduct />,
@@ -80,18 +58,6 @@ const userItems: ItemType[] = [
 ];
 
 const adminItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Register,
-    components: <Register />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
   {
     key: URL.Home,
     components: <Home />,
@@ -124,30 +90,6 @@ const adminItems: ItemType[] = [
     private: false,
   },
   {
-    key: "/register",
-    components: <Register />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: "/forgot-password",
-    components: <ForgotPassword />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: "/check-email",
-    components: <CheckEmail />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: "/check-password",
-    components: <CheckPassword />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
     key: "/dashboard/setting",
     components: <Setting />,
     layout: DEFAULT_LAYOUT,
@@ -169,20 +111,8 @@ const adminItems: ItemType[] = [
 
 const sharedItems: ItemType[] = [
   {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
     key: URL.Home,
     components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Register,
-    components: <Register />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },

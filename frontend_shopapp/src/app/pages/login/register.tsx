@@ -12,106 +12,137 @@ import {
   InputAdornment,
   Checkbox,
   FormControlLabel,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 
-import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
+import PhoneIphoneRoundedIcon from "@mui/icons-material/PhoneIphoneRounded";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-import { useDispatch } from "react-redux";
-import { useAppDispatch, useAppSelector } from "@/stores";
-import { actionResgister, postRegisterUser } from "@/stores/user";
-import { useEffect } from "react";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import CakeRoundedIcon from "@mui/icons-material/CakeRounded";
 
-function GoogleIcon() {
-  return (
-    <Box component="span" sx={{ display: "inline-flex", mr: 1 }} aria-hidden>
-      {/* ... giữ nguyên svg ... */}
-      <svg width="18" height="18" viewBox="0 0 48 48">
-        <path
-          fill="#FFC107"
-          d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 12.9 2 4 10.9 4 22s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-1.5z"
-        />
-        <path
-          fill="#FF3D00"
-          d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34.8 4.1 29.7 2 24 2 16.3 2 9.7 6.3 6.3 14.7z"
-        />
-        <path
-          fill="#4CAF50"
-          d="M24 42c5.2 0 10-2 13.6-5.2l-6.3-5.3c-1.9 1.5-4.3 2.5-7.3 2.5-5.3 0-9.8-3.4-11.4-8.2l-6.7 5.2C9.4 37.8 16.2 42 24 42z"
-        />
-        <path
-          fill="#1976D2"
-          d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.6 5.5l.1.1 6.3 5.3C39.5 36.6 44 32 44 22c0-1.3-.1-2.7-.4-1.5z"
-        />
-      </svg>
-    </Box>
-  );
-}
+import { useDispatch, useSelector } from "react-redux";
+import {
+  registerUser,
+  selectAuthLoading,
+  selectAuthError,
+  selectRegisterSuccess,
+} from "@/stores/authSlice";
+import { useAppDispatch } from "@/stores";
 
 export default function SignUpPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const registerUser = useAppSelector(postRegisterUser);
-  const [email, setEmail] = React.useState("");
+  const loading = useSelector(selectAuthLoading);
+  const error = useSelector(selectAuthError);
+  const registerSuccess = useSelector(selectRegisterSuccess);
+
+  const [fullname, setFullname] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [touched, setTouched] = React.useState({
-    email: false,
-    password: false,
-  });
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [dateOfBirth, setDateOfBirth] = React.useState("");
+
   const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [touched, setTouched] = React.useState({
+    fullname: false,
+    phoneNumber: false,
+    password: false,
+    confirmPassword: false,
+    address: false,
+  });
+  const [agreeTerms, setAgreeTerms] = React.useState(false);
 
-  const isValidEmail = (v: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-  const isValidPassword = (v: string) => v.trim().length >= 8;
+  // Validation functions
+  const isValidFullname = (v: string) => v.trim().length >= 2;
+  const isValidPhoneNumber = (v: string) => /^[0-9]{10,11}$/.test(v);
+  const isValidPassword = (v: string) => v.length >= 8;
+  const passwordsMatch = password === confirmPassword;
+  const isValidAddress = (v: string) => v.trim().length >= 5;
 
-  const emailErr =
-    touched.email && email.trim().length === 0
-      ? "Email is required."
-      : touched.email && !isValidEmail(email)
-      ? "Please enter a valid email address."
+  // Error messages
+  const fullnameErr =
+    touched.fullname && !isValidFullname(fullname)
+      ? "Full name must be at least 2 characters"
       : "";
 
-  const passErr =
-    touched.password && password.trim().length === 0
-      ? "Password is required."
-      : touched.password && !isValidPassword(password)
-      ? "Password must be at least 8 characters."
+  const phoneErr =
+    touched.phoneNumber && !isValidPhoneNumber(phoneNumber)
+      ? "Please enter a valid phone number (10-11 digits)"
       : "";
 
-  const canSubmit = isValidEmail(email) && isValidPassword(password);
+  const passwordErr =
+    touched.password && !isValidPassword(password)
+      ? "Password must be at least 8 characters"
+      : "";
+
+  const confirmPasswordErr =
+    touched.confirmPassword && !passwordsMatch ? "Passwords do not match" : "";
+
+  const addressErr =
+    touched.address && !isValidAddress(address)
+      ? "Address must be at least 5 characters"
+      : "";
+
+  const canSubmit =
+    isValidFullname(fullname) &&
+    isValidPhoneNumber(phoneNumber) &&
+    isValidPassword(password) &&
+    passwordsMatch &&
+    isValidAddress(address) &&
+    agreeTerms;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setTouched({
-      email: true,
+      fullname: true,
+      phoneNumber: true,
       password: true,
+      confirmPassword: true,
+      address: true,
     });
 
     if (!canSubmit) return;
 
     const payload = {
-      fullname: "ass",
-      phone_number: "022234234222",
-      password,
-      address: "hanoi",
-      date_of_birth: "2026-01-03",
-      email,
+      fullname: fullname.trim(),
+      phone_number: phoneNumber.trim(),
+      password: password,
+      address: address.trim(),
+      date_of_birth: dateOfBirth || undefined,
+      email: `${phoneNumber.trim()}@shopapp.com`,
       role_id: 1,
     };
 
     try {
-      const resultAction = await dispatch(actionResgister(payload));
-      if (actionResgister.fulfilled.match(resultAction)) {
-        navigate("/check-password");
+      const result = await dispatch(registerUser(payload)).unwrap();
+
+      if (result.access_token) {
+        navigate("/", { replace: true });
       } else {
-        console.error("Register failed", resultAction.payload);
+        navigate("/login", {
+          replace: true,
+          state: { message: "Registration successful! Please log in." },
+        });
       }
     } catch (err) {
-      console.error("Unexpected error", err);
+      console.error("Registration failed:", err);
     }
   };
+
+  React.useEffect(() => {
+    if (registerSuccess && !error) {
+      navigate("/login", {
+        state: { message: "Registration successful! Please log in." },
+      });
+    }
+  }, [registerSuccess, error, navigate]);
 
   return (
     <Box
@@ -136,50 +167,65 @@ export default function SignUpPage() {
           borderRadius: "28px",
           p: { xs: 3, sm: 5 },
           backgroundColor: "#f5f6f7",
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
           Create Your Account
         </Typography>
 
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <Box
           component="form"
           onSubmit={handleSubmit}
           sx={{ display: "grid", gap: 2 }}
         >
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 1.2,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontWeight: 700,
-              backgroundColor: "#fff",
-            }}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
-
-          <Divider sx={{ my: 0.5 }}>Or</Divider>
-
           <Box>
             <Typography sx={{ mb: 1, color: "text.secondary" }}>
-              Email address
+              Full Name
             </Typography>
             <TextField
               fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-              error={Boolean(emailErr)}
-              helperText={emailErr || " "}
-              placeholder="email@address.com"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, fullname: true }))}
+              error={Boolean(fullnameErr)}
+              helperText={fullnameErr || " "}
+              placeholder="John Doe"
+              disabled={loading === "pending"}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <MailOutlineRoundedIcon color="primary" />
+                    <PersonOutlineRoundedIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Phone Number
+            </Typography>
+            <TextField
+              fullWidth
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, phoneNumber: true }))}
+              error={Boolean(phoneErr)}
+              helperText={phoneErr || " "}
+              placeholder="0912345678"
+              disabled={loading === "pending"}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PhoneIphoneRoundedIcon color="primary" />
                   </InputAdornment>
                 ),
               }}
@@ -195,10 +241,11 @@ export default function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-              error={Boolean(passErr)}
-              helperText={passErr || " "}
+              error={Boolean(passwordErr)}
+              helperText={passwordErr || " "}
               type={showPassword ? "text" : "password"}
               placeholder="••••••••••••"
+              disabled={loading === "pending"}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -211,6 +258,7 @@ export default function SignUpPage() {
                       edge="end"
                       aria-label="show password"
                       onClick={() => setShowPassword((v) => !v)}
+                      disabled={loading === "pending"}
                     >
                       <VisibilityRoundedIcon />
                     </IconButton>
@@ -220,17 +268,117 @@ export default function SignUpPage() {
             />
           </Box>
 
+          <Box>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Confirm Password
+            </Typography>
+            <TextField
+              fullWidth
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              onBlur={() =>
+                setTouched((t) => ({ ...t, confirmPassword: true }))
+              }
+              error={Boolean(confirmPasswordErr)}
+              helperText={confirmPasswordErr || " "}
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••••••"
+              disabled={loading === "pending"}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockOutlinedIcon color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      aria-label="show password"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      disabled={loading === "pending"}
+                    >
+                      <VisibilityRoundedIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Address
+            </Typography>
+            <TextField
+              fullWidth
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              onBlur={() => setTouched((t) => ({ ...t, address: true }))}
+              error={Boolean(addressErr)}
+              helperText={addressErr || " "}
+              placeholder="123 Main Street, City, Country"
+              disabled={loading === "pending"}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <HomeRoundedIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1, color: "text.secondary" }}>
+              Date of Birth (Optional)
+            </Typography>
+            <TextField
+              fullWidth
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              disabled={loading === "pending"}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CakeRoundedIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Divider sx={{ my: 1.5 }} />
+
           <FormControlLabel
-            control={<Checkbox />}
-            label="Receive news, updates and deals"
-            sx={{ color: "text.secondary" }}
+            control={
+              <Checkbox
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                disabled={loading === "pending"}
+              />
+            }
+            label={
+              <Typography sx={{ color: "text.secondary", fontSize: 14 }}>
+                I agree to the{" "}
+                <Link href="#" underline="hover">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="#" underline="hover">
+                  Privacy Policy
+                </Link>
+              </Typography>
+            }
           />
 
           <Button
             type="submit"
             variant="contained"
             size="large"
-            disabled={!canSubmit}
+            disabled={!canSubmit || loading === "pending"}
             sx={{
               mt: 0.5,
               py: 1.4,
@@ -245,20 +393,12 @@ export default function SignUpPage() {
               },
             }}
           >
-            Create Account
+            {loading === "pending" ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Create Account"
+            )}
           </Button>
-
-          <Typography sx={{ mt: 1, color: "text.secondary", fontSize: 14 }}>
-            By creating an account, you are agree to the{" "}
-            <Link href="#" underline="hover">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="#" underline="hover">
-              Privacy Policy
-            </Link>
-            .
-          </Typography>
 
           <Typography sx={{ color: "text.secondary" }}>
             Already have an account?{" "}
