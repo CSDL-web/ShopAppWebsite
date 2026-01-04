@@ -32,22 +32,25 @@ export default function SearchPage() {
       if (categoryId) params.append("category_id", categoryId);
       if (sortBy) params.append("sort_by", sortBy);
 
-      // 🔥 FIX CỨNG
+      // 🔥 Lấy toàn bộ dữ liệu để FE paginate
       params.append("skip", "0");
       params.append("limit", "1001");
 
       const url = `http://localhost:5000/products/filter?${params.toString()}`;
       const res = await fetch(url);
-      const data = await res.json();
+      const data: Product[] = await res.json();
 
-      setAllProducts(data);
+      const filteredData = data.filter(
+        (p) => p.thumbnail && p.thumbnail.trim() !== ""
+      );
+
+      setAllProducts(filteredData);
       setLoading(false);
     };
 
     fetchProducts();
   }, [keyword, minPrice, maxPrice, categoryId, sortBy]);
 
-  // 👉 cắt data theo trang
   const paginatedProducts = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;

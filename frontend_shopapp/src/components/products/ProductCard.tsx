@@ -22,7 +22,11 @@ const ProductCard = ({
 
   return (
     <Box
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() =>
+        navigate(`/product/${product.name}`, {
+          state: product,
+        })
+      }
       sx={{
         backgroundColor: COLORS.white,
         width,

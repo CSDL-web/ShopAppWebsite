@@ -3,6 +3,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import qs from "qs";
 import { RootState } from ".";
 
+export type Image = {
+  id: number;
+  url: string;
+};
+
 export type Product = {
   id: number;
   name: string;
@@ -12,6 +17,7 @@ export type Product = {
   description: string;
   created_at: Date;
   updated_at: Date;
+  images: Image[];
 };
 
 export interface ProductState {
@@ -25,7 +31,6 @@ const initialState: ProductState = {
   loading: false,
   error: null,
 };
-
 
 export const actionGetProduct = createAsyncThunk(
   "product/actionGetProduct",

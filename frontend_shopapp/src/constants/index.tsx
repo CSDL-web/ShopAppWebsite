@@ -5,7 +5,7 @@ export const URL = {
   ForgotPassword: "/forgot-password",
   CheckEmail: "/check-email",
   CheckPassword: "/check-password",
-  Products: "/product/:id",
+  Products: "/product/:name",
   Cart: "/cart",
   user: "/dashboard/users",
   product: "/dashboard/products",
