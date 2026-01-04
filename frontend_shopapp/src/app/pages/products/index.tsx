@@ -18,8 +18,10 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/headers/Header";
 import { Product } from "@/stores/products";
-import { useAppDispatch } from "@/stores";
+import { useAppDispatch, useAppSelector } from "@/stores";
 import { addToCart } from "@/stores/cart";
+import { selectIsAuthenticated } from "@/stores/authSlice";
+import { enqueueSnackbar } from "notistack";
 
 export default function ProductPage() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -27,6 +29,7 @@ export default function ProductPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [openToast, setOpenToast] = useState(false);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const product = location.state as Product | null;
 
@@ -61,7 +64,13 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    console.log("Adding product to cart:", product.name);
+    if (!isAuthenticated) {
+      enqueueSnackbar("Please login to add product to cart", {
+        variant: "warning",
+      });
+      navigate("/login");
+      return;
+    }
 
     const productWithId = { ...product };
 
@@ -69,7 +78,6 @@ export default function ProductPage() {
       productWithId.name = product.name;
     }
 
-    console.log("Product with ID:", productWithId.id);
     dispatch(addToCart(productWithId));
     setOpenToast(true);
   };

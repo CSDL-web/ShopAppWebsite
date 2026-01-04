@@ -1,36 +1,68 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { enqueueSnackbar } from "notistack";
 import { store } from "@/stores";
-import { actionLogout } from "@/stores/authSlice";
+import { logoutUser, refreshToken } from "@/stores/authSlice";
 
+const API_URL = import.meta.env.VITE_API_URL;
 export const instanceAxios = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-instanceAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+const isTokenExpired = (): boolean => {
+  const expiration = localStorage.getItem("tokenExpiration");
+  if (!expiration) return false;
 
+  const expirationTime = new Date(expiration).getTime();
+  const currentTime = Date.now();
+
+  return currentTime >= expirationTime - 5 * 60 * 1000;
+};
+
+// ===== REQUEST INTERCEPTOR =====
+instanceAxios.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token && isTokenExpired()) {
+      const result = await store.dispatch(refreshToken());
+
+      if (refreshToken.fulfilled.match(result)) {
+        const newToken = localStorage.getItem("accessToken");
+        if (newToken) {
+          config.headers.Authorization = `Bearer ${newToken}`;
+        }
+      }
+    } else if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ===== RESPONSE INTERCEPTOR =====
 instanceAxios.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      store.dispatch(actionLogout());
-      enqueueSnackbar("Session expired. Please log in again.", {
-        variant: "warning",
-      });
-    } else {
-      enqueueSnackbar(error.message || "Something went wrong", {
-        variant: "error",
-      });
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const result = await store.dispatch(refreshToken());
+
+      if (refreshToken.fulfilled.match(result)) {
+        const newToken = localStorage.getItem("accessToken");
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return instanceAxios(originalRequest);
+      }
+
+      store.dispatch(logoutUser());
     }
+
     return Promise.reject(error);
   }
 );

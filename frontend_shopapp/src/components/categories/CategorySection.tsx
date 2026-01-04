@@ -15,8 +15,6 @@ interface Props {
 export default function CategorySection({ title, products }: Props) {
   const navigate = useNavigate();
 
-  console.log(title, products);
-
   const randomProducts = useMemo(() => {
     return [...products].sort(() => Math.random() - 0.5).slice(0, 4);
   }, [products]);

@@ -10,6 +10,7 @@ export const URL = {
   user: "/dashboard/users",
   product: "/dashboard/products",
   Categories: "/categories/:name/:id",
+  Checkout: "/checkout",
 };
 
 export const DATE_TIME_FORMAT = "YYYY/MM/DD HH:mm:ss";
