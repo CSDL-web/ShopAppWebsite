@@ -101,14 +101,12 @@ export default function Checkout() {
       }
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setLocalError("Email không hợp lệ");
       return false;
     }
 
-    // Validate phone number (Vietnamese format)
     const phoneRegex = /(0[3|5|7|8|9])+([0-9]{8})\b/;
     if (!phoneRegex.test(formData.phone_number)) {
       setLocalError("Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)");
@@ -123,14 +121,6 @@ export default function Checkout() {
       setOpenSnackbar(true);
       return;
     }
-
-    // Prepare cart items for API
-    const cartItems: OrderItem[] = cart.map((item) => ({
-      product_id: item.product.id || item.product.name,
-      quantity: item.quantity,
-      price: item.product.price,
-      product_name: item.product.name,
-    }));
 
     // Calculate shipping cost
     const shippingCost = formData.shipping_method === "express" ? 10 : 5;
@@ -154,7 +144,6 @@ export default function Checkout() {
       payment_method: formData.payment_method,
       active: true,
       coupon_id: 0,
-      cart_items: cartItems,
     };
 
     // Dispatch create order action
@@ -163,7 +152,6 @@ export default function Checkout() {
   };
 
   const handleBackToCart = () => {
-    
     navigate("/cart");
   };
 

@@ -27,7 +27,6 @@ export interface OrderRequest {
   payment_method: string;
   active: boolean;
   coupon_id: number;
-  cart_items: OrderItem[];
 }
 
 export interface Order {
