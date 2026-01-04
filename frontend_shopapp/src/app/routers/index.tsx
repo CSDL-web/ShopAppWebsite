@@ -14,7 +14,8 @@ const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
 const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
-
+const Login = lazy(() => import("@/app/pages/login/loginPage"));
+const Register = lazy(() => import("@/app/pages/login/register"));
 interface ItemType {
   key: string;
   components: ReactElement;
@@ -51,6 +52,18 @@ const userItems: ItemType[] = [
   {
     key: "/search",
     components: <ProductContainer />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Login,
+    components: <Login />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Register,
+    components: <Register />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },
@@ -106,12 +119,48 @@ const adminItems: ItemType[] = [
     layout: DEFAULT_LAYOUT,
     private: false,
   },
+  {
+    key: URL.Login,
+    components: <Login />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Register,
+    components: <Register />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
 ];
 
 const sharedItems: ItemType[] = [
   {
     key: URL.Home,
     components: <Home />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Products,
+    components: <Products />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Login,
+    components: <Login />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+  {
+    key: URL.Register,
+    components: <Register />,
+    layout: DEFAULT_LAYOUT,
+    private: false,
+  },
+    {
+    key: URL.Categories,
+    components: <CateProduct />,
     layout: DEFAULT_LAYOUT,
     private: false,
   },
