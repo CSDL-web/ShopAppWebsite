@@ -21,7 +21,7 @@ const ProductCard = ({
 
   return (
     <Box
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() => navigate(`/products/${product.thumbnail}`)} // ✅ FIX
       sx={{
         backgroundColor: COLORS.white,
         width,
@@ -37,10 +37,10 @@ const ProductCard = ({
         src={buildImageSrc(product.thumbnail)}
         alt={product.name}
         style={{ width: "100%", height: 250, objectFit: "contain" }}
+        onClick={(e) => e.stopPropagation()}
         onError={(e) => {
           const img = e.currentTarget;
           img.onerror = null;
-
           img.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
         }}
       />

@@ -1,17 +1,18 @@
 import request from "@/utils/request";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import qs from "qs";
-import { RootState } from ".";
+import type { RootState } from ".";
+
+
+
 
 export type Product = {
-  id: number;
   name: string;
-  price: number;
-  thumbnail: string;
-  category_id: number;
+  price: string; // ✅ NOTE: backend trả string
+  thumbnail: string; // ✅ NOTE: dùng thumbnail làm key
   description: string;
-  created_at: Date;
-  updated_at: Date;
+  category_id: number;
+  images: { image_url: string }[];
 };
 
 export interface ProductState {
@@ -26,9 +27,8 @@ const initialState: ProductState = {
   error: null,
 };
 
-
 export const actionGetProduct = createAsyncThunk(
-  "product/actionGetProduct",
+  "products/actionGetProduct",
   async (data: { skip: number; limit: number }, { rejectWithValue }) => {
     try {
       const response = await request({
@@ -38,9 +38,8 @@ export const actionGetProduct = createAsyncThunk(
         paramsSerializer: (params) => qs.stringify(params, { allowDots: true }),
       });
       return response;
-    } catch (error) {
-      console.log(error);
-      return rejectWithValue(error);
+    } catch (error: any) {
+      return rejectWithValue(error?.response?.data ?? error);
     }
   }
 );
@@ -55,21 +54,32 @@ export const slice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(actionGetProduct.fulfilled, (state, action) => {
+      .addCase(actionGetProduct.fulfilled, (state, action: any) => {
         state.loading = false;
 
-        state.data = action.payload.data.filter(
-          (p: Product) => p.thumbnail !== null && p.thumbnail !== ""
-        );
+        const payload = action.payload;
+        const list: Product[] = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
+        state.data = list.filter((p) => p?.thumbnail !== null && p?.thumbnail !== "");
       })
-
-      .addCase(actionGetProduct.rejected, (state, action) => {
+      .addCase(actionGetProduct.rejected, (state, action: any) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error =
+          action.payload?.message ??
+          action.error?.message ??
+          "Get products failed";
       });
   },
 });
-export const selectProductsData = (state: RootState): ProductState =>
-  state.products;
 
+// ✅ NOTE: selectors
+export const selectProductsList = (state: RootState) => state.products.data;
+export const selectProductsLoading = (state: RootState) => state.products.loading;
+export const selectProductsError = (state: RootState) => state.products.error;
+
+export const selectProductsData = (state: RootState) => state.products; // ✅ legacy cho Home
 export default slice.reducer;

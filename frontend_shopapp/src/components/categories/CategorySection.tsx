@@ -45,11 +45,17 @@ export default function CategorySection({ title, products }: Props) {
         </Box>
       </Box>
 
-      <Box display="grid" gridTemplateColumns="repeat(4, 1fr)" gap="1rem">
-        {randomProducts.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </Box>
+<Box
+  display="grid"
+  gridTemplateColumns="repeat(4, 1fr)"
+  gap="1rem"
+  sx={{ position: "relative", zIndex: 1 }} // ✅ FIX
+>
+  {randomProducts.map((p) => (
+    <ProductCard key={p.thumbnail} product={p} />
+  ))}
+</Box>
+
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/stores";
 import { actionGetCategories, selectCategoriesData } from "@/stores/categories";
 import { useEffect } from "react";
 
+
 export default function HomePage() {
   const dispatch = useAppDispatch();
 

@@ -5,6 +5,8 @@ import DefaultLayout from "../layouts/DefaultLayout";
 import User from "@/app/pages/dashboards/users/user";
 import Product from "@/app/pages/dashboards/product";
 import Layout from "@/app/pages/login/layout";
+const ProductDetail = lazy(() => import("@/app/pages/products/ProductsPage"));
+
 
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
@@ -104,6 +106,14 @@ const adminItems: ItemType[] = [
     layout: DEFAULT_LAYOUT,
     private: false,
   },
+
+  {
+  key: "/products/:thumbnail",
+  components: <ProductDetail />,
+  layout: DEFAULT_LAYOUT,
+  private: false,
+},
+
 
   // ✅ ADD route User vào đây
   {
