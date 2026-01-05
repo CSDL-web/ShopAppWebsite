@@ -15,9 +15,7 @@ const initialState: CartState = {
   items: [],
 };
 
-// Trong cartSlice.ts
 const getProductKey = (product: Product): string => {
-  // Tạo key từ name + price để tránh trùng
   return `${product.name}_${product.price}`;
 };
 

@@ -7,6 +7,7 @@ import cartReducer from "./cart";
 import categories from "./categories";
 import products from "./products";
 import orderReducer from "./orderSlice";
+import users from "./users";
 
 export type DynamicKeyObject = Record<string, any>;
 
@@ -30,6 +31,7 @@ const reducers = {
   categories,
   products,
   order: orderReducer,
+  users,
 };
 
 const rootReducer = combineReducers(reducers);

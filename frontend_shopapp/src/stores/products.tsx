@@ -98,7 +98,6 @@ export const slice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ===== PRODUCTS BY CATEGORY =====
       .addCase(actionGetProductByCategories.pending, (state) => {
         state.loading = true;
         state.error = null;

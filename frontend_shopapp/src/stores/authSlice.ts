@@ -23,7 +23,6 @@ interface AuthResponse {
   refresh_expiration_date: string;
 }
 
-// Auth State Interface
 export interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -61,7 +60,6 @@ export const loginUser = createAsyncThunk(
         method: "POST",
         data: credentials,
       });
-
 
       const {
         access_token,
@@ -128,13 +126,11 @@ export const registerUser = createAsyncThunk(
         Object.assign(payload, { date_of_birth: data.date_of_birth });
       }
 
-
       const res = await request({
         url: "/users/register",
         method: "POST",
         data: payload,
       });
-
 
       if (res.data.access_token) {
         const { access_token, refresh_token, user } = res.data;
@@ -207,6 +203,8 @@ export const refreshToken = createAsyncThunk(
         data: { refresh_token },
       });
 
+      console.log("Refresh token response:", res.data);
+
       const { access_token, refresh_token: new_refresh_token, user } = res.data;
 
       if (!access_token) {
@@ -248,12 +246,10 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-// Logout Async Thunk
 export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      // Gọi API logout nếu có
       await request({
         url: "/users/logout",
         method: "POST",
@@ -261,7 +257,6 @@ export const logoutUser = createAsyncThunk(
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
-      // Luôn xóa tokens
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");

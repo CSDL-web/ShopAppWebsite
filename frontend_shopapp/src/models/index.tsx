@@ -9,7 +9,7 @@ export interface MenuItemType {
   label: ReactNode;
   icon?: ReactNode;
   path?: string;
-  children?: MenuItemType[]; 
+  children?: MenuItemType[];
 }
 
 export interface DynamicKeyObject {
