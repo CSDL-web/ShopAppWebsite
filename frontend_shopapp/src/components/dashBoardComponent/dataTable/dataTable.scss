@@ -1,0 +1,49 @@
+.dataTable {
+  .dataGrid {
+    background: white;
+    padding: 20px;
+
+    .MuiDataGrid-toolbarContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .action {
+      display: flex;
+      align-items: center; /* Center items vertically */
+      gap: 15px;
+
+      .editActions {
+        display: flex;
+        align-items: center; /* Center items vertically */
+        gap: 8px; /* Space between save and cancel buttons */
+
+        .save,
+        .cancel {
+          cursor: pointer;
+          display: flex; /* Ensure buttons are inline */
+          align-items: center; /* Center content vertically */
+        }
+
+        img {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      img {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+    }
+  }
+}

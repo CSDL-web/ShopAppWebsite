@@ -2,8 +2,10 @@ import { ReactElement, Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { URL } from "../../constants";
 import DefaultLayout from "../layouts/DefaultLayout";
-import User from "@/app/pages/dashboards/users/user";
-import Product from "@/app/pages/dashboards/product";
+import UserDashborad from "@/app/pages/dashboards/users/Users";
+import ProductDashborad from "@/app/pages/dashboards/products/Products";
+import HomeDashboard from "@/app/pages/dashboards/homeDashborad/Home";
+
 import ProductContainer from "../pages/searchs/searchPage";
 import ProtectedRoute from "../pages/login/ProtectedPage";
 
@@ -13,7 +15,6 @@ const AUTH_LAYOUT = "auth";
 const Home = lazy(() => import("@/app/pages/homes/index"));
 const Products = lazy(() => import("@/app/pages/products/index"));
 const Cart = lazy(() => import("@/app/pages/carts/index"));
-const Setting = lazy(() => import("@/app/pages/dashboards/setting"));
 const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
 const Login = lazy(() => import("@/app/pages/login/loginPage"));
 const Register = lazy(() => import("@/app/pages/login/register"));
@@ -85,21 +86,21 @@ const protectedRoutes: ItemType[] = [
 const adminRoutes: ItemType[] = [
   {
     key: "/dashboard/users",
-    components: <User />,
+    components: <UserDashborad />,
     layout: DEFAULT_LAYOUT,
     requireAuth: true,
     adminOnly: true,
   },
   {
     key: "/dashboard/products",
-    components: <Product />,
+    components: <ProductDashborad />,
     layout: DEFAULT_LAYOUT,
     requireAuth: true,
     adminOnly: true,
   },
-  {
-    key: "/dashboard/setting",
-    components: <Setting />,
+    {
+    key: "/dashboard/homeDashboard",
+    components: <HomeDashboard />,
     layout: DEFAULT_LAYOUT,
     requireAuth: true,
     adminOnly: true,
