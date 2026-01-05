@@ -1,5 +1,5 @@
-@import "../../styles/variables.scss";
-@import "../../styles/responsive.scss";
+@use "../../../styles/variables" as *;
+@use "../../../styles/responsive" as *;
 
 .menu {
   .item {
@@ -14,7 +14,7 @@
       color: $soft-color;
       text-transform: uppercase;
 
-      @include lg{
+      @include lg {
         display: none;
       }
     }
@@ -30,8 +30,8 @@
         background-color: $soft-bg;
       }
 
-      .listItemTitle{
-        @include lg{
+      .listItemTitle {
+        @include lg {
           display: none;
         }
       }

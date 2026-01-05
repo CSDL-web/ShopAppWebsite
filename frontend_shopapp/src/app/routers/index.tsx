@@ -8,6 +8,7 @@ import HomeDashboard from "@/app/pages/dashboards/homeDashborad/Home";
 
 import ProductContainer from "../pages/searchs/searchPage";
 import ProtectedRoute from "../pages/login/ProtectedPage";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 const DEFAULT_LAYOUT = "default";
 const AUTH_LAYOUT = "auth";
@@ -87,21 +88,21 @@ const adminRoutes: ItemType[] = [
   {
     key: "/dashboard/users",
     components: <UserDashborad />,
-    layout: DEFAULT_LAYOUT,
+    layout: "Dashboard",
     requireAuth: true,
     adminOnly: true,
   },
   {
     key: "/dashboard/products",
     components: <ProductDashborad />,
-    layout: DEFAULT_LAYOUT,
+    layout: "Dashboard",
     requireAuth: true,
     adminOnly: true,
   },
-    {
-    key: "/dashboard/homeDashboard",
+  {
+    key: "/dashboard",
     components: <HomeDashboard />,
-    layout: DEFAULT_LAYOUT,
+    layout: "Dashboard",
     requireAuth: true,
     adminOnly: true,
   },
@@ -121,6 +122,10 @@ export default function Routers() {
 
         if (item.layout === DEFAULT_LAYOUT) {
           element = <DefaultLayout>{element}</DefaultLayout>;
+        }
+
+        if (item.layout === "Dashboard") {
+          element = <DashboardLayout>{element}</DashboardLayout>;
         }
 
         if (item.requireAuth) {

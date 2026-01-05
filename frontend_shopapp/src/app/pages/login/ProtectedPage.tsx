@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  selectIsAuthenticated,
-  selectAuthLoading,
-  selectUser,
-} from "@/stores/authSlice";
+import { selectIsAuthenticated, selectAuthLoading } from "@/stores/authSlice";
 import { Box, CircularProgress } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 
@@ -22,8 +18,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const loading = useSelector(selectAuthLoading);
-  const user = useSelector(selectUser);
   const location = useLocation();
+
+  const roleId = Number(localStorage.getItem("user_role"));
 
   useEffect(() => {
     if (requireAuth && isAuthenticated) {
@@ -38,9 +35,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           });
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-          localStorage.removeItem("user");
+          localStorage.removeItem("user_role");
           localStorage.removeItem("tokenExpiration");
-          localStorage.removeItem("refreshTokenExpiration");
+          localStorage.removeItem("refresh_expiration_date");
           window.location.href = "/login";
         }
       }
@@ -67,10 +64,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Route yêu cầu role admin
-  if (requireAuth && adminOnly && user?.role_id !== 2) {
+  if (requireAuth && adminOnly && roleId == 2) {
     enqueueSnackbar("Access denied. Admin only.", { variant: "error" });
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   if (

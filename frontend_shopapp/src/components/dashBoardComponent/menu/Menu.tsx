@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./Menu.scss";
-import { menu } from "../../data";
+import { menu } from "@/components/dashBoardComponent/data";
 
 const Menu = () => {
   return (

@@ -1,50 +1,70 @@
-@import "../../styles/variables.scss";
-
 .add {
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.724);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 
   .modal {
     padding: 50px;
     border-radius: 10px;
-    background-color: $main-bg;
+    background-color: #2a3447;
     position: relative;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
 
     h1 {
       margin-bottom: 40px;
       font-size: 24px;
-      color: $soft-color;
+      color: #ddd;
     }
 
     .close {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 20px;
+      right: 20px;
       cursor: pointer;
+      font-size: 18px;
+      color: #ddd;
+
+      &:hover {
+        color: #fff;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
     form {
       display: flex;
       flex-wrap: wrap;
-      max-width: 500px;
       justify-content: space-between;
+      gap: 20px;
 
       .item {
-        width: 40%;
+        width: 48%;
         display: flex;
         flex-direction: column;
         gap: 10px;
-        margin-bottom: 20px;
 
         label {
           font-size: 14px;
+          color: #ddd;
+
+          .error {
+            color: #ff4757;
+            font-size: 12px;
+            margin-left: 5px;
+          }
         }
 
         input {
@@ -52,14 +72,100 @@
           background-color: transparent;
           color: white;
           outline: none;
-          border: 1px solid $soft-color;
+          border: 1px solid #ddd;
           border-radius: 3px;
+          font-size: 14px;
+
+          &:focus {
+            border-color: #6439ff;
+          }
+
+          &[type="date"] {
+            &::-webkit-calendar-picker-indicator {
+              filter: invert(1);
+              cursor: pointer;
+            }
+          }
+
+          &[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+          }
+
+          &[type="password"] {
+            letter-spacing: 1px;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        .checkbox-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 0;
+
+          .checkbox-input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+
+            &:disabled {
+              opacity: 0.5;
+            }
+          }
+
+          .checkbox-label {
+            margin: 0;
+            font-size: 14px;
+            color: #ddd;
+            cursor: pointer;
+
+            &:disabled {
+              opacity: 0.5;
+            }
+          }
         }
       }
+
       button {
         width: 100%;
-        padding: 10px;
+        padding: 15px;
         cursor: pointer;
+        background-color: #6439ff;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        margin-top: 20px;
+        font-size: 16px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #5b2dff;
+        }
+
+        &:disabled {
+          background-color: #7c7c7c;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .add {
+    .modal {
+      padding: 30px 20px;
+
+      form {
+        .item {
+          width: 100%;
+        }
       }
     }
   }

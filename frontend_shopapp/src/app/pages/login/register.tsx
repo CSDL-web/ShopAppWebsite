@@ -330,9 +330,6 @@ export default function SignUpPage() {
           </Box>
 
           <Box>
-            <Typography sx={{ mb: 1, color: "text.secondary" }}>
-              Date of Birth (Optional)
-            </Typography>
             <TextField
               fullWidth
               type="date"
