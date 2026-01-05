@@ -2,88 +2,141 @@ import { ReactElement, Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { URL } from "../../constants";
 import DefaultLayout from "../layouts/DefaultLayout";
+import UserDashborad from "@/app/pages/dashboards/users/Users";
+import ProductDashborad from "@/app/pages/dashboards/products/Products";
+import HomeDashboard from "@/app/pages/dashboards/homeDashborad/Home";
 
-const NONE_LAYOUT = "none";
+import ProductContainer from "../pages/searchs/searchPage";
+import ProtectedRoute from "../pages/login/ProtectedPage";
+import DashboardLayout from "../layouts/DashboardLayout";
+
 const DEFAULT_LAYOUT = "default";
+const AUTH_LAYOUT = "auth";
 
-const Login = lazy(() => import("app/pages/login/loginPage"));
-const Home = lazy(() => import("app/pages/home/index"));
+const Home = lazy(() => import("@/app/pages/homes/index"));
+const Products = lazy(() => import("@/app/pages/products/index"));
+const Cart = lazy(() => import("@/app/pages/carts/index"));
+const CateProduct = lazy(() => import("@/app/pages/products/cateProduct"));
+const Login = lazy(() => import("@/app/pages/login/loginPage"));
+const Register = lazy(() => import("@/app/pages/login/register"));
+const Checkout = lazy(() => import("@/app/pages/checkout/checkout"));
 
 interface ItemType {
   key: string;
   components: ReactElement;
   layout: string;
-  private: boolean;
+  requireAuth: boolean;
+  adminOnly?: boolean;
 }
 
-const userItems: ItemType[] = [
-  {
-    key: URL.Login,
-    components: <Login />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
-  },
+const publicRoutes: ItemType[] = [
   {
     key: URL.Home,
     components: <Home />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
-];
-
-const adminItems: ItemType[] = [
+  {
+    key: URL.Products,
+    components: <Products />,
+    layout: DEFAULT_LAYOUT,
+    requireAuth: false,
+  },
+  {
+    key: URL.Categories,
+    components: <CateProduct />,
+    layout: DEFAULT_LAYOUT,
+    requireAuth: false,
+  },
+  {
+    key: "/search",
+    components: <ProductContainer />,
+    layout: DEFAULT_LAYOUT,
+    requireAuth: false,
+  },
   {
     key: URL.Login,
     components: <Login />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
   },
   {
-    key: URL.Home,
-    components: <Home />,
+    key: URL.Register,
+    components: <Register />,
     layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: false,
+  },
+  {
+    key: URL.Checkout,
+    components: <Checkout />,
+    layout: DEFAULT_LAYOUT,
+    requireAuth: false,
   },
 ];
 
-const sharedItems: ItemType[] = [
+const protectedRoutes: ItemType[] = [
   {
-    key: URL.Login,
-    components: <Login />,
+    key: URL.Cart,
+    components: <Cart />,
     layout: DEFAULT_LAYOUT,
-    private: false,
-  },
-  {
-    key: URL.Home,
-    components: <Home />,
-    layout: DEFAULT_LAYOUT,
-    private: false,
+    requireAuth: true,
+    adminOnly: false,
   },
 ];
 
-function getItems(isTargetAdmin: boolean) {
-  const items = isTargetAdmin
-    ? adminItems.concat(sharedItems)
-    : userItems.concat(sharedItems);
-  return items;
-}
+const adminRoutes: ItemType[] = [
+  {
+    key: "/dashboard/users",
+    components: <UserDashborad />,
+    layout: "Dashboard",
+    requireAuth: true,
+    adminOnly: true,
+  },
+  {
+    key: "/dashboard/products",
+    components: <ProductDashborad />,
+    layout: "Dashboard",
+    requireAuth: true,
+    adminOnly: true,
+  },
+  {
+    key: "/dashboard",
+    components: <HomeDashboard />,
+    layout: "Dashboard",
+    requireAuth: true,
+    adminOnly: true,
+  },
+];
+
+const allRoutes: ItemType[] = [
+  ...publicRoutes,
+  ...protectedRoutes,
+  ...adminRoutes,
+];
 
 export default function Routers() {
-  const items = getItems(true);
-  const token = localStorage.getItem("token");
-  console.log(items);
-
   return (
     <Routes>
-      {items.map((item) => {
+      {allRoutes.map((item) => {
         let element = <Suspense fallback={null}>{item.components}</Suspense>;
 
         if (item.layout === DEFAULT_LAYOUT) {
           element = <DefaultLayout>{element}</DefaultLayout>;
         }
 
-        if (item.private && !token) {
-          element = <Navigate to={URL.Login} replace />;
+        if (item.layout === "Dashboard") {
+          element = <DashboardLayout>{element}</DashboardLayout>;
+        }
+
+        if (item.requireAuth) {
+          element = (
+            <ProtectedRoute
+              requireAuth={item.requireAuth}
+              adminOnly={item.adminOnly || false}
+            >
+              {element}
+            </ProtectedRoute>
+          );
         }
 
         return <Route key={item.key} path={item.key} element={element} />;

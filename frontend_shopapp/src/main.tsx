@@ -7,36 +7,18 @@ import { SnackbarProvider } from "notistack";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { store, persistor } from "./stores";
 import Routers from "./app/routers";
-import "./styles/index.scss";
-
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#9c27b0",
-    },
-    background: {
-      default: "#f4f6f8",
-    },
-  },
-  typography: {
-    fontFamily: "'Roboto', sans-serif",
-  },
-});
+import theme from "./styles/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <React.StrictMode>
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <QueryClientProvider client={queryClient}>
@@ -44,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <CssBaseline />
           <SnackbarProvider
             maxSnack={3}
-            autoHideDuration={5173}
+            autoHideDuration={5000}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
           >
             <BrowserRouter>
@@ -55,5 +37,4 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </QueryClientProvider>
     </PersistGate>
   </Provider>
-  // </React.StrictMode>
 );

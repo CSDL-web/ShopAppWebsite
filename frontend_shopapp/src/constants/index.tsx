@@ -1,6 +1,19 @@
+import Checkout from "@/app/pages/checkout/checkout";
+
 export const URL = {
   Home: "/",
   Login: "/login",
+  Register: "/register",
+  ForgotPassword: "/forgot-password",
+  CheckEmail: "/check-email",
+  CheckPassword: "/check-password",
+  Products: "/product/:name",
+  Cart: "/cart",
+  user: "/dashboard/users",
+  product: "/dashboard/products",
+  Categories: "/categories/:name/:id",
+  Checkout: "/checkout",
+  OrderSuccess: "/order-success",
 };
 
 export const DATE_TIME_FORMAT = "YYYY/MM/DD HH:mm:ss";

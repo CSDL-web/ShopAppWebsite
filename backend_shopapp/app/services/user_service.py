@@ -1,0 +1,332 @@
+import hashlib
+import bcrypt
+import requests
+import uuid
+import os
+from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from app.models.user_model import User
+from app.repositories.user_repo import UserRepository
+from app.repositories.token_repo import TokenRepository
+from app.dtos.user_dto import UserDTO, UserUpdateProfileDTO, ChangePasswordDTO 
+from app.dtos.user_login_dto import UserLoginDTO
+from app.dtos.facebook_login_dto import FacebookLoginDTO
+from app.dtos.google_login_dto import GoogleLoginDTO
+from app.services.token_service import TokenService
+
+class UserService:
+    def __init__(self, db: Session):
+        self.repo = UserRepository(db)
+        self.token_repo = TokenRepository(db)
+
+    def _hash_password(self, password: str) -> str:
+        sha256_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        hashed_bytes = bcrypt.hashpw(sha256_hash.encode('utf-8'), bcrypt.gensalt())
+        return hashed_bytes.decode('utf-8')
+
+    def _verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        sha256_hash = hashlib.sha256(plain_password.encode('utf-8')).hexdigest()
+        try:
+            return bcrypt.checkpw(
+                sha256_hash.encode('utf-8'),
+                hashed_password.encode('utf-8')
+            )
+        except Exception:
+            return False
+
+    def register_user(self, user_dto: UserDTO) -> User:
+        if user_dto.phone_number and self.repo.exists_by_phone(user_dto.phone_number):
+            raise HTTPException(status_code=400, detail="Số điện thoại đã tồn tại")
+
+        if user_dto.email and self.repo.exists_by_email(user_dto.email):
+            raise HTTPException(status_code=400, detail="Email đã tồn tại")
+
+        hashed_password = self._hash_password(user_dto.password)
+        user_data = user_dto.model_dump()
+        user_data['password'] = hashed_password
+
+        if 'role_id' not in user_data or not user_data['role_id']:
+            user_data['role_id'] = 1
+
+        return self.repo.create(user_data)
+
+    def login_user(self, login_dto: UserLoginDTO):
+        account_input = login_dto.account
+        user = None
+
+        if "@" in account_input:
+            user = self.repo.get_by_email(account_input)
+        else:
+            user = self.repo.get_by_phone_number(account_input)
+
+        if not user:
+            raise HTTPException(status_code=400, detail="Tài khoản hoặc mật khẩu không đúng")
+
+        if not self._verify_password(login_dto.password, user.password):
+            raise HTTPException(status_code=400, detail="Tài khoản hoặc mật khẩu không đúng")
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number if user.phone_number else user.email
+        if not sub_identifier and user.facebook_account_id:
+            sub_identifier = user.facebook_account_id
+        if not sub_identifier and user.google_account_id:
+            sub_identifier = user.google_account_id
+
+        return self._generate_tokens(user, sub_identifier)
+
+    def login_facebook(self, fb_dto: FacebookLoginDTO):
+        try:
+            url = f"https://graph.facebook.com/me?access_token={fb_dto.facebook_token}&fields=id,name"
+            response = requests.get(url)
+            fb_data = response.json()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Lỗi kết nối đến Facebook")
+
+        if "error" in fb_data:
+            raise HTTPException(status_code=400, detail=f"Token Facebook lỗi: {fb_data['error']['message']}")
+
+        fb_id = fb_data.get("id")
+        fb_name = fb_data.get("name", "Người dùng Facebook")
+
+        user = self.repo.get_by_facebook_id(fb_id)
+
+        if not user:
+            random_password = str(uuid.uuid4())
+            hashed_password = self._hash_password(random_password)
+
+            new_user_data = {
+                "fullname": fb_name,
+                "facebook_account_id": fb_id,
+                "password": hashed_password,
+                "role_id": 1,
+                "is_active": True,
+            }
+            user = self.repo.create(new_user_data)
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.facebook_account_id
+        )
+
+        return self._generate_tokens(user, sub_identifier)
+
+    def login_google(self, google_dto: GoogleLoginDTO):
+        try:
+            CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
+            if not CLIENT_ID:
+                print("Lỗi: Chưa tìm thấy GOOGLE_CLIENT_ID trong biến môi trường (.env)")
+                pass 
+            if CLIENT_ID:
+                id_info = id_token.verify_oauth2_token(
+                    google_dto.google_token,
+                    google_requests.Request(),
+                    CLIENT_ID
+                )
+                google_id = id_info['sub']
+                email = id_info.get('email')
+                name = id_info.get('name', 'Google User')
+            else:
+                 
+                 # Giả sử token gửi lên là dummy
+                 raise HTTPException(status_code=400, detail="Server chưa cấu hình GOOGLE_CLIENT_ID")
+
+        except ValueError as e:
+            print(f"Google Login Error: {str(e)}")
+            raise HTTPException(status_code=400, detail="Token Google không hợp lệ hoặc đã hết hạn")
+
+        user = self.repo.db.query(User).filter(User.google_account_id == google_id).first()
+
+        if not user and email:
+            user = self.repo.get_by_email(email)
+            if user:
+                user.google_account_id = google_id
+                self.repo.db.commit()
+                self.repo.db.refresh(user)
+
+        if not user:
+            random_password = str(uuid.uuid4())
+            hashed_password = self._hash_password(random_password)
+
+            new_user_data = {
+                "fullname": name,
+                "email": email,
+                "google_account_id": google_id,
+                "password": hashed_password,
+                "role_id": 1,
+                "is_active": True,
+            }
+            user = self.repo.create(new_user_data)
+
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Tài khoản đã bị khóa")
+
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.google_account_id
+        )
+
+        return self._generate_tokens(user, sub_identifier)
+
+    def _generate_tokens(self, user: User, sub_identifier: str):
+        access_token_expires = timedelta(minutes=30)
+        access_token = TokenService.create_access_token(
+            data={"sub": sub_identifier, "id": user.id, "role_id": user.role_id},
+            expires_delta=access_token_expires
+        )
+
+        refresh_token_expires = timedelta(days=7)
+        refresh_token = TokenService.create_refresh_token(
+            data={"sub": sub_identifier, "id": user.id},
+            expires_delta=refresh_token_expires
+        )
+
+        self.token_repo.create({
+            "token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user_id": user.id,
+            "expiration_date": datetime.now() + access_token_expires,
+            "refresh_expiration_date": datetime.now() + refresh_token_expires,
+            "revoked": False,
+            "expired": False,
+            "is_mobile": False
+        })
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": user,
+            "expiration": datetime.now() + access_token_expires,
+            "refresh_expiration_date": datetime.now() + refresh_token_expires
+        }
+
+    def refresh_access_token(self, refresh_token_str: str):
+        stored_token = self.token_repo.get_by_refresh_token(refresh_token_str)
+
+        if not stored_token:
+            raise HTTPException(status_code=400, detail="Refresh token không tồn tại")
+
+        if stored_token.revoked:
+            raise HTTPException(status_code=401, detail="Token đã bị thu hồi")
+
+        if stored_token.refresh_expiration_date < datetime.now():
+            stored_token.expired = True
+            self.token_repo.save(stored_token)
+            raise HTTPException(status_code=401, detail="Refresh token đã hết hạn")
+
+        user = self.repo.get_by_id(stored_token.user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User không tồn tại")
+
+        sub_identifier = user.phone_number if user.phone_number else (
+            user.email if user.email else user.facebook_account_id
+        )
+        if not sub_identifier and user.google_account_id:
+            sub_identifier = user.google_account_id
+
+        access_token_expires = timedelta(minutes=30)
+        new_access_token = TokenService.create_access_token(
+            data={"sub": sub_identifier, "id": user.id, "role_id": user.role_id},
+            expires_delta=access_token_expires
+        )
+
+        refresh_token_expires = timedelta(days=7)
+        new_refresh_token = TokenService.create_refresh_token(
+            data={"sub": sub_identifier, "id": user.id},
+            expires_delta=refresh_token_expires
+        )
+
+        stored_token.token = new_access_token
+        stored_token.expiration_date = datetime.now() + access_token_expires
+        stored_token.refresh_token = new_refresh_token
+        stored_token.refresh_expiration_date = datetime.now() + refresh_token_expires
+
+        self.token_repo.save(stored_token)
+
+        return {
+            "access_token": new_access_token,
+            "refresh_token": new_refresh_token,
+            "token_type": "bearer",
+            "expiration": stored_token.expiration_date,
+            "refresh_expiration_date": stored_token.refresh_expiration_date,
+            "is_mobile": stored_token.is_mobile
+        }
+
+    def get_user_by_id(self, user_id: int):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+        return user
+
+
+    def update_user_profile(self, user_id: int, update_data: UserUpdateProfileDTO):
+        # Lấy user hiện tại
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # Chuyển DTO thành dict, loại bỏ các giá trị None
+        data_dict = update_data.model_dump(exclude_unset=True)
+        
+        # Gọi hàm update có sẵn của Repo
+        updated_user = self.repo.update(user_id, data_dict)
+        return updated_user
+
+    def change_password(self, user_id: int, password_dto: ChangePasswordDTO):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # 1. Kiểm tra mật khẩu cũ có đúng không
+        if not self._verify_password(password_dto.old_password, user.password):
+            raise HTTPException(status_code=400, detail="Mật khẩu cũ không chính xác")
+
+        # 2. Hash mật khẩu mới
+        hashed_new_password = self._hash_password(password_dto.new_password)
+
+        # 3. Lưu vào DB
+        self.repo.update(user_id, {"password": hashed_new_password})
+        return {"message": "Đổi mật khẩu thành công"}
+
+    def admin_update_user_status(self, user_id: int, is_active: bool):
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User không tồn tại")
+        
+        return self.repo.update(user_id, {"is_active": is_active})
+    
+    def delete_user(self, admin_id: int, user_id: int):
+        # Tìm user cần xóa
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+        # KHÔNG ĐƯỢC XÓA chính mình (Admin không thể tự xóa mình khi đang login)
+        if user.id == admin_id:
+            raise HTTPException(status_code=400, detail="Không thể tự xóa tài khoản của chính mình")
+
+  
+        if user.orders and len(user.orders) > 0:
+            raise HTTPException(
+                status_code=400, 
+                detail="User này đã có lịch sử đơn hàng. Chỉ có thể block, không thể XÓA để bảo toàn dữ liệu."
+            )
+
+        
+        self.repo.delete(user_id)
+        
+        return {"message": "Xóa người dùng thành công"}
+    
+    
