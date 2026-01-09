@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // Gửi request /api -> Flask backend (port 5000)
         "/api": {
-          target: "http://localhost:5000",
+          target: "http://localhost:8088",
           changeOrigin: true,
           secure: false,
         },

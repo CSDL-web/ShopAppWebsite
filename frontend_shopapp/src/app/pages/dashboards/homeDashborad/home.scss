@@ -1,5 +1,6 @@
-@import "../../../../styles/variables.scss";
-@import "../../../../styles/responsive.scss";
+@use "../../../../styles/responsive.scss" as *;
+@use "../../../../styles/variables.scss" as *;
+
 
 .home {
   display: grid;
