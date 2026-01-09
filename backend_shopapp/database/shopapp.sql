@@ -52,6 +52,18 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `chat_history`
+--
+DROP TABLE IF EXISTS `chat_history`;
+CREATE TABLE `chat_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `session_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'User ID hoặc Session ID',
+  `message` json NOT NULL COMMENT 'Nội dung chat LangChain',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_session_id` (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+--
 -- Cấu trúc bảng cho bảng `comments`
 --
 

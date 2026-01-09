@@ -11,3 +11,6 @@ export_data.sql
 write.py
 all_python_code*
 test_google_login.html
+venv/
+.venv/
+

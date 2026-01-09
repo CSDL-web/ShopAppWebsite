@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from fastapi.staticfiles import StaticFiles
 
 from app.configs.dbConfig import Base, engine
-from app.controllers import userRouter, categoryRouter
 from app.models.role_model import Role
 
+# 1. Thêm chat_router vào danh sách import
 from app.controllers import (
     userRouter,
     categoryRouter,
@@ -21,6 +21,7 @@ from app.controllers import (
     role_router,
     product_image_router,
     statisticRouter,
+    chat_router, # <--- THÊM MỚI Ở ĐÂY
 )
 
 def seed_roles():
@@ -36,6 +37,7 @@ def seed_roles():
         session.commit()
 
 def init_routers(app: FastAPI):
+    app.include_router(chat_router)
     app.include_router(userRouter)
     app.include_router(categoryRouter)
     app.include_router(productRouter)
@@ -68,7 +70,6 @@ def create_app() -> FastAPI:
         StaticFiles(directory="/app/app/uploads"),
         name="uploads"
     )
-
 
     init_routers(app)
     return app
