@@ -8,25 +8,25 @@ export const menu = [
       {
         id: 1,
         title: "Homepage",
-        url: "http://localhost:5173/dashboard",
+        url: "http://13.213.54.164:3000/dashboard",
         icon: "home.svg",
       },
       {
         id: 1,
         title: "Users",
-        url: "http://localhost:5173/dashboard/users",
+        url: "http://13.213.54.164:3000/dashboard/users",
         icon: "user.svg",
       },
       {
         id: 2,
         title: "Products",
-        url: "http://localhost:5173/dashboard/products",
+        url: "http://13.213.54.164:3000/dashboard/products",
         icon: "product.svg",
       },
       {
         id: 3,
         title: "Orders",
-        url: "http://localhost:5173/dashboard/orders",
+        url: "http://13.213.54.164:3000dashboard/orders",
         icon: "order.svg",
       },
     ],
@@ -38,7 +38,7 @@ export const menu = [
       {
         id: 1,
         title: "Settings",
-        url: "http://localhost:5173/dashboard/settings",
+        url: "http://13.213.54.164:3000/dashboard/settings",
         icon: "setting.svg",
       },
     ],

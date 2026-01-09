@@ -1,4 +1,6 @@
-
+app/uploads
+uploads
+**uploads
 .git
 .gitignore
 

@@ -16,7 +16,7 @@ export default function ProductSearchContainer() {
       limit: "20",
     } as any).toString();
 
-    const res = await fetch(`http://localhost:5000/products/filter?${query}`);
+    const res = await fetch(`http://13.213.54.164:5000/products/filter?${query}`);
 
     const data = await res.json();
     setProducts(data);

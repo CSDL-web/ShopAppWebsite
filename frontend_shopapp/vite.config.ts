@@ -1,7 +1,7 @@
-import { defineConfig, loadEnv } from "vite";
-import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
-import svgr from "vite-plugin-svgr";
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -23,12 +23,15 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      port: 5173,
-      open: true,
+      port: 3000, // Để port 3000 cho khớp với lệnh mày chạy
+      host: true,  // Cho phép truy cập từ IP ngoài
+      allowedHosts: [
+        'tonypham.duckdns.org' // <--- MỞ KHÓA CHO DOMAIN CỦA MÀY
+      ],
       proxy: {
-        // Gửi request /api -> Flask backend (port 5000)
+        // Nếu mày dùng proxy trong code thì nó sẽ đẩy về backend
         "/api": {
-          target: "http://localhost:8088",
+          target: "http://localhost:5000", // Sửa thành 5000 cho đúng port backend mày đang chạy
           changeOrigin: true,
           secure: false,
         },
