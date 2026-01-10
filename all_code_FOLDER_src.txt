@@ -656,9 +656,8 @@ export default function Checkout() {
 --------------------------------------------------
 
 #8. file frontend_shopapp\src\app\pages\dashboards\homeDashborad\home.scss
-@use "../../../../styles/responsive.scss" as *;
-@use "../../../../styles/variables.scss" as *;
-
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/responsive.scss";
 
 .home {
   display: grid;
@@ -4723,7 +4722,7 @@ export default BarChartBox;
 --------------------------------------------------
 
 #46. file frontend_shopapp\src\components\dashBoardComponent\bigChartBox\bigChartBox.scss
-@use "../../../styles/responsive.scss" as *;
+@import "../../../styles/responsive.scss";
 
 .bigChartBox{
   width: 100%;
@@ -4853,8 +4852,7 @@ export default BigChartBox;
 --------------------------------------------------
 
 #48. file frontend_shopapp\src\components\dashBoardComponent\chartBox\chartBox.scss
-@use "../../../styles/responsive.scss" as *;
-
+@import "../../../styles/responsive.scss";
 
 .chartBox {
   display: flex;
@@ -5465,7 +5463,7 @@ export default Menu;
 --------------------------------------------------
 
 #56. file frontend_shopapp\src\components\dashBoardComponent\pieCartBox\pieChartBox.scss
-@use "../../../styles/responsive" as *;
+@import "../../../styles/responsive.scss";
 
 .pieChartBox {
   height: 100%;
@@ -5790,7 +5788,7 @@ export default Single;
 --------------------------------------------------
 
 #60. file frontend_shopapp\src\components\dashBoardComponent\topBox\topBox.scss
-@use "../../../styles/responsive.scss" as *;
+@import "../../../styles/responsive.scss";
 
 .topBox {
   h1 {
@@ -5920,13 +5918,14 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
 import SearchBar from "./SearchBar";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "@/stores";
-import { selectIsAuthenticated } from "@/stores/authSlice";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { logoutUser, selectIsAuthenticated } from "@/stores/authSlice";
+import { AsyncThunkAction, AsyncThunkConfig } from "@reduxjs/toolkit";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -5953,6 +5952,10 @@ export default function Header() {
     }
   };
 
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/login", { replace: true });
+  };
   const itemStyle = {
     display: "flex",
     alignItems: "center",
@@ -6041,7 +6044,10 @@ export default function Header() {
           <Typography>Trợ giúp và hỗ trợ</Typography>
         </MenuItem>
 
-        <MenuItem sx={{ ...itemStyle, color: "error.main" }}>
+        <MenuItem
+          sx={{ ...itemStyle, color: "error.main" }}
+          onClick={handleLogout}
+        >
           <LogoutIcon />
           <Typography>Đăng xuất</Typography>
         </MenuItem>
@@ -6809,25 +6815,13 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const logoutUser = createAsyncThunk(
-  "auth/logout",
-  async (_, { rejectWithValue }) => {
-    try {
-      await request({
-        url: "/users/logout",
-        method: "POST",
-      });
-    } catch (error) {
-      console.error("Logout API error:", error);
-    } finally {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      localStorage.removeItem("tokenExpiration");
-      localStorage.removeItem("refreshTokenExpiration");
-    }
-  }
-);
+export const logoutUser = createAsyncThunk("auth/logout", async () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("user");
+  localStorage.removeItem("tokenExpiration");
+  localStorage.removeItem("refreshTokenExpiration");
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -7905,8 +7899,8 @@ export const COLORS = {
 --------------------------------------------------
 
 #81. file frontend_shopapp\src\styles\global.scss
-@use "./variables.scss" as *;
-@use "./responsive.scss" as *;
+@import "./variables.scss";
+@import "./responsive.scss";
 
 * {
   margin: 0;
