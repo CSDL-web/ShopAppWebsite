@@ -9,7 +9,9 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const buildImageUrl = (img?: string | null): string => {
   if (!img) return `/uploads/notfound.jpeg`;
-  return img.startsWith("http") ? img : `/uploads/${img}`;
+  return img.startsWith("http")
+    ? img
+    : `/uploads/${img}`;
 };
 
 export const getMainImage = (product: Product): string | null => {
@@ -55,7 +57,8 @@ const ProductCard = ({
         justifyContent: "space-between",
         cursor: "pointer",
         border: "1px solid #ff9966",
-        borderRadius: "8px",
+borderRadius: "8px",
+
       }}
     >
       <img
