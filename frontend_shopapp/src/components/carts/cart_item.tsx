@@ -17,8 +17,8 @@ export default function CartItem({ item }: { item: CartItemType }) {
   const getProductKey = (product: any) => `${product.name}_${product.price}`;
 
   const imageUrl = product.thumbnail
-    ? `${API_URL}/backend_shopapp/uploads/${product.thumbnail}`
-    : `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+    ? `/uploads/${product.thumbnail}`
+    : `/uploads/notfound.jpeg`;
 
   return (
     <Box>
@@ -38,7 +38,7 @@ export default function CartItem({ item }: { item: CartItemType }) {
             height={200}
             style={{ objectFit: "contain" }}
             onError={(e) => {
-              e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+              e.currentTarget.src = `/uploads/notfound.jpeg`;
             }}
           />
 
