@@ -4,7 +4,7 @@ import { store } from "@/stores";
 import { logoutUser, refreshToken } from "@/stores/authSlice";
 
 export const instanceAxios = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "http://149.28.152.6:5000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -33,7 +33,7 @@ instanceAxios.interceptors.response.use(
         }
 
         const response = await axios.post(
-          "http://localhost:5000/users/refresh-token",
+          "http://149.28.152.6:5000/users/refresh-token",
           { refresh_token }
         );
 
