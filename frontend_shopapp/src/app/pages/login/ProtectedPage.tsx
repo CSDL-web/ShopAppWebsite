@@ -64,7 +64,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requireAuth && adminOnly && roleId == 2) {
+  if (requireAuth && adminOnly && roleId != 2) {
     enqueueSnackbar("Access denied. Admin only.", { variant: "error" });
     return <Navigate to="/dashboard" replace />;
   }

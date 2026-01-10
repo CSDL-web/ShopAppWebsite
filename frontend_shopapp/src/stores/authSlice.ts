@@ -246,25 +246,13 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const logoutUser = createAsyncThunk(
-  "auth/logout",
-  async (_, { rejectWithValue }) => {
-    try {
-      await request({
-        url: "/users/logout",
-        method: "POST",
-      });
-    } catch (error) {
-      console.error("Logout API error:", error);
-    } finally {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      localStorage.removeItem("tokenExpiration");
-      localStorage.removeItem("refreshTokenExpiration");
-    }
-  }
-);
+export const logoutUser = createAsyncThunk("auth/logout", async () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("user");
+  localStorage.removeItem("tokenExpiration");
+  localStorage.removeItem("refreshTokenExpiration");
+});
 
 const authSlice = createSlice({
   name: "auth",
