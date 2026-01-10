@@ -11,17 +11,23 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # Import API Keys
-LIST_KEYS = []
-try:
-    from app.api_config import LIST_KEYS
-    print("✅ Đã nạp API Key từ app.api_config")
-except ImportError:
-    try:
-        import api_config
-        LIST_KEYS = api_config.LIST_KEYS
-        print("✅ Đã nạp API Key từ api_config trực tiếp")
-    except ImportError:
-        print("❌ LỖI: Không tìm thấy file api_config.py!")
+
+LIST_KEYS = [
+   "AIzaSyAXgBvxS5c2sGlGun47acOebAjtArQjyb0",
+   "AIzaSyCkAGKWeSGDI13bPIQQJ22hy7B7L98sqJA",
+   "AIzaSyD4xqRw7VQnatWRpza9KsxNgzeqnOSHwVM",
+   "AIzaSyCf2mOl1MKmY20sUVTZKwdGc7CeQvCva7k",
+]
+# try:
+#     from app.api_config import LIST_KEYS
+#     print("✅ Đã nạp API Key từ app.api_config")
+# except ImportError:
+#     try:
+#         import api_config
+#         LIST_KEYS = api_config.LIST_KEYS
+#         print("✅ Đã nạp API Key từ api_config trực tiếp")
+#     except ImportError:
+#         print("❌ LỖI: Không tìm thấy file api_config.py!")
 
 
 # Danh sách model dùng để truy vấn SQL (sẽ xoay vòng)

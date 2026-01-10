@@ -14,3 +14,4 @@ test_google_login.html
 venv/
 .venv/
 backend_shopapp/app/api_config.py
+

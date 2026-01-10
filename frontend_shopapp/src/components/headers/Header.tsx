@@ -19,13 +19,14 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useState } from "react";
 import SearchBar from "./SearchBar";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "@/stores";
-import { selectIsAuthenticated } from "@/stores/authSlice";
+import { useAppDispatch, useAppSelector } from "@/stores";
+import { logoutUser, selectIsAuthenticated } from "@/stores/authSlice";
+import { AsyncThunkAction, AsyncThunkConfig } from "@reduxjs/toolkit";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -52,6 +53,10 @@ export default function Header() {
     }
   };
 
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/login", { replace: true });
+  };
   const itemStyle = {
     display: "flex",
     alignItems: "center",
@@ -140,7 +145,10 @@ export default function Header() {
           <Typography>Trợ giúp và hỗ trợ</Typography>
         </MenuItem>
 
-        <MenuItem sx={{ ...itemStyle, color: "error.main" }}>
+        <MenuItem
+          sx={{ ...itemStyle, color: "error.main" }}
+          onClick={handleLogout}
+        >
           <LogoutIcon />
           <Typography>Đăng xuất</Typography>
         </MenuItem>
