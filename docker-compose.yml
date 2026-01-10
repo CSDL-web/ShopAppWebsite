@@ -3,12 +3,13 @@
 services:
   mysql_container:
     image: mysql:8.0
+    platform: linux/amd64
     container_name: shopapp-mysql
     restart: always
     env_file:
       - ./.env
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -35,10 +36,14 @@ services:
     build: ./backend_shopapp
     container_name: shopapp-backend
     restart: always
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     env_file:
       - ./.env
     ports:
       - "5000:5000"
+      - "5678:5678"
     depends_on:
       mysql_container:
         condition: service_healthy

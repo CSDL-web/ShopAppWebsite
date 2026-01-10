@@ -14,5 +14,9 @@ passlib[bcrypt]
 email-validator
 requests
 google-auth
+langchain>=0.2.0
+langchain-google-genai>=1.0.3
+langchain-community 
+mysql-connector-python
 
 
