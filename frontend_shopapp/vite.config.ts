@@ -25,10 +25,15 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: false,
+      allowedHosts: [
+        "agenticsuzinai.com",
+        "www.agenticsuzinai.com",
+        "localhost",
+        "127.0.0.1",
+      ],
       proxy: {
-        // Gửi request /api -> Flask backend (port 5000)
         "/api": {
-          target: "http://localhost:5000",
+          target: "http://149.28.152.6:5000",
           changeOrigin: true,
           secure: false,
         },

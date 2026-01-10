@@ -1,4 +1,4 @@
-export const UPLOAD_BASE_URL = "http://localhost:5000/backend_shopapp/uploads";
+export const UPLOAD_BASE_URL = "http://149.28.152.6:5000/backend_shopapp/uploads";
 
 const buildImageSrc = (thumbnail?: string | null) => {
   if (!thumbnail) return "";
