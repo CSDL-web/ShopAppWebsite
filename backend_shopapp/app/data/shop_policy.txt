@@ -1,0 +1,26 @@
+=== THÔNG TIN CỬA HÀNG SHOPAPP ===
+1. Địa chỉ & Liên hệ:
+- Địa chỉ: abc Đường Nguyễn Trãi, Hà Nội.
+- Hotline: 0826570256 (8h00 - 22h00 hàng ngày).
+- Email: pham02021616@gmail.com
+
+2. Chính sách Vận chuyển (Shipping):
+- Freeship cho đơn hàng trên 500k nội thành Hà Nội.
+- Phí ship tỉnh đồng giá 30k.
+- Thời gian giao hàng: 1-2 ngày (Hà Nội), 3-5 ngày (Tỉnh).
+
+3. Chính sách Đổi trả & Bảo hành:
+- Đổi trả trong vòng 7 ngày nếu lỗi nhà sản xuất (giữ nguyên tem mác).
+- Không hỗ trợ đổi trả nếu khách hàng không ưng ý màu sắc sau khi đã bóc seal.
+- Bảo hành điện tử 12 tháng qua số điện thoại mua hàng.
+
+4. Phương thức thanh toán:
+- Nhận hàng thanh toán (COD).
+- Chuyển khoản ngân hàng (hiện chúng tôi đang phát triển, rất xin lỗi về sự bất tiện)
+- Ví điện tử Momo/ZaloPay (hiện chúng tôi đang phát triển, rất xin lỗi về sự bất tiện)
+
+5. DANH MỤC SẢN PHẨM KINH DOANH:
+Bánh kẹo, Chăn ga gối đệm, Phụ kiện, Quần áo, Đồ gia dụng, Đồ điện tử
+(Lưu ý: Shop KHÔNG bán thuốc, vé máy bay,... hay các dịch vụ khác).
+
+Lưu ý cho AI: Nếu khách hỏi câu hỏi nằm trong nội dung trên, hãy trả lời ngắn gọn, chính xác theo thông tin này.
