@@ -4,14 +4,12 @@ import { store } from "@/stores";
 import { logoutUser, refreshToken } from "@/stores/authSlice";
 
 export const instanceAxios = axios.create({
-  baseURL: "http://149.28.152.6:5000",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "/api",
+  headers: { "Content-Type": "application/json" },
 });
 
 instanceAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken"); 
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,7 +21,7 @@ instanceAxios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -32,10 +30,9 @@ instanceAxios.interceptors.response.use(
           throw new Error("No refresh token available");
         }
 
-        const response = await axios.post(
-          "http://149.28.152.6:5000/users/refresh-token",
-          { refresh_token }
-        );
+        const response = await axios.post("api/users/refresh-token", {
+          refresh_token,
+        });
 
         const { access_token, refresh_token: new_refresh_token } =
           response.data;
