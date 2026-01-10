@@ -20,14 +20,14 @@ LIST_KEYS = [
 ]
 try:
     from app.api_config import LIST_KEYS
-    print("✅ Đã nạp API Key từ app.api_config")
+    print(" Đã nạp API Key từ app.api_config")
 except ImportError:
     try:
         import api_config
         LIST_KEYS = api_config.LIST_KEYS
-        print("✅ Đã nạp API Key từ api_config trực tiếp")
+        print(" Đã nạp API Key từ api_config trực tiếp")
     except ImportError:
-        print("❌ LỖI: Không tìm thấy file api_config.py!")
+        print(" LỖI: Không tìm thấy file api_config.py!")
 
 
 # Danh sách model dùng để truy vấn SQL (sẽ xoay vòng)
@@ -79,7 +79,7 @@ class ResourceManager:
         self.model_index = 0
 
         if not self.keys:
-            print("⚠️ KHÔNG CÓ API KEY!")
+            print(" KHÔNG CÓ API KEY!")
 
     def get_current_key(self):
         return self.keys[self.key_index] if self.keys else None
