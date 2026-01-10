@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      open: true,
+      open: false,
       proxy: {
         // Gửi request /api -> Flask backend (port 5000)
         "/api": {
