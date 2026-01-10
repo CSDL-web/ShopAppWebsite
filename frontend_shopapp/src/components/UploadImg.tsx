@@ -5,9 +5,6 @@ const buildImageSrc = (thumbnail?: string | null) => {
 
   const hasExtension = /\.[a-zA-Z0-9]+$/.test(thumbnail);
   const fileName = hasExtension ? thumbnail : `${thumbnail}.jpg`;
-
-  if (thumbnail.startsWith("http")) return thumbnail;
-
   return `${UPLOAD_BASE_URL}/${fileName}`;
 };
 

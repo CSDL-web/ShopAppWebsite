@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const buildImageUrl = (img?: string | null): string => {
   if (!img) return `/uploads/notfound.jpeg`;
-  return img.startsWith("http") ? img : `/uploads/${img}`;
+  return `/uploads/${img}`;
 };
 
 export const getMainImage = (product: Product): string | null => {

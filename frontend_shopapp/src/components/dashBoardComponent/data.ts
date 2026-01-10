@@ -8,25 +8,25 @@ export const menu = [
       {
         id: 1,
         title: "Homepage",
-        url: "http://localhost:5173/dashboard",
+        url: "https://agenticsuzinai.com/dashboard",
         icon: "home.svg",
       },
       {
         id: 1,
         title: "Users",
-        url: "http://localhost:5173/dashboard/users",
+        url: "https://agenticsuzinai.com/dashboard/users",
         icon: "user.svg",
       },
       {
         id: 2,
         title: "Products",
-        url: "http://localhost:5173/dashboard/products",
+        url: "https://agenticsuzinai.com/dashboard/products",
         icon: "product.svg",
       },
       {
         id: 3,
         title: "Orders",
-        url: "http://localhost:5173/dashboard/orders",
+        url: "https://agenticsuzinai.com/dashboard/orders",
         icon: "order.svg",
       },
     ],
@@ -38,7 +38,7 @@ export const menu = [
       {
         id: 1,
         title: "Settings",
-        url: "http://localhost:5173/dashboard/settings",
+        url: "https://agenticsuzinai.com/dashboard/settings",
         icon: "setting.svg",
       },
     ],
