@@ -44,10 +44,10 @@ export default function ProductPage() {
   }
 
   const buildImageUrl = (img?: string | null) => {
-    if (!img) return `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+    if (!img) return `/uploads/notfound.jpeg`;
     return img.startsWith("http")
       ? img
-      : `${API_URL}/backend_shopapp/uploads/${img}`;
+      : `/uploads/${img}`;
   };
 
   const getMainImage = () => {
@@ -127,7 +127,7 @@ export default function ProductPage() {
                   objectFit: "contain",
                 }}
                 onError={(e) => {
-                  e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                  e.currentTarget.src = `/uploads/notfound.jpeg`;
                 }}
               />
             </Paper>
@@ -325,7 +325,7 @@ export default function ProductPage() {
                         objectFit: "cover",
                       }}
                       onError={(e) => {
-                        e.currentTarget.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                        e.currentTarget.src = `/uploads/notfound.jpeg`;
                       }}
                     />
                   </Box>

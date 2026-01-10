@@ -50,7 +50,7 @@ export default function Categories({ categories }: Props) {
             }}
           >
             <img
-              src={`${API_URL}/backend_shopapp/uploads/${c.id}.jpg`}
+              src={`/uploads/${c.id}.jpg`}
               alt={c.name}
               loading="lazy"
               onError={(e) => {
@@ -58,7 +58,7 @@ export default function Categories({ categories }: Props) {
 
                 if (!target.dataset.fallback) {
                   target.dataset.fallback = "true";
-                  target.src = `${API_URL}/backend_shopapp/uploads/notfound.jpeg`;
+                  target.src = `/uploads/notfound.jpeg`;
                 }
               }}
               style={{

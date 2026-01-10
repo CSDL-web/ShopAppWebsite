@@ -1,4 +1,4 @@
-export const UPLOAD_BASE_URL = "api/backend_shopapp/uploads";
+export const UPLOAD_BASE_URL = "/uploads";
 
 const buildImageSrc = (thumbnail?: string | null) => {
   if (!thumbnail) return "";
