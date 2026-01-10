@@ -1,5 +1,5 @@
 import { GridColDef } from "@mui/x-data-grid";
-import "./Users.scss";
+import "./users.scss";
 import { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/dashBoardComponent/dataTable/DataTable";
 import Add from "@/components/dashBoardComponent/add/Add";

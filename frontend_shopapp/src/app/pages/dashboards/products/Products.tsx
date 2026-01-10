@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./Products.scss";
+import "./products.scss";
 import DataTable from "@/components/dashBoardComponent/dataTable/DataTable";
 import Add from "@/components/dashBoardComponent/add/Add";
 import { GridColDef } from "@mui/x-data-grid";
