@@ -7,10 +7,13 @@ import {
   Typography,
   Fab,
   CircularProgress,
+  Avatar,
+  Stack,
+  Tooltip,
 } from "@mui/material";
-import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
+import SmartToyIcon from "@mui/icons-material/SmartToy"; // Icon Robot
 import request from "@/utils/request";
 
 interface Message {
@@ -22,12 +25,22 @@ interface Message {
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Xin chào! Tôi có thể giúp gì cho bạn?", sender: "bot" },
+    { id: 1, text: "Xin chào! Tôi là Chatbot AI. Tôi có thể giúp gì cho bạn?", sender: "bot" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Hàm lấy session_id để duy trì ngữ cảnh
+  const getSessionId = () => {
+    let sessionId = localStorage.getItem("chat_session_id");
+    if (!sessionId) {
+      sessionId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("chat_session_id", sessionId);
+    }
+    return sessionId;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,13 +64,18 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
+      const sessionId = getSessionId();
+
       const res = await request({
         url: "/chat",
         method: "POST",
-        data: { message: userMsg.text },
+        data: { 
+            question: userMsg.text,
+            session_id: sessionId
+        },
       });
 
-      const botText = res.data?.data || res.data?.message || "Tôi không hiểu câu hỏi.";
+      const botText = res.data?.response || res.data?.data || "Tôi không hiểu câu hỏi.";
 
       setMessages((prev) => [
         ...prev,
@@ -67,7 +85,7 @@ export default function Chatbot() {
       console.error("Chat error:", error);
       setMessages((prev) => [
         ...prev,
-        { id: Date.now() + 1, text: "Lỗi kết nối server.", sender: "bot" },
+        { id: Date.now() + 1, text: "Hệ thống đang bận, vui lòng thử lại sau.", sender: "bot" },
       ]);
     } finally {
       setLoading(false);
@@ -76,14 +94,33 @@ export default function Chatbot() {
 
   return (
     <>
-      <Fab
-        color="primary"
-        onClick={() => setIsOpen(!isOpen)}
-        sx={{ position: "fixed", bottom: 20, right: 20, zIndex: 9999 }}
-      >
-        {isOpen ? <CloseIcon /> : <ChatIcon />}
-      </Fab>
+      {/* Nút Chatbot (FAB) */}
+      <Tooltip title={isOpen ? "Đóng Chatbot" : "Chat với AI"}>
+        <Fab
+          color="primary"
+          onClick={() => setIsOpen(!isOpen)}
+          sx={{ 
+            position: "fixed", 
+            bottom: 20, 
+            right: 20, 
+            zIndex: 9999,
+            width: 60,  // Tăng nhẹ kích thước nếu cần
+            height: 60
+          }}
+        >
+          {isOpen ? (
+            <CloseIcon />
+          ) : (
+            // Icon hiển thị rõ chữ "AI"
+            <Stack alignItems="center" justifyContent="center">
+                <SmartToyIcon sx={{ fontSize: 20 }} />
+                <Typography variant="caption" sx={{ fontWeight: '900', lineHeight: 1 }}>AI</Typography>
+            </Stack>
+          )}
+        </Fab>
+      </Tooltip>
 
+      {/* Cửa sổ Chat */}
       {isOpen && (
         <Paper
           elevation={6}
@@ -92,19 +129,41 @@ export default function Chatbot() {
             bottom: 90,
             right: 20,
             width: 350,
-            height: 450,
+            height: 480, // Tăng chiều cao một chút cho thoáng
             display: "flex",
             flexDirection: "column",
-            borderRadius: 2,
+            borderRadius: 3,
             zIndex: 9999,
             overflow: "hidden",
             border: "1px solid #ccc",
           }}
         >
-          <Box sx={{ p: 2, bgcolor: "#ff9966", color: "white" }}>
-            <Typography variant="h6" fontSize={16} fontWeight="bold">Hỗ trợ khách hàng</Typography>
+          {/* HEADER CHATBOT */}
+          <Box 
+            sx={{ 
+              p: 2, 
+              bgcolor: "#ff9966", 
+              color: "white", 
+              display: "flex", 
+              alignItems: "center",
+              gap: 1.5,
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            }}
+          >
+            <Avatar sx={{ bgcolor: "white", color: "#ff9966" }}>
+                <SmartToyIcon />
+            </Avatar>
+            <Box>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Chatbot Hỗ trợ
+                </Typography>
+                <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                  Trợ lý AI trực tuyến
+                </Typography>
+            </Box>
           </Box>
 
+          {/* NỘI DUNG CHAT */}
           <Box sx={{ flex: 1, p: 2, overflowY: "auto", bgcolor: "#f5f5f5" }}>
             {messages.map((msg) => (
               <Box
@@ -112,39 +171,75 @@ export default function Chatbot() {
                 sx={{
                   display: "flex",
                   justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
-                  mb: 1,
+                  mb: 1.5,
                 }}
               >
+                {/* Avatar nhỏ cho Bot trong tin nhắn */}
+                {msg.sender === "bot" && (
+                    <Avatar 
+                        sx={{ width: 28, height: 28, mr: 1, bgcolor: "#ff9966" }}
+                    >
+                        <SmartToyIcon sx={{ fontSize: 16 }} />
+                    </Avatar>
+                )}
+
                 <Box
                   sx={{
                     maxWidth: "75%",
-                    p: 1,
+                    p: 1.5,
                     borderRadius: 2,
                     bgcolor: msg.sender === "user" ? "#ff9966" : "white",
                     color: msg.sender === "user" ? "white" : "black",
                     boxShadow: 1,
-                    fontSize: "0.9rem"
+                    fontSize: "0.9rem",
+                    borderTopLeftRadius: msg.sender === "bot" ? 0 : 2,
+                    borderTopRightRadius: msg.sender === "user" ? 0 : 2,
                   }}
                 >
                   {msg.text}
                 </Box>
               </Box>
             ))}
-            {loading && <CircularProgress size={20} />}
+            
+            {/* Loading Indicator */}
+            {loading && (
+                <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 1, ml: 4 }}>
+                    <Box sx={{ p: 1, bgcolor: "white", borderRadius: 2, boxShadow: 1 }}>
+                        <CircularProgress size={16} sx={{ color: "#ff9966" }} />
+                        <Typography variant="caption" sx={{ ml: 1, color: "gray" }}>AI đang trả lời...</Typography>
+                    </Box>
+                </Box>
+            )}
             <div ref={messagesEndRef} />
           </Box>
 
-          <Box sx={{ p: 1, display: "flex", bgcolor: "white", borderTop: "1px solid #eee" }}>
+          {/* INPUT CHAT */}
+          <Box sx={{ p: 1.5, display: "flex", bgcolor: "white", borderTop: "1px solid #eee", gap: 1 }}>
             <TextField
               fullWidth
               size="small"
-              placeholder="Nhập tin nhắn..."
+              placeholder="Nhập câu hỏi của bạn..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSend()}
               disabled={loading}
+              sx={{ 
+                "& .MuiOutlinedInput-root": {
+                    borderRadius: "20px",
+                    bgcolor: "#f9f9f9"
+                }
+              }}
             />
-            <IconButton color="primary" onClick={handleSend} disabled={!input.trim() || loading}>
+            <IconButton 
+                color="primary" 
+                onClick={handleSend} 
+                disabled={!input.trim() || loading}
+                sx={{ 
+                    bgcolor: input.trim() ? "#ff9966" : "transparent", 
+                    color: input.trim() ? "white" : "gray",
+                    "&:hover": { bgcolor: "#e68a5c" }
+                }}
+            >
               <SendIcon />
             </IconButton>
           </Box>
